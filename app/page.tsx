@@ -12,7 +12,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Play, Sparkles, TrendingUp, Trophy, Zap, ChevronRight, Star } from "lucide-react";
+import { Play, Sparkles, TrendingUp, Trophy, Zap, ChevronRight, Star, Heart, Github } from "lucide-react";
 import { aiCoaches } from "@/components/data/coaches";
 
 export default function HomePage() {
@@ -270,6 +270,56 @@ export default function HomePage() {
                 {feature}
               </span>
             ))}
+          </div>
+
+          {/* MVP Support Banner */}
+          <div className={`mt-12 sm:mt-16 transition-all duration-1000 delay-900 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+            <div className="relative bg-gradient-to-r from-primary/5 via-accent/5 to-secondary/5 rounded-2xl p-6 sm:p-8 border border-border/30 backdrop-blur">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                <span className="px-4 py-1 bg-accent text-accent-foreground text-xs font-bold rounded-full shadow-lg">
+                  ✨ MVP Preview
+                </span>
+              </div>
+              
+              <div className="text-center space-y-4">
+                <h3 className="text-lg sm:text-xl font-serif font-bold text-foreground">
+                  Love what we&apos;re building? 💜
+                </h3>
+                <p className="text-sm sm:text-base text-muted-foreground max-w-xl mx-auto">
+                  This is an early MVP built for the AWS AI Hackathon 2025! We&apos;re on a mission to make 
+                  financial literacy fun and accessible for every teen. Your support helps us keep building!
+                </p>
+                
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+                  <a
+                    href="https://github.com/sponsors/nuvcai"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105"
+                  >
+                    <Heart className="h-5 w-5 group-hover:animate-pulse" />
+                    Become a Sponsor
+                  </a>
+                  <a
+                    href="https://github.com/nuvcai/MiniFi"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-card hover:bg-muted border border-border rounded-xl font-medium text-foreground transition-all hover:scale-105"
+                  >
+                    <Github className="h-5 w-5" />
+                    Star on GitHub ⭐
+                  </a>
+                </div>
+
+                <p className="text-xs text-muted-foreground pt-2">
+                  Made with 💜 by{" "}
+                  <a href="https://nuvc.ai" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                    NUVC.AI
+                  </a>
+                  {" "}× Tick.AI for teens everywhere
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
