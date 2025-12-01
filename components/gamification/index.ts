@@ -4,8 +4,16 @@
  * Export all gamification-related components and utilities.
  */
 
+// Loss Aversion Components
 export { RiskPreviewCard } from "./RiskPreviewCard";
 export { CourageXpNotification, MiniCourageXp } from "./CourageXpNotification";
+
+// Quick Win Components
+export { LevelUpCelebration, levelTitles } from "./LevelUpCelebration";
+export { XpProgressBar, XpBadge } from "./XpProgressBar";
+export { DailyStreak, StreakBadge } from "./DailyStreak";
+
+// Effort Rewards Data & Utilities
 export {
   courageRewards,
   effortBadges,

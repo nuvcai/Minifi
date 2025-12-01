@@ -19,6 +19,7 @@ import { EventDetailModal } from "@/components/modals/EventDetailModal";
 import { MissionModal } from "@/components/modals/MissionModal";
 import { SummaryModal } from "@/components/modals/SummaryModal";
 import { RewardsModal } from "@/components/modals/RewardsModal";
+import { LevelUpCelebration } from "@/components/gamification/LevelUpCelebration";
 
 // Import data
 import { financialEvents, FinancialEvent } from "@/components/data/events";
@@ -43,6 +44,10 @@ export default function TimelinePage() {
   const [competitionUnlocked, setCompetitionUnlocked] = useState(false);
   const [showRewardsStore, setShowRewardsStore] = useState(false);
   const [redeemedRewards, setRedeemedRewards] = useState<string[]>([]);
+  
+  // Level up celebration state
+  const [showLevelUp, setShowLevelUp] = useState(false);
+  const [levelUpInfo, setLevelUpInfo] = useState({ newLevel: 1, previousLevel: 0 });
 
   // Mission game state management
   const [missionStep, setMissionStep] = useState<
@@ -174,10 +179,13 @@ export default function TimelinePage() {
         updateUnlockStatus();
       }
 
-      // Level up logic
+      // Level up logic with celebration
       const newLevel = Math.floor((playerXP + missionReward) / 1000) + 1;
       if (newLevel > playerLevel) {
+        setLevelUpInfo({ newLevel, previousLevel: playerLevel });
         setPlayerLevel(newLevel);
+        // Show celebration after a short delay
+        setTimeout(() => setShowLevelUp(true), 500);
       }
 
       // Check if competition is unlocked (when specific event completed)
@@ -212,6 +220,12 @@ export default function TimelinePage() {
     setTotalScore((prev) => prev + amount);
   };
 
+  // Handle daily streak bonus
+  const handleStreakBonus = (bonus: number) => {
+    setPlayerXP((prev) => prev + bonus);
+    setTotalScore((prev) => prev + bonus);
+  };
+
   const closeMissionModal = () => {
     setGameStarted(false);
     setMissionEvent(null);
@@ -225,7 +239,7 @@ export default function TimelinePage() {
     : null;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950">
       <GameHeader
         playerLevel={playerLevel}
         playerXP={playerXP}
@@ -245,10 +259,12 @@ export default function TimelinePage() {
 
             <ProgressCard
               playerXP={playerXP}
+              playerLevel={playerLevel}
               completedCount={financialEvents.filter((e) => e.completed).length}
               availableCount={
                 financialEvents.filter((e) => e.unlocked && !e.completed).length
               }
+              onStreakBonusClaimed={handleStreakBonus}
             />
           </div>
 
@@ -312,6 +328,14 @@ export default function TimelinePage() {
         playerXP={playerXP}
         redeemedRewards={redeemedRewards}
         onRedeemReward={redeemReward}
+      />
+
+      {/* Level Up Celebration */}
+      <LevelUpCelebration
+        open={showLevelUp}
+        newLevel={levelUpInfo.newLevel}
+        previousLevel={levelUpInfo.previousLevel}
+        onClose={() => setShowLevelUp(false)}
       />
     </div>
   );
