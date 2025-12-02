@@ -148,34 +148,22 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const userSegment = determineUserSegment(body);
 
     // ==========================================================================
-    // 4. DISCORD NOTIFICATION (Optional)
+    // 4. WHATSAPP NOTIFICATION (Admin Alert)
     // ==========================================================================
-    if (process.env.DISCORD_WEBHOOK_URL) {
-      try {
-        await fetch(process.env.DISCORD_WEBHOOK_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            embeds: [{
-              title: '🎯 New User Onboarded!',
-              color: 0x10b981,
-              fields: [
-                { name: 'Age Range', value: body.ageRange, inline: true },
-                { name: 'Personality', value: `${body.riskPersonality} (${body.riskScore}%)`, inline: true },
-                { name: 'Coach', value: body.selectedCoach, inline: true },
-                { name: 'Learning Style', value: body.learningStyle, inline: true },
-                { name: 'Session Length', value: body.preferredSessionLength, inline: true },
-                { name: 'Marketing Consent', value: body.marketingConsent ? '✅ Yes' : '❌ No', inline: true },
-                { name: 'Source', value: body.utm_source || body.source || 'direct', inline: true },
-                { name: 'Saved to DB', value: profileResult.success ? '✅' : '❌', inline: true }
-              ],
-              timestamp: new Date().toISOString()
-            }]
-          }),
-        });
-      } catch (webhookError) {
-        console.warn('Discord webhook failed:', webhookError);
-      }
+    try {
+      const { whatsappNotify } = await import('@/lib/marketing-stack');
+      await whatsappNotify.send(
+        whatsappNotify.templates.newOnboarding({
+          ageRange: body.ageRange,
+          riskPersonality: body.riskPersonality,
+          riskScore: body.riskScore,
+          selectedCoach: body.selectedCoach,
+          learningStyle: body.learningStyle,
+          source: body.utm_source || body.source || 'direct'
+        })
+      );
+    } catch (notifyError) {
+      console.warn('WhatsApp notification failed:', notifyError);
     }
 
     return NextResponse.json({

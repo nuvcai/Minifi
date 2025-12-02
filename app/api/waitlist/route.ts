@@ -99,28 +99,14 @@ export async function POST(request: NextRequest): Promise<NextResponse<WaitlistR
         subscribed_at: new Date().toISOString()
       }, { onConflict: 'email' });
 
-    // Discord notification
-    if (process.env.DISCORD_WEBHOOK_URL) {
-      try {
-        await fetch(process.env.DISCORD_WEBHOOK_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            embeds: [{
-              title: '🎯 New Waitlist Signup!',
-              color: 0x9b59b6,
-              fields: [
-                { name: 'Email', value: normalizedEmail, inline: true },
-                { name: 'Feature', value: feature, inline: true },
-                { name: 'Position', value: `#${count || 1}`, inline: true }
-              ],
-              timestamp: new Date().toISOString()
-            }]
-          }),
-        });
-      } catch (webhookError) {
-        log.warn('Discord webhook failed', { error: webhookError });
-      }
+    // WhatsApp notification to admin
+    try {
+      const { whatsappNotify } = await import('@/lib/marketing-stack');
+      await whatsappNotify.send(
+        whatsappNotify.templates.newWaitlist(normalizedEmail, feature)
+      );
+    } catch (notifyError) {
+      log.warn('WhatsApp notification failed', { error: notifyError });
     }
 
     log.info('New waitlist signup', { email: normalizedEmail, feature });

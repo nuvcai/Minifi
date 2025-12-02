@@ -69,28 +69,14 @@ export async function POST(request: NextRequest): Promise<NextResponse<Subscribe
       source: source || 'website'
     });
 
-    // Send Discord notification if configured
-    if (process.env.DISCORD_WEBHOOK_URL) {
-      try {
-        await fetch(process.env.DISCORD_WEBHOOK_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            embeds: [{
-              title: '📧 New Newsletter Subscriber!',
-              color: 0x00ff88,
-              fields: [
-                { name: 'Email', value: normalizedEmail, inline: true },
-                { name: 'Name', value: firstName || 'Not provided', inline: true },
-                { name: 'Source', value: source || 'website', inline: true }
-              ],
-              timestamp: new Date().toISOString()
-            }]
-          }),
-        });
-      } catch (webhookError) {
-        log.warn('Discord webhook failed', { error: webhookError });
-      }
+    // Send WhatsApp notification to admin
+    try {
+      const { whatsappNotify } = await import('@/lib/marketing-stack');
+      await whatsappNotify.send(
+        whatsappNotify.templates.newSubscriber(normalizedEmail, source || 'website')
+      );
+    } catch (notifyError) {
+      log.warn('WhatsApp notification failed', { error: notifyError });
     }
 
     log.info('New subscriber', { 

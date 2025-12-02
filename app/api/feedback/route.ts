@@ -51,44 +51,14 @@ export async function POST(request: NextRequest): Promise<NextResponse<FeedbackR
       );
     }
 
-    // Send Discord notification if configured
-    if (process.env.DISCORD_FEEDBACK_WEBHOOK || process.env.DISCORD_WEBHOOK_URL) {
-      const webhookUrl = process.env.DISCORD_FEEDBACK_WEBHOOK || process.env.DISCORD_WEBHOOK_URL;
-      const typeEmojis: Record<string, string> = {
-        love: '💖',
-        idea: '💡',
-        issue: '🐛',
-        general: '💬'
-      };
-      const typeColors: Record<string, number> = {
-        love: 0xff69b4,
-        idea: 0xffa500,
-        issue: 0xff4444,
-        general: 0x00bfff
-      };
-
-      try {
-        await fetch(webhookUrl!, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            embeds: [{
-              title: `${typeEmojis[type]} New ${type.charAt(0).toUpperCase() + type.slice(1)} Feedback`,
-              description: message.length > 500 ? message.substring(0, 500) + '...' : message,
-              color: typeColors[type],
-              fields: [
-                { name: 'Rating', value: rating ? '⭐'.repeat(rating) : 'N/A', inline: true },
-                { name: 'Page', value: pageContext || 'Unknown', inline: true },
-                { name: 'ID', value: result.id || 'N/A', inline: true }
-              ],
-              timestamp: new Date().toISOString(),
-              footer: { text: 'Legacy Guardians Feedback' }
-            }]
-          }),
-        });
-      } catch (webhookError) {
-        log.warn('Discord webhook failed', { error: webhookError });
-      }
+    // Send WhatsApp notification to admin
+    try {
+      const { whatsappNotify } = await import('@/lib/marketing-stack');
+      await whatsappNotify.send(
+        whatsappNotify.templates.newFeedback(type, message, rating)
+      );
+    } catch (notifyError) {
+      log.warn('WhatsApp notification failed', { error: notifyError });
     }
 
     log.info('New feedback received', { 

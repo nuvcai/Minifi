@@ -437,7 +437,7 @@ export const contentDistribution = {
     });
 
     // Format for Medium
-    const mediumPost = medium.formatPost({
+    const mediumResult = medium.formatPost({
       title: content.title,
       sections: [
         { body: content.body }
@@ -453,7 +453,10 @@ export const contentDistribution = {
 
     return {
       substackPost,
-      mediumPost,
+      mediumPost: {
+        markdown: mediumResult.markdown,
+        tags: mediumResult.recommendedTags
+      },
       whatsappShare
     };
   },
@@ -472,11 +475,135 @@ export const contentDistribution = {
 };
 
 // =============================================================================
+// WHATSAPP NOTIFICATIONS (Admin Alerts)
+// =============================================================================
+
+/**
+ * WhatsApp notification system for admin alerts
+ * Uses Twilio WhatsApp API or generates click-to-send links
+ */
+export const whatsappNotify = {
+  /**
+   * Check if Twilio WhatsApp is configured
+   */
+  isConfigured(): boolean {
+    return !!(
+      process.env.TWILIO_ACCOUNT_SID &&
+      process.env.TWILIO_AUTH_TOKEN &&
+      process.env.TWILIO_WHATSAPP_FROM &&
+      process.env.ADMIN_WHATSAPP_NUMBER
+    );
+  },
+
+  /**
+   * Send WhatsApp notification via Twilio
+   */
+  async send(message: string): Promise<{ success: boolean; error?: string }> {
+    const adminNumber = process.env.ADMIN_WHATSAPP_NUMBER;
+    
+    if (!this.isConfigured()) {
+      // Log for dev mode - generate click link instead
+      const shareLink = whatsapp.directLink(adminNumber || '0', message);
+      console.log('📱 [WhatsApp Alert]:', message);
+      console.log('🔗 Manual send link:', shareLink);
+      return { success: true };
+    }
+
+    try {
+      const accountSid = process.env.TWILIO_ACCOUNT_SID;
+      const authToken = process.env.TWILIO_AUTH_TOKEN;
+      const fromNumber = process.env.TWILIO_WHATSAPP_FROM; // e.g., 'whatsapp:+14155238886'
+
+      const response = await fetch(
+        `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Basic ' + Buffer.from(`${accountSid}:${authToken}`).toString('base64'),
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({
+            From: fromNumber!.startsWith('whatsapp:') ? fromNumber! : `whatsapp:${fromNumber}`,
+            To: adminNumber!.startsWith('whatsapp:') ? adminNumber! : `whatsapp:${adminNumber}`,
+            Body: message,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        console.error('WhatsApp send failed:', error);
+        return { success: false, error: error.message };
+      }
+
+      return { success: true };
+    } catch (error) {
+      console.error('WhatsApp notification error:', error);
+      return { success: false, error: String(error) };
+    }
+  },
+
+  /**
+   * Pre-built notification templates
+   */
+  templates: {
+    newSubscriber: (email: string, source: string) => 
+      `📧 *New Subscriber!*\n\n` +
+      `Email: ${email}\n` +
+      `Source: ${source}\n` +
+      `Time: ${new Date().toLocaleString()}`,
+
+    newOnboarding: (data: {
+      ageRange: string;
+      riskPersonality: string;
+      riskScore: number;
+      selectedCoach: string;
+      learningStyle: string;
+      source: string;
+    }) =>
+      `🎯 *New User Onboarded!*\n\n` +
+      `Age: ${data.ageRange}\n` +
+      `Personality: ${data.riskPersonality} (${data.riskScore}%)\n` +
+      `Coach: ${data.selectedCoach}\n` +
+      `Learning: ${data.learningStyle}\n` +
+      `Source: ${data.source}\n` +
+      `Time: ${new Date().toLocaleString()}`,
+
+    newFeedback: (type: string, message: string, rating?: number) =>
+      `💬 *New Feedback!*\n\n` +
+      `Type: ${type}\n` +
+      (rating ? `Rating: ${'⭐'.repeat(rating)}\n` : '') +
+      `Message: ${message.substring(0, 200)}${message.length > 200 ? '...' : ''}\n` +
+      `Time: ${new Date().toLocaleString()}`,
+
+    newWaitlist: (email: string, feature: string) =>
+      `📝 *Waitlist Signup!*\n\n` +
+      `Email: ${email}\n` +
+      `Feature: ${feature}\n` +
+      `Time: ${new Date().toLocaleString()}`,
+
+    newsletterSent: (title: string, recipientCount: number) =>
+      `📰 *Newsletter Sent!*\n\n` +
+      `Title: ${title}\n` +
+      `Recipients: ${recipientCount}\n` +
+      `Time: ${new Date().toLocaleString()}`,
+
+    dailyStats: (stats: { subscribers: number; onboarded: number; feedback: number }) =>
+      `📊 *Daily Stats*\n\n` +
+      `Subscribers: ${stats.subscribers}\n` +
+      `Onboarded: ${stats.onboarded}\n` +
+      `Feedback: ${stats.feedback}\n` +
+      `Date: ${new Date().toLocaleDateString()}`,
+  }
+};
+
+// =============================================================================
 // EXPORT
 // =============================================================================
 
 export default {
   whatsapp,
+  whatsappNotify,
   substack,
   medium,
   resend,

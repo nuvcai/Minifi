@@ -319,24 +319,14 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         }
       }
 
-      // Discord notification
-      if (process.env.DISCORD_WEBHOOK_URL) {
-        await fetch(process.env.DISCORD_WEBHOOK_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            embeds: [{
-              title: '📧 Newsletter Sent!',
-              color: 0x10b981,
-              fields: [
-                { name: 'Title', value: edition.title, inline: true },
-                { name: 'Recipients', value: sent.toString(), inline: true },
-                { name: 'Type', value: type, inline: true }
-              ],
-              timestamp: new Date().toISOString()
-            }]
-          })
-        });
+      // WhatsApp notification to admin
+      try {
+        const { whatsappNotify } = await import('@/lib/marketing-stack');
+        await whatsappNotify.send(
+          whatsappNotify.templates.newsletterSent(edition.title, sent)
+        );
+      } catch (notifyError) {
+        console.warn('WhatsApp notification failed:', notifyError);
       }
 
       return NextResponse.json({

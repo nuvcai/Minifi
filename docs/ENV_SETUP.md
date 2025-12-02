@@ -27,15 +27,21 @@ SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ADMIN_API_KEY=your-secure-admin-key-here
 
 # =============================================================================
-# DISCORD WEBHOOKS - Real-time notifications (optional but recommended)
-# Create webhooks: Server Settings > Integrations > Webhooks
+# WHATSAPP NOTIFICATIONS - Real-time admin alerts (optional but recommended)
+# Uses Twilio WhatsApp API: https://www.twilio.com/docs/whatsapp
 # =============================================================================
 
-# General notifications (new subscribers, etc.)
-DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/...
+# Twilio Account SID (from Twilio Console)
+TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-# Feedback-specific channel (optional)
-DISCORD_FEEDBACK_WEBHOOK=https://discord.com/api/webhooks/...
+# Twilio Auth Token (from Twilio Console)
+TWILIO_AUTH_TOKEN=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+# Twilio WhatsApp Number (e.g., whatsapp:+14155238886 for sandbox)
+TWILIO_WHATSAPP_FROM=whatsapp:+14155238886
+
+# Your admin WhatsApp number to receive notifications (with country code)
+ADMIN_WHATSAPP_NUMBER=+61412345678
 ```
 
 ---
