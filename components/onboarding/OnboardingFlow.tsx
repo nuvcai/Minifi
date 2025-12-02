@@ -254,7 +254,7 @@ export function OnboardingFlow({ onComplete, onSkip, source = "app" }: Onboardin
       exit={{ opacity: 0, y: -20 }}
       className="text-center space-y-6"
     >
-      <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 mb-4">
+      <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-linear-to-br from-emerald-500 to-teal-500 mb-4">
         <Sparkles className="h-10 w-10 text-white" />
       </div>
       
@@ -312,7 +312,7 @@ export function OnboardingFlow({ onComplete, onSkip, source = "app" }: Onboardin
       className="space-y-6"
     >
       <div className="text-center">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-amber-500 to-orange-500 mb-4">
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-linear-to-br from-amber-500 to-orange-500 mb-4">
           <Wallet className="h-8 w-8 text-white" />
         </div>
         <h2 className="text-xl font-bold text-white">About Your Money Experience</h2>
@@ -383,7 +383,7 @@ export function OnboardingFlow({ onComplete, onSkip, source = "app" }: Onboardin
         className="space-y-6"
       >
         <div className="text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 mb-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-linear-to-br from-purple-500 to-pink-500 mb-4">
             <Brain className="h-8 w-8 text-white" />
           </div>
           <h2 className="text-xl font-bold text-white">Your Investor Personality</h2>
@@ -462,7 +462,7 @@ export function OnboardingFlow({ onComplete, onSkip, source = "app" }: Onboardin
       className="space-y-6"
     >
       <div className="text-center">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 mb-4">
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-linear-to-br from-blue-500 to-cyan-500 mb-4">
           <GraduationCap className="h-8 w-8 text-white" />
         </div>
         <h2 className="text-xl font-bold text-white">How You Learn Best</h2>
@@ -548,7 +548,7 @@ export function OnboardingFlow({ onComplete, onSkip, source = "app" }: Onboardin
         className="space-y-6"
       >
         {/* Risk Profile Result */}
-        <div className="text-center p-6 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30">
+        <div className="text-center p-6 rounded-xl bg-linear-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30">
           <span className="text-4xl">{personalityInfo.emoji}</span>
           <h3 className="text-xl font-bold text-white mt-2">{personalityInfo.title}</h3>
           <p className="text-slate-300 text-sm">{personalityInfo.desc}</p>
@@ -636,7 +636,7 @@ export function OnboardingFlow({ onComplete, onSkip, source = "app" }: Onboardin
           <Button 
             onClick={handleComplete}
             disabled={!data.termsAccepted}
-            className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600"
+            className="bg-linear-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600"
           >
             <Sparkles className="h-4 w-4 mr-2" />
             Start My Journey!
@@ -659,13 +659,13 @@ export function OnboardingFlow({ onComplete, onSkip, source = "app" }: Onboardin
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-linear-to-br from-slate-950 via-slate-900 to-emerald-950 flex items-center justify-center p-4">
       <div className="w-full max-w-lg">
         {/* Progress bar */}
         <div className="mb-8">
           <div className="h-1 bg-slate-800 rounded-full overflow-hidden">
             <motion.div
-              className="h-full bg-gradient-to-r from-emerald-500 to-teal-500"
+              className="h-full bg-linear-to-r from-emerald-500 to-teal-500"
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
               transition={{ duration: 0.3 }}
@@ -688,4 +688,5 @@ export function OnboardingFlow({ onComplete, onSkip, source = "app" }: Onboardin
 }
 
 export default OnboardingFlow;
+
 

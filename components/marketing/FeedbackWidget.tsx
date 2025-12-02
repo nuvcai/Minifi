@@ -167,7 +167,7 @@ export function FeedbackWidget({
           className={`
             fixed bottom-6 right-6 z-50
             p-4 rounded-full shadow-2xl
-            bg-gradient-to-r from-purple-500 to-pink-500
+            bg-linear-to-r from-purple-500 to-pink-500
             hover:from-purple-600 hover:to-pink-600
             text-white transition-all duration-300
             hover:scale-110 active:scale-95
@@ -185,7 +185,7 @@ export function FeedbackWidget({
           <div className="fixed bottom-6 right-6 z-50 w-80 animate-in slide-in-from-bottom-4 duration-300">
             <div className="bg-slate-900 rounded-2xl border border-slate-700 shadow-2xl overflow-hidden">
               {/* Header */}
-              <div className="flex items-center justify-between p-4 border-b border-slate-700/50 bg-gradient-to-r from-purple-500/10 to-pink-500/10">
+              <div className="flex items-center justify-between p-4 border-b border-slate-700/50 bg-linear-to-r from-purple-500/10 to-pink-500/10">
                 <div className="flex items-center gap-2">
                   <Sparkles className="h-5 w-5 text-purple-400" />
                   <span className="font-semibold text-slate-100">Share Feedback</span>
@@ -220,7 +220,7 @@ export function FeedbackWidget({
                             onClick={() => setSelectedType(option.type)}
                             className="w-full flex items-center gap-3 p-3 rounded-xl bg-slate-800/50 border border-slate-700/50 hover:border-purple-500/30 hover:bg-slate-800 transition-all group"
                           >
-                            <div className={`p-2 rounded-lg bg-gradient-to-br ${option.color} text-white`}>
+                            <div className={`p-2 rounded-lg bg-linear-to-br ${option.color} text-white`}>
                               {option.icon}
                             </div>
                             <span className="font-medium text-slate-200 group-hover:text-white">
@@ -234,7 +234,7 @@ export function FeedbackWidget({
                       <div className="space-y-3">
                         {/* Selected type badge */}
                         <div className="flex items-center justify-between">
-                          <Badge className={`bg-gradient-to-r ${selectedOption?.color} text-white border-0`}>
+                          <Badge className={`bg-linear-to-r ${selectedOption?.color} text-white border-0`}>
                             {selectedOption?.emoji} {selectedOption?.label}
                           </Badge>
                           <button
@@ -279,7 +279,7 @@ export function FeedbackWidget({
                         <Button
                           onClick={handleSubmit}
                           disabled={!message.trim() || status === "loading"}
-                          className={`w-full bg-gradient-to-r ${selectedOption?.color} text-white hover:opacity-90`}
+                          className={`w-full bg-linear-to-r ${selectedOption?.color} text-white hover:opacity-90`}
                         >
                           {status === "loading" ? (
                             <Loader2 className="h-4 w-4 animate-spin mr-2" />
@@ -371,7 +371,7 @@ export function FeedbackWidget({
   // Full inline variant
   return (
     <div className={`${className}`}>
-      <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 rounded-2xl p-6 border border-slate-700/50">
+      <div className="bg-linear-to-br from-slate-800/80 to-slate-900/80 rounded-2xl p-6 border border-slate-700/50">
         {status === "success" ? (
           <div className="text-center py-8">
             <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto mb-4">
@@ -384,7 +384,7 @@ export function FeedbackWidget({
           <>
             {/* Header */}
             <div className="flex items-center gap-3 mb-6">
-              <div className="p-2 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500">
+              <div className="p-2 rounded-xl bg-linear-to-br from-purple-500 to-pink-500">
                 <MessageSquare className="h-5 w-5 text-white" />
               </div>
               <div>
@@ -402,7 +402,7 @@ export function FeedbackWidget({
                   className={`
                     p-4 rounded-xl border transition-all
                     ${selectedType === option.type 
-                      ? `bg-gradient-to-br ${option.color} border-transparent text-white` 
+                      ? `bg-linear-to-br ${option.color} border-transparent text-white` 
                       : 'bg-slate-800/50 border-slate-700/50 hover:border-slate-600 text-slate-300'
                     }
                   `}
@@ -430,7 +430,7 @@ export function FeedbackWidget({
                           className={`
                             p-3 rounded-xl transition-all
                             ${rating === reaction.value 
-                              ? 'bg-gradient-to-br from-pink-500/20 to-purple-500/20 scale-110 border border-pink-500/30' 
+                              ? 'bg-linear-to-br from-pink-500/20 to-purple-500/20 scale-110 border border-pink-500/30' 
                               : 'bg-slate-800/50 hover:bg-slate-800 border border-slate-700/50'
                             }
                           `}
@@ -453,7 +453,7 @@ export function FeedbackWidget({
                 <Button
                   onClick={handleSubmit}
                   disabled={!message.trim() || status === "loading"}
-                  className={`w-full bg-gradient-to-r ${selectedOption?.color} hover:opacity-90 text-white py-6 text-lg font-semibold rounded-xl`}
+                  className={`w-full bg-linear-to-r ${selectedOption?.color} hover:opacity-90 text-white py-6 text-lg font-semibold rounded-xl`}
                 >
                   {status === "loading" ? (
                     <Loader2 className="h-5 w-5 animate-spin mr-2" />

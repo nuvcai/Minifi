@@ -21,35 +21,35 @@ interface WisdomCardProps {
 
 const categoryStyles = {
   pillar: {
-    bg: "bg-gradient-to-br from-amber-50 to-orange-50",
+    bg: "bg-linear-to-br from-amber-50 to-orange-50",
     border: "border-amber-200",
     badge: "bg-amber-100 text-amber-800",
     icon: <Star className="h-5 w-5 text-amber-600" />,
     label: "Wealth Pillar"
   },
   era: {
-    bg: "bg-gradient-to-br from-blue-50 to-indigo-50",
+    bg: "bg-linear-to-br from-blue-50 to-indigo-50",
     border: "border-blue-200",
     badge: "bg-blue-100 text-blue-800",
     icon: <TrendingUp className="h-5 w-5 text-blue-600" />,
     label: "Wealth Era"
   },
   investor: {
-    bg: "bg-gradient-to-br from-purple-50 to-pink-50",
+    bg: "bg-linear-to-br from-purple-50 to-pink-50",
     border: "border-purple-200",
     badge: "bg-purple-100 text-purple-800",
     icon: <BookOpen className="h-5 w-5 text-purple-600" />,
     label: "Investor Wisdom"
   },
   principle: {
-    bg: "bg-gradient-to-br from-emerald-50 to-teal-50",
+    bg: "bg-linear-to-br from-emerald-50 to-teal-50",
     border: "border-emerald-200",
     badge: "bg-emerald-100 text-emerald-800",
     icon: <Lightbulb className="h-5 w-5 text-emerald-600" />,
     label: "FO Principle"
   },
   hope: {
-    bg: "bg-gradient-to-br from-rose-50 to-orange-50",
+    bg: "bg-linear-to-br from-rose-50 to-orange-50",
     border: "border-rose-200",
     badge: "bg-rose-100 text-rose-800",
     icon: <Star className="h-5 w-5 text-rose-600" />,
@@ -164,4 +164,5 @@ export function WisdomCard({
 }
 
 export default WisdomCard;
+
 

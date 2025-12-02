@@ -80,8 +80,8 @@ export function RoadmapTeaser({
   if (variant === "banner") {
     return (
       <div className={`relative overflow-hidden rounded-xl ${className}`}>
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-900/50 via-violet-900/50 to-pink-900/50" />
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(139,92,246,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(139,92,246,0.1)_1px,transparent_1px)] bg-[size:20px_20px]" />
+        <div className="absolute inset-0 bg-linear-to-r from-purple-900/50 via-violet-900/50 to-pink-900/50" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(139,92,246,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(139,92,246,0.1)_1px,transparent_1px)] bg-size-[20px_20px]" />
         
         <div className="relative p-4 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -126,7 +126,7 @@ export function RoadmapTeaser({
       <div className={`${className}`}>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <div className="p-1.5 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500">
+            <div className="p-1.5 rounded-lg bg-linear-to-br from-purple-500 to-pink-500">
               <Rocket className="h-4 w-4 text-white" />
             </div>
             <div>
@@ -149,14 +149,14 @@ export function RoadmapTeaser({
             >
               <div className={`
                 relative p-3 rounded-xl border border-slate-700/50 
-                bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur
+                bg-linear-to-br from-slate-800/80 to-slate-900/80 backdrop-blur
                 hover:border-purple-500/30 transition-all duration-300
                 ${hoveredFeature === feature.id ? 'scale-[1.02]' : ''}
               `}>
                 {/* Glow effect */}
                 <div className={`
                   absolute inset-0 rounded-xl opacity-0 group-hover:opacity-20 
-                  transition-opacity duration-300 bg-gradient-to-br ${STATUS_COLORS[feature.status]}
+                  transition-opacity duration-300 bg-linear-to-br ${STATUS_COLORS[feature.status]}
                 `} />
                 
                 <div className="relative">
@@ -178,7 +178,7 @@ export function RoadmapTeaser({
                       {feature.eta}
                     </div>
                     <Badge 
-                      className={`text-[8px] px-1.5 py-0.5 bg-gradient-to-r ${STATUS_COLORS[feature.status]} text-white border-0`}
+                      className={`text-[8px] px-1.5 py-0.5 bg-linear-to-r ${STATUS_COLORS[feature.status]} text-white border-0`}
                     >
                       {STATUS_LABELS[feature.status]}
                     </Badge>
@@ -190,9 +190,9 @@ export function RoadmapTeaser({
         </div>
 
         {showWisdomConnection && (
-          <div className="mt-4 p-3 rounded-lg bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20">
+          <div className="mt-4 p-3 rounded-lg bg-linear-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20">
             <div className="flex items-start gap-2">
-              <BookOpen className="h-4 w-4 text-amber-400 flex-shrink-0 mt-0.5" />
+              <BookOpen className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
               <div className="text-xs text-amber-300">
                 <span className="font-semibold">Built on Wealth Wisdom:</span>
                 <span className="text-amber-300/80 ml-1">
@@ -243,27 +243,27 @@ export function RoadmapTeaser({
           >
             <div className={`
               relative p-5 rounded-2xl border border-slate-700/50 
-              bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur
+              bg-linear-to-br from-slate-800/80 to-slate-900/80 backdrop-blur
               hover:border-purple-500/30 transition-all duration-300
             `}>
               {/* Animated background */}
               <div className={`
                 absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-10 
-                transition-opacity duration-300 bg-gradient-to-br ${STATUS_COLORS[feature.status]}
+                transition-opacity duration-300 bg-linear-to-br ${STATUS_COLORS[feature.status]}
               `} />
               
               <div className="relative flex gap-4">
                 {/* Icon and timeline */}
                 <div className="flex flex-col items-center">
                   <div className={`
-                    w-14 h-14 rounded-xl bg-gradient-to-br ${STATUS_COLORS[feature.status]}
+                    w-14 h-14 rounded-xl bg-linear-to-br ${STATUS_COLORS[feature.status]}
                     flex items-center justify-center text-2xl shadow-lg
                     group-hover:scale-110 transition-transform duration-300
                   `}>
                     {feature.icon}
                   </div>
                   {index < upcomingFeatures.length - 1 && (
-                    <div className="w-0.5 h-full bg-gradient-to-b from-purple-500/50 to-transparent mt-2" />
+                    <div className="w-0.5 h-full bg-linear-to-b from-purple-500/50 to-transparent mt-2" />
                   )}
                 </div>
                 
@@ -278,7 +278,7 @@ export function RoadmapTeaser({
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge 
-                        className={`text-xs bg-gradient-to-r ${STATUS_COLORS[feature.status]} text-white border-0`}
+                        className={`text-xs bg-linear-to-r ${STATUS_COLORS[feature.status]} text-white border-0`}
                       >
                         {STATUS_LABELS[feature.status]}
                       </Badge>
@@ -304,7 +304,7 @@ export function RoadmapTeaser({
                   {/* Teen benefit */}
                   <div className="p-3 rounded-lg bg-slate-900/50 border border-slate-700/50">
                     <div className="flex items-start gap-2">
-                      <Zap className="h-4 w-4 text-amber-400 flex-shrink-0 mt-0.5" />
+                      <Zap className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
                       <div>
                         <span className="text-xs text-amber-400 font-semibold">For Teens:</span>
                         <p className="text-xs text-slate-400 mt-0.5">{feature.benefitForTeens}</p>
@@ -315,7 +315,7 @@ export function RoadmapTeaser({
                   {/* Wisdom connection */}
                   {showWisdomConnection && (
                     <div className="mt-2 flex items-start gap-2 text-xs text-purple-400">
-                      <BookOpen className="h-3 w-3 flex-shrink-0 mt-0.5" />
+                      <BookOpen className="h-3 w-3 shrink-0 mt-0.5" />
                       <span>{feature.wisdomConnection}</span>
                     </div>
                   )}
@@ -329,7 +329,7 @@ export function RoadmapTeaser({
       {/* CTA */}
       <div className="mt-8 text-center">
         <div className="inline-flex flex-col sm:flex-row items-center gap-4">
-          <button className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold transition-all hover:scale-105 shadow-lg shadow-purple-500/25">
+          <button className="flex items-center gap-2 px-6 py-3 rounded-xl bg-linear-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold transition-all hover:scale-105 shadow-lg shadow-purple-500/25">
             <Star className="h-5 w-5" />
             Get Early Access
           </button>

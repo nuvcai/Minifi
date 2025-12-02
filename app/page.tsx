@@ -60,7 +60,7 @@ export default function HomePage() {
   const selectedCoach = aiCoaches[selectedCoachIndex];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 overflow-hidden">
+    <div className="min-h-screen bg-linear-to-br from-slate-950 via-slate-900 to-emerald-950 overflow-hidden">
       {/* Animated Background Elements */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-20 left-10 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl animate-pulse" />
@@ -74,7 +74,7 @@ export default function HomePage() {
         <div className="absolute bottom-1/4 right-1/3 text-4xl animate-bounce delay-700">💎</div>
         
         {/* Grid overlay */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(16,185,129,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.03)_1px,transparent_1px)] bg-[size:60px_60px]" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(16,185,129,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.03)_1px,transparent_1px)] bg-size-[60px_60px]" />
       </div>
 
       <div className="relative container mx-auto px-4 py-6 sm:py-8">
@@ -104,7 +104,7 @@ export default function HomePage() {
                 href="https://github.com/sponsors/nuvcai"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-pink-500/20 to-rose-500/20 hover:from-pink-500/30 hover:to-rose-500/30 text-pink-400 text-xs font-semibold rounded-full border border-pink-500/30 transition-all hover:scale-105"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-linear-to-r from-pink-500/20 to-rose-500/20 hover:from-pink-500/30 hover:to-rose-500/30 text-pink-400 text-xs font-semibold rounded-full border border-pink-500/30 transition-all hover:scale-105"
               >
                 <Heart className="h-3.5 w-3.5" />
                 <span className="hidden sm:inline">Sponsor</span>
@@ -128,7 +128,7 @@ export default function HomePage() {
             {/* Logo and Title */}
             <div className="flex flex-col items-center gap-3">
               <div className="relative">
-                <div className="absolute -inset-4 bg-gradient-to-r from-emerald-500/20 via-teal-500/20 to-cyan-500/20 rounded-full blur-xl animate-pulse" />
+                <div className="absolute -inset-4 bg-linear-to-r from-emerald-500/20 via-teal-500/20 to-cyan-500/20 rounded-full blur-xl animate-pulse" />
                 <Image
                   src="/favicon.png"
                   alt="Legacy Guardians"
@@ -137,7 +137,7 @@ export default function HomePage() {
                   className="relative object-contain w-20 h-20 sm:w-24 sm:h-24 drop-shadow-lg"
                 />
               </div>
-              <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent leading-tight">
+              <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black bg-linear-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent leading-tight">
                 Legacy Guardians
               </h1>
               <p className="text-xl sm:text-2xl font-medium text-slate-300 flex items-center gap-2">
@@ -166,7 +166,7 @@ export default function HomePage() {
 
           {/* NUVC Mission Section - Prominent */}
           <div className={`mt-8 transition-all duration-1000 delay-200 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            <div className="relative bg-gradient-to-br from-emerald-500/10 via-slate-800/50 to-teal-500/10 rounded-2xl p-6 sm:p-8 border border-emerald-500/20 backdrop-blur overflow-hidden">
+            <div className="relative bg-linear-to-br from-emerald-500/10 via-slate-800/50 to-teal-500/10 rounded-2xl p-6 sm:p-8 border border-emerald-500/20 backdrop-blur overflow-hidden">
               {/* Decorative elements */}
               <div className="absolute top-0 right-0 w-40 h-40 bg-emerald-500/10 rounded-full blur-3xl" />
               <div className="absolute bottom-0 left-0 w-32 h-32 bg-teal-500/10 rounded-full blur-3xl" />
@@ -230,7 +230,7 @@ export default function HomePage() {
               
               <div className="space-y-4">
                 <div className="flex items-start gap-4 p-3 rounded-xl bg-emerald-500/5 hover:bg-emerald-500/10 transition-colors group border border-emerald-500/10">
-                  <div className="flex-shrink-0 w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                  <div className="shrink-0 w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
                     🕹️
                   </div>
                   <div>
@@ -242,7 +242,7 @@ export default function HomePage() {
                 </div>
 
                 <div className="flex items-start gap-4 p-3 rounded-xl bg-teal-500/5 hover:bg-teal-500/10 transition-colors group border border-teal-500/10">
-                  <div className="flex-shrink-0 w-12 h-12 rounded-full bg-teal-500/20 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                  <div className="shrink-0 w-12 h-12 rounded-full bg-teal-500/20 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
                     🤖
                   </div>
                   <div>
@@ -254,7 +254,7 @@ export default function HomePage() {
                 </div>
 
                 <div className="flex items-start gap-4 p-3 rounded-xl bg-cyan-500/5 hover:bg-cyan-500/10 transition-colors group border border-cyan-500/10">
-                  <div className="flex-shrink-0 w-12 h-12 rounded-full bg-cyan-500/20 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                  <div className="shrink-0 w-12 h-12 rounded-full bg-cyan-500/20 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
                     💸
                   </div>
                   <div>
@@ -266,7 +266,7 @@ export default function HomePage() {
                 </div>
 
                 <div className="flex items-start gap-4 p-3 rounded-xl bg-amber-500/5 hover:bg-amber-500/10 transition-colors group border border-amber-500/10">
-                  <div className="flex-shrink-0 w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                  <div className="shrink-0 w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
                     🎁
                   </div>
                   <div>
@@ -287,11 +287,11 @@ export default function HomePage() {
               </h2>
 
               {/* Featured Coach */}
-              <div className="relative bg-gradient-to-br from-emerald-500/10 to-teal-500/10 rounded-xl p-6 mb-6 overflow-hidden border border-slate-700/50">
+              <div className="relative bg-linear-to-br from-emerald-500/10 to-teal-500/10 rounded-xl p-6 mb-6 overflow-hidden border border-slate-700/50">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-teal-500/10 rounded-full blur-2xl" />
                 <div className="relative flex items-center gap-4">
                   <div className="relative">
-                    <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full blur animate-pulse" />
+                    <div className="absolute -inset-1 bg-linear-to-r from-emerald-500 to-teal-500 rounded-full blur animate-pulse" />
                     <Image
                       src={selectedCoach.animatedAvatar}
                       alt={selectedCoach.name}
@@ -360,14 +360,14 @@ export default function HomePage() {
           {/* CTA Section */}
           <div className={`text-center mt-10 sm:mt-12 transition-all duration-1000 delay-500 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
             <Link href="/timeline">
-              <button className="group relative bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-500 bg-[length:200%_100%] hover:bg-right text-white text-lg sm:text-xl px-10 sm:px-14 py-4 sm:py-5 font-bold rounded-2xl transition-all duration-500 shadow-xl shadow-emerald-500/25 hover:shadow-2xl hover:shadow-emerald-500/40 hover:scale-105 active:scale-95">
+              <button className="group relative bg-linear-to-r from-emerald-500 via-teal-500 to-emerald-500 bg-[length:200%_100%] hover:bg-right text-white text-lg sm:text-xl px-10 sm:px-14 py-4 sm:py-5 font-bold rounded-2xl transition-all duration-500 shadow-xl shadow-emerald-500/25 hover:shadow-2xl hover:shadow-emerald-500/40 hover:scale-105 active:scale-95">
                 <span className="flex items-center gap-3">
                   <Play className="h-6 w-6 group-hover:animate-pulse" />
                   Let&apos;s Go! 🚀
                   <ChevronRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </span>
                 {/* Shine effect */}
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                <div className="absolute inset-0 rounded-2xl bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
               </button>
             </Link>
             
@@ -429,7 +429,7 @@ export default function HomePage() {
                   </div>
                   <div className="flex flex-col gap-2">
                     <Link href="/library">
-                      <button className="px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-xl font-semibold transition-all duration-300 flex items-center gap-2 shadow-lg hover:shadow-amber-500/25">
+                      <button className="px-6 py-3 bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-xl font-semibold transition-all duration-300 flex items-center gap-2 shadow-lg hover:shadow-amber-500/25">
                         <BookOpen className="h-5 w-5" />
                         Explore Wealth Library
                       </button>
@@ -447,7 +447,7 @@ export default function HomePage() {
           <div className={`mt-10 sm:mt-12 transition-all duration-1000 delay-800 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
             <div className="grid sm:grid-cols-2 gap-4">
               {/* Sponsor Card */}
-              <div className="relative bg-gradient-to-br from-pink-500/10 via-rose-500/5 to-slate-800/50 rounded-2xl p-6 border border-pink-500/20 backdrop-blur overflow-hidden group hover:border-pink-500/40 transition-colors">
+              <div className="relative bg-linear-to-br from-pink-500/10 via-rose-500/5 to-slate-800/50 rounded-2xl p-6 border border-pink-500/20 backdrop-blur overflow-hidden group hover:border-pink-500/40 transition-colors">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-pink-500/10 rounded-full blur-3xl group-hover:bg-pink-500/20 transition-colors" />
                 <div className="relative">
                   <div className="flex items-center gap-2 mb-3">
@@ -462,7 +462,7 @@ export default function HomePage() {
                       href="https://github.com/sponsors/nuvcai"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-semibold rounded-xl shadow-lg shadow-pink-500/25 hover:shadow-xl hover:shadow-pink-500/40 transition-all hover:scale-105"
+                      className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-linear-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-semibold rounded-xl shadow-lg shadow-pink-500/25 hover:shadow-xl hover:shadow-pink-500/40 transition-all hover:scale-105"
                     >
                       <Heart className="h-4 w-4" />
                       Become a Sponsor
@@ -481,7 +481,7 @@ export default function HomePage() {
               </div>
 
               {/* Share Card */}
-              <div className="relative bg-gradient-to-br from-cyan-500/10 via-teal-500/5 to-slate-800/50 rounded-2xl p-6 border border-cyan-500/20 backdrop-blur overflow-hidden group hover:border-cyan-500/40 transition-colors">
+              <div className="relative bg-linear-to-br from-cyan-500/10 via-teal-500/5 to-slate-800/50 rounded-2xl p-6 border border-cyan-500/20 backdrop-blur overflow-hidden group hover:border-cyan-500/40 transition-colors">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full blur-3xl group-hover:bg-cyan-500/20 transition-colors" />
                 <div className="relative">
                   <div className="flex items-center gap-2 mb-3">

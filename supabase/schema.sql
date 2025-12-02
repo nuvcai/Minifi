@@ -145,6 +145,88 @@ CREATE POLICY "Service role full access" ON sponsors
   WITH CHECK (true);
 
 -- =============================================================================
+-- USER_PROFILES TABLE - Onboarding data and personalization
+-- =============================================================================
+
+CREATE TABLE IF NOT EXISTS user_profiles (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  
+  -- Identity (optional email - can be anonymous)
+  email TEXT UNIQUE,
+  display_name TEXT,
+  session_id TEXT,  -- For anonymous users
+  
+  -- Demographics
+  age_range TEXT CHECK (age_range IN ('12-14', '15-16', '17-18')),
+  country TEXT DEFAULT 'AU',
+  
+  -- Financial Background
+  has_part_time_job BOOLEAN DEFAULT FALSE,
+  has_savings_goal BOOLEAN DEFAULT FALSE,
+  family_discusses_finances BOOLEAN DEFAULT FALSE,
+  
+  -- Risk Profile
+  risk_personality TEXT CHECK (risk_personality IN ('guardian', 'builder', 'explorer', 'pioneer')),
+  risk_score INTEGER CHECK (risk_score >= 0 AND risk_score <= 100),
+  risk_answers JSONB DEFAULT '[]',
+  
+  -- Learning Preferences
+  learning_style TEXT CHECK (learning_style IN ('visual', 'auditory', 'reading', 'kinesthetic')),
+  preferred_session_length TEXT CHECK (preferred_session_length IN ('short', 'medium', 'long')),
+  
+  -- Coach Selection
+  selected_coach TEXT,
+  
+  -- Consent
+  terms_accepted BOOLEAN DEFAULT FALSE,
+  terms_accepted_at TIMESTAMPTZ,
+  marketing_consent BOOLEAN DEFAULT FALSE,
+  marketing_consent_at TIMESTAMPTZ,
+  
+  -- Game Progress (synced from localStorage periodically)
+  total_xp INTEGER DEFAULT 0,
+  player_level INTEGER DEFAULT 1,
+  completed_missions JSONB DEFAULT '[]',
+  daily_streak INTEGER DEFAULT 0,
+  
+  -- Attribution
+  source TEXT DEFAULT 'app',
+  utm_source TEXT,
+  utm_medium TEXT,
+  utm_campaign TEXT,
+  referral_code TEXT,
+  
+  -- Metadata
+  onboarding_completed_at TIMESTAMPTZ,
+  last_active_at TIMESTAMPTZ DEFAULT NOW(),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Indexes for user_profiles
+CREATE INDEX IF NOT EXISTS idx_profiles_email ON user_profiles(email);
+CREATE INDEX IF NOT EXISTS idx_profiles_session ON user_profiles(session_id);
+CREATE INDEX IF NOT EXISTS idx_profiles_risk ON user_profiles(risk_personality);
+CREATE INDEX IF NOT EXISTS idx_profiles_coach ON user_profiles(selected_coach);
+CREATE INDEX IF NOT EXISTS idx_profiles_created ON user_profiles(created_at DESC);
+
+-- Enable Row Level Security
+ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;
+
+-- Policy: Service role can do everything
+CREATE POLICY "Service role full access" ON user_profiles
+  FOR ALL
+  TO service_role
+  USING (true)
+  WITH CHECK (true);
+
+-- Policy: Anonymous users can insert their own profile
+CREATE POLICY "Anyone can create profile" ON user_profiles
+  FOR INSERT
+  TO anon
+  WITH CHECK (true);
+
+-- =============================================================================
 -- WAITLIST TABLE - Feature-specific waitlists
 -- =============================================================================
 
@@ -276,11 +358,15 @@ GRANT SELECT, INSERT ON waitlist TO anon;
 GRANT ALL ON leads TO service_role;
 GRANT ALL ON feedback TO service_role;
 GRANT ALL ON user_activity TO service_role;
+GRANT ALL ON user_profiles TO service_role;
 GRANT ALL ON sponsors TO service_role;
 GRANT ALL ON waitlist TO service_role;
+
+GRANT SELECT, INSERT ON user_profiles TO anon;
 
 -- Grant view permissions
 GRANT SELECT ON lead_stats TO service_role;
 GRANT SELECT ON feedback_stats TO service_role;
 GRANT SELECT ON lead_sources TO service_role;
+
 

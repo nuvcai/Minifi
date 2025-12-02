@@ -104,7 +104,7 @@ export function ShareButton({
         onClick={handleNativeShare}
         className={`
           ${variant === 'button' 
-            ? 'px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-lg font-medium flex items-center gap-2 transition-all hover:scale-105 shadow-lg'
+            ? 'px-4 py-2 bg-linear-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-lg font-medium flex items-center gap-2 transition-all hover:scale-105 shadow-lg'
             : 'p-2 bg-white/10 hover:bg-white/20 rounded-full transition-all'}
         `}
       >
@@ -166,4 +166,5 @@ export function ShareButton({
     </div>
   );
 }
+
 

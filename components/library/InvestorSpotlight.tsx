@@ -40,7 +40,7 @@ export function InvestorSpotlight({
   };
   
   return (
-    <Card className="bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 border-purple-200 overflow-hidden">
+    <Card className="bg-linear-to-br from-purple-50 via-pink-50 to-orange-50 border-purple-200 overflow-hidden">
       <CardContent className="p-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
@@ -80,7 +80,7 @@ export function InvestorSpotlight({
           </div>
           
           {/* Quote */}
-          <blockquote className="relative bg-gradient-to-r from-purple-100 to-pink-100 rounded-lg p-4 border-l-4 border-purple-400">
+          <blockquote className="relative bg-linear-to-r from-purple-100 to-pink-100 rounded-lg p-4 border-l-4 border-purple-400">
             <Quote className="absolute top-2 right-2 h-6 w-6 text-purple-300" />
             <p className="text-lg font-medium text-gray-800 italic pr-8">
               "{currentInvestor.quote}"
@@ -97,7 +97,7 @@ export function InvestorSpotlight({
           </div>
           
           {/* For Teens */}
-          <div className="bg-gradient-to-r from-amber-100 to-orange-100 rounded-lg p-4 border border-amber-200">
+          <div className="bg-linear-to-r from-amber-100 to-orange-100 rounded-lg p-4 border border-amber-200">
             <div className="flex items-center gap-2 mb-2">
               <span className="text-lg">💡</span>
               <span className="font-semibold text-gray-800">For You</span>
@@ -127,4 +127,5 @@ export function InvestorSpotlight({
 }
 
 export default InvestorSpotlight;
+
 

@@ -80,7 +80,7 @@ export function FloatingXp({ amount, type = "default", onComplete }: FloatingXpP
       <div className={`
         inline-flex items-center gap-1 px-2 py-1 
         rounded-full shadow-lg backdrop-blur-sm
-        bg-gradient-to-r ${variant.bg} bg-opacity-90
+        bg-linear-to-r ${variant.bg} bg-opacity-90
         text-white font-bold text-sm
         transform-gpu
       `}>
@@ -203,4 +203,5 @@ export function InlineFloatingXp({
 }
 
 export default FloatingXp;
+
 

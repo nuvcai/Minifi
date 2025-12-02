@@ -72,7 +72,7 @@ export function XpProgressBar({
       {showLabels && (
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className={`bg-gradient-to-br ${currentLevelInfo.color} rounded-full p-1`}>
+            <div className={`bg-linear-to-br ${currentLevelInfo.color} rounded-full p-1`}>
               {React.cloneElement(currentLevelInfo.icon as React.ReactElement, {
                 className: `${sizeClass.icon} text-white`,
               })}
@@ -103,11 +103,11 @@ export function XpProgressBar({
         <div className={`w-full bg-slate-700/50 rounded-full ${sizeClass.bar} overflow-hidden`}>
           {/* Progress fill */}
           <div
-            className={`${sizeClass.bar} bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-500 rounded-full transition-all duration-700 ease-out relative`}
+            className={`${sizeClass.bar} bg-linear-to-r from-emerald-500 via-teal-500 to-emerald-500 rounded-full transition-all duration-700 ease-out relative`}
             style={{ width: `${animatedProgress}%` }}
           >
             {/* Shimmer effect */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" />
+            <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent animate-shimmer" />
           </div>
         </div>
 
@@ -180,7 +180,7 @@ export function XpBadge({ currentXp, level, xpPerLevel = 1000 }: XpBadgeProps) {
   return (
     <div className="flex items-center gap-3 px-3 py-2 bg-slate-800/50 border border-slate-700/50 rounded-lg">
       {/* Level indicator */}
-      <div className={`bg-gradient-to-br ${levelInfo.color} rounded-full p-1.5`}>
+      <div className={`bg-linear-to-br ${levelInfo.color} rounded-full p-1.5`}>
         <span className="text-sm font-bold text-white">{level}</span>
       </div>
 
@@ -194,7 +194,7 @@ export function XpBadge({ currentXp, level, xpPerLevel = 1000 }: XpBadgeProps) {
         </div>
         <div className="w-20 h-1.5 bg-slate-700 rounded-full overflow-hidden">
           <div
-            className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full transition-all duration-500"
+            className="h-full bg-linear-to-r from-emerald-500 to-teal-500 rounded-full transition-all duration-500"
             style={{ width: `${progressPercent}%` }}
           />
         </div>
@@ -204,4 +204,5 @@ export function XpBadge({ currentXp, level, xpPerLevel = 1000 }: XpBadgeProps) {
 }
 
 export default XpProgressBar;
+
 

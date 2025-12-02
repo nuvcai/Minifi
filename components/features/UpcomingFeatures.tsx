@@ -101,13 +101,13 @@ export function UpcomingFeatures({
           {displayFeatures.map((feature) => (
             <div
               key={feature.id}
-              className="flex-shrink-0 group relative"
+              className="shrink-0 group relative"
               onMouseEnter={() => setHoveredFeature(feature.id)}
               onMouseLeave={() => setHoveredFeature(null)}
             >
               <div className={`
                 relative w-40 p-3 rounded-xl border border-slate-700/50 
-                bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur
+                bg-linear-to-br from-slate-800/80 to-slate-900/80 backdrop-blur
                 hover:border-purple-500/50 transition-all duration-300
                 hover:shadow-lg hover:shadow-purple-500/10
                 ${hoveredFeature === feature.id ? 'scale-105' : ''}
@@ -115,7 +115,7 @@ export function UpcomingFeatures({
                 {/* Glow effect on hover */}
                 <div className={`
                   absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 
-                  transition-opacity duration-300 bg-gradient-to-br ${feature.color}
+                  transition-opacity duration-300 bg-linear-to-br ${feature.color}
                   blur-xl -z-10
                 `} style={{ transform: 'scale(0.8)' }} />
                 
@@ -128,7 +128,7 @@ export function UpcomingFeatures({
                 
                 {/* Icon */}
                 <div className={`
-                  w-8 h-8 rounded-lg bg-gradient-to-br ${feature.color}
+                  w-8 h-8 rounded-lg bg-linear-to-br ${feature.color}
                   flex items-center justify-center text-white mb-2
                 `}>
                   {feature.icon}
@@ -151,7 +151,7 @@ export function UpcomingFeatures({
           ))}
           
           {/* "More coming" indicator */}
-          <div className="flex-shrink-0 w-20 flex items-center justify-center">
+          <div className="shrink-0 w-20 flex items-center justify-center">
             <div className="text-center">
               <Sparkles className="h-4 w-4 text-purple-400 mx-auto mb-1 animate-pulse" />
               <span className="text-[10px] text-slate-500">More coming...</span>
@@ -167,7 +167,7 @@ export function UpcomingFeatures({
     <div className={`${className}`}>
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500">
+          <div className="p-2 rounded-xl bg-linear-to-br from-purple-500 to-pink-500">
             <Rocket className="h-5 w-5 text-white" />
           </div>
           <div>
@@ -190,19 +190,19 @@ export function UpcomingFeatures({
           >
             <div className={`
               relative p-4 rounded-2xl border border-slate-700/50 
-              bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur
+              bg-linear-to-br from-slate-800/80 to-slate-900/80 backdrop-blur
               hover:border-purple-500/30 transition-all duration-300
             `}>
               {/* Background gradient on hover */}
               <div className={`
                 absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-10 
-                transition-opacity duration-300 bg-gradient-to-br ${feature.color}
+                transition-opacity duration-300 bg-linear-to-br ${feature.color}
               `} />
               
               <div className="relative flex gap-4">
                 {/* Icon */}
                 <div className={`
-                  flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br ${feature.color}
+                  shrink-0 w-12 h-12 rounded-xl bg-linear-to-br ${feature.color}
                   flex items-center justify-center text-white shadow-lg
                 `}>
                   {feature.icon}
@@ -244,7 +244,7 @@ export function UpcomingFeatures({
       </div>
       
       {/* Notify me CTA */}
-      <div className="mt-6 p-4 rounded-xl bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20">
+      <div className="mt-6 p-4 rounded-xl bg-linear-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Sparkles className="h-5 w-5 text-purple-400" />
@@ -263,4 +263,5 @@ export function UpcomingFeatures({
 }
 
 export default UpcomingFeatures;
+
 

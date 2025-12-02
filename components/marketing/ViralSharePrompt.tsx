@@ -131,7 +131,7 @@ export function ViralSharePrompt({
           initial={{ y: -100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: -100, opacity: 0 }}
-          className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 shadow-lg"
+          className="fixed top-0 left-0 right-0 z-50 bg-linear-to-r from-purple-600 via-pink-600 to-rose-600 shadow-lg"
         >
           <div className="container mx-auto px-4 py-3 flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -164,7 +164,7 @@ export function ViralSharePrompt({
   // Inline variant
   if (variant === "inline") {
     return (
-      <div className="p-4 rounded-xl bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20">
+      <div className="p-4 rounded-xl bg-linear-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20">
         <div className="flex items-start gap-3">
           <div className="p-2 rounded-lg bg-purple-500/20">
             <Share2 className="h-5 w-5 text-purple-400" />
@@ -217,7 +217,7 @@ export function ViralSharePrompt({
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
-          className="relative w-full max-w-md bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-slate-700/50 shadow-2xl overflow-hidden"
+          className="relative w-full max-w-md bg-linear-to-br from-slate-800 to-slate-900 rounded-2xl border border-slate-700/50 shadow-2xl overflow-hidden"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Background decoration */}
@@ -236,7 +236,7 @@ export function ViralSharePrompt({
           <div className="relative p-6">
             {/* Header */}
             <div className="text-center mb-6">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 mb-4">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-linear-to-br from-purple-500 to-pink-500 mb-4">
                 <Trophy className="h-8 w-8 text-white" />
               </div>
               <h3 className="text-xl font-bold text-white mb-2">

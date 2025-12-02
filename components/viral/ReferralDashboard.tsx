@@ -47,9 +47,9 @@ export function ReferralDashboard({
   };
 
   return (
-    <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl border border-white/10 overflow-hidden">
+    <div className="bg-linear-to-br from-slate-900 to-slate-800 rounded-2xl border border-white/10 overflow-hidden">
       {/* Header */}
-      <div className="p-6 bg-gradient-to-r from-purple-600/20 to-blue-600/20 border-b border-white/10">
+      <div className="p-6 bg-linear-to-r from-purple-600/20 to-blue-600/20 border-b border-white/10">
         <div className="flex justify-between items-start">
           <div>
             <h2 className="text-2xl font-bold text-white flex items-center gap-2">
@@ -58,7 +58,7 @@ export function ReferralDashboard({
             <p className="text-gray-400 mt-1">Invite friends, earn rewards together</p>
           </div>
           <div className="text-right">
-            <div className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-400">
+            <div className="text-3xl font-bold text-transparent bg-clip-text bg-linear-to-r from-yellow-400 to-orange-400">
               {tierConfig.name}
             </div>
             <div className="text-sm text-gray-400">{conversionsCount} successful referrals</div>
@@ -112,7 +112,7 @@ export function ReferralDashboard({
           </div>
           <div className="h-3 bg-slate-700 rounded-full overflow-hidden">
             <div 
-              className="h-full bg-gradient-to-r from-purple-500 to-blue-500 transition-all duration-500"
+              className="h-full bg-linear-to-r from-purple-500 to-blue-500 transition-all duration-500"
               style={{ width: `${progressToNext}%` }}
             />
           </div>
@@ -169,7 +169,7 @@ export function ReferralDashboard({
 
       {/* Share CTA */}
       <div className="p-6">
-        <div className="bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-xl p-4">
+        <div className="bg-linear-to-r from-purple-600/20 to-blue-600/20 rounded-xl p-4">
           <h4 className="font-bold text-white mb-2">Share on social media</h4>
           <p className="text-sm text-gray-400 mb-4">
             Your friends get +50 XP bonus when they use your code!
@@ -186,4 +186,5 @@ export function ReferralDashboard({
     </div>
   );
 }
+
 

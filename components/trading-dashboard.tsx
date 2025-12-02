@@ -526,7 +526,7 @@ export default function TradingDashboard({
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950">
+    <div className="min-h-screen bg-linear-to-br from-slate-950 via-slate-900 to-emerald-950">
       <div className="container mx-auto px-4 py-4 sm:py-8">
         {/* Header */}
         <div className="mb-6 sm:mb-8">

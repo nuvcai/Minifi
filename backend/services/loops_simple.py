@@ -161,3 +161,4 @@ async def send_weekly_digest_event(emails: list[str], week_number: int):
     sent = sum(1 for r in results if r.get("success"))
     return {"sent": sent, "total": len(emails)}
 
+

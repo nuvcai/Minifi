@@ -192,7 +192,7 @@ export function RiskPreviewCard({
 
   if (!showFullPreview) {
     return (
-      <Card className="border-2 border-dashed border-primary/30 bg-gradient-to-br from-primary/5 to-secondary/5">
+      <Card className="border-2 border-dashed border-primary/30 bg-linear-to-br from-primary/5 to-secondary/5">
         <CardContent className="p-6">
           <div className="text-center space-y-4">
             <div className="flex items-center justify-center gap-2">
@@ -205,7 +205,7 @@ export function RiskPreviewCard({
               <span className="font-medium text-primary"> Every choice is a learning opportunity!</span>
             </p>
 
-            <div className="bg-gradient-to-r from-emerald-500/10 to-teal-500/10 rounded-lg p-4 border border-emerald-500/20">
+            <div className="bg-linear-to-r from-emerald-500/10 to-teal-500/10 rounded-lg p-4 border border-emerald-500/20">
               <div className="flex items-center gap-2 justify-center">
                 <Sparkles className="h-4 w-4 text-emerald-500" />
                 <span className="text-sm font-medium text-emerald-700">
@@ -216,7 +216,7 @@ export function RiskPreviewCard({
 
             <Button 
               onClick={() => setShowFullPreview(true)}
-              className="w-full bg-gradient-to-r from-primary to-secondary"
+              className="w-full bg-linear-to-r from-primary to-secondary"
             >
               <Brain className="h-4 w-4 mr-2" />
               Show Me What I Need to Know
@@ -231,7 +231,7 @@ export function RiskPreviewCard({
   return (
     <Card className="border-2 border-primary/30 overflow-hidden">
       {/* Header with risk gradient */}
-      <div className={`bg-gradient-to-r ${getRiskColor(riskLevel)} p-4`}>
+      <div className={`bg-linear-to-r ${getRiskColor(riskLevel)} p-4`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <span className="text-2xl">{getRiskEmoji(riskLevel)}</span>
@@ -300,7 +300,7 @@ export function RiskPreviewCard({
                 <ul className="space-y-2">
                   {learnings.slice(0, 3).map((learning, index) => (
                     <li key={index} className="text-sm text-emerald-700 flex items-start gap-2">
-                      <BookOpen className="h-3 w-3 mt-1 flex-shrink-0" />
+                      <BookOpen className="h-3 w-3 mt-1 shrink-0" />
                       {learning}
                     </li>
                   ))}
@@ -313,14 +313,14 @@ export function RiskPreviewCard({
         {/* Coach Advice Section */}
         <div className={`rounded-lg p-4 border ${
           coach 
-            ? "bg-gradient-to-r from-slate-800 to-slate-900 border-slate-700" 
-            : "bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200"
+            ? "bg-linear-to-r from-slate-800 to-slate-900 border-slate-700" 
+            : "bg-linear-to-r from-blue-50 to-purple-50 border-blue-200"
         }`}>
           <div className="flex items-start gap-3">
             {coach ? (
               <>
                 {/* Coach Avatar */}
-                <div className="relative flex-shrink-0">
+                <div className="relative shrink-0">
                   <div className={`w-12 h-12 rounded-full overflow-hidden border-2 ${
                     coach.riskTolerance === "very_aggressive" ? "border-purple-400" :
                     coach.riskTolerance === "aggressive" ? "border-orange-400" :
@@ -350,7 +350,7 @@ export function RiskPreviewCard({
               </>
             ) : (
               <>
-                <div className="bg-blue-500 rounded-full p-2 flex-shrink-0">
+                <div className="bg-blue-500 rounded-full p-2 shrink-0">
                   <Trophy className="h-4 w-4 text-white" />
                 </div>
                 <div>
@@ -363,7 +363,7 @@ export function RiskPreviewCard({
         </div>
 
         {/* Effort Rewards Section */}
-        <Card className="bg-gradient-to-br from-amber-50 to-orange-50 border-amber-200">
+        <Card className="bg-linear-to-br from-amber-50 to-orange-50 border-amber-200">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm flex items-center gap-2">
               <Target className="h-4 w-4 text-amber-600" />
@@ -415,7 +415,7 @@ export function RiskPreviewCard({
           <Button
             onClick={handleConfirmInvestment}
             disabled={!acknowledged}
-            className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600"
+            className="flex-1 bg-linear-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600"
           >
             <Shield className="h-4 w-4 mr-2" />
             I'm Ready - Let's Do This! 🚀

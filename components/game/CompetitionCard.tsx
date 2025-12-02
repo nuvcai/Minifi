@@ -23,17 +23,17 @@ export function CompetitionCard({ unlocked, onStartCompetition }: CompetitionCar
   return (
     <div className="relative flex items-start gap-6">
       {/* Competition Node */}
-      <div className="relative z-10 flex h-16 w-16 items-center justify-center rounded-full border-4 bg-gradient-to-r from-amber-500 to-emerald-500 border-amber-500 text-white">
+      <div className="relative z-10 flex h-16 w-16 items-center justify-center rounded-full border-4 bg-linear-to-r from-amber-500 to-emerald-500 border-amber-500 text-white">
         <Trophy className="h-6 w-6" />
       </div>
 
       {/* Competition Card */}
       <div className="flex-1">
-        <Card className="border-2 border-amber-500/30 bg-gradient-to-r from-amber-500/10 via-slate-800/50 to-emerald-500/10 backdrop-blur">
+        <Card className="border-2 border-amber-500/30 bg-linear-to-r from-amber-500/10 via-slate-800/50 to-emerald-500/10 backdrop-blur">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-lg bg-gradient-to-r from-amber-400 to-emerald-400 bg-clip-text text-transparent">
+                <CardTitle className="text-lg bg-linear-to-r from-amber-400 to-emerald-400 bg-clip-text text-transparent">
                   Investment Competition
                 </CardTitle>
                 <CardDescription className="font-medium text-teal-400 mt-1">
@@ -77,7 +77,7 @@ export function CompetitionCard({ unlocked, onStartCompetition }: CompetitionCar
               </div>
               <Button
                 size="sm"
-                className="font-medium bg-gradient-to-r from-amber-500 to-emerald-500 hover:from-amber-600 hover:to-emerald-600 text-white border-0"
+                className="font-medium bg-linear-to-r from-amber-500 to-emerald-500 hover:from-amber-600 hover:to-emerald-600 text-white border-0"
                 onClick={onStartCompetition}
               >
                 <Trophy className="h-5 w-5 mr-2" />

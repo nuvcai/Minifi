@@ -112,7 +112,7 @@ export function RiskSpectrum({
           <span className="text-xs font-medium text-slate-400">Risk Spectrum</span>
         </div>
         
-        <div className="relative h-8 rounded-full bg-gradient-to-r from-green-500/20 via-yellow-500/20 to-red-500/20 border border-slate-700/50">
+        <div className="relative h-8 rounded-full bg-linear-to-r from-green-500/20 via-yellow-500/20 to-red-500/20 border border-slate-700/50">
           {/* Risk labels */}
           <div className="absolute inset-x-0 -bottom-5 flex justify-between text-[9px] text-slate-500 px-2">
             <span>Low</span>
@@ -176,9 +176,9 @@ export function RiskSpectrum({
         )}
         
         {/* Spectrum bar */}
-        <div className="relative h-16 rounded-xl bg-gradient-to-r from-green-500/10 via-yellow-500/10 via-orange-500/10 to-red-500/10 border border-slate-700/50 overflow-hidden">
+        <div className="relative h-16 rounded-xl bg-linear-to-r from-green-500/10 via-yellow-500/10 via-orange-500/10 to-red-500/10 border border-slate-700/50 overflow-hidden">
           {/* Gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-r from-green-500/5 via-yellow-500/5 via-orange-500/5 to-red-500/5" />
+          <div className="absolute inset-0 bg-linear-to-r from-green-500/5 via-yellow-500/5 via-orange-500/5 to-red-500/5" />
           
           {/* Grid lines */}
           <div className="absolute inset-0 flex">
@@ -386,4 +386,5 @@ export function RiskSpectrum({
 }
 
 export default RiskSpectrum;
+
 

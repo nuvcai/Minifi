@@ -165,3 +165,4 @@ This allows development without database setup.
 - [ ] Admin API key generated and stored securely
 - [ ] Row Level Security policies reviewed
 
+

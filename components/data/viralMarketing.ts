@@ -945,3 +945,4 @@ export function calculateKFactor(
   return invitesSentPerUser * inviteConversionRate;
 }
 
+

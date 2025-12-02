@@ -148,7 +148,7 @@ export function InvestmentDecision({
       )}
 
       {/* Effort-Based Rewards Banner */}
-      <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/30 rounded-lg p-3">
+      <div className="bg-linear-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/30 rounded-lg p-3">
         <div className="flex items-center gap-2 justify-center">
           <Sparkles className="h-4 w-4 text-amber-400" />
           <span className="text-sm font-medium text-amber-300">
@@ -280,7 +280,7 @@ export function InvestmentDecision({
         <Button
           onClick={handleConfirmClick}
           disabled={!selectedInvestment}
-          className="flex-1 font-medium bg-gradient-to-r from-primary to-secondary"
+          className="flex-1 font-medium bg-linear-to-r from-primary to-secondary"
         >
           <DollarSign className="h-4 w-4 mr-2" />
           Review & Confirm 🎯

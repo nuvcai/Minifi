@@ -3,7 +3,7 @@
  * Handles database connections for lead capture and user data
  */
 
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
 
 // Environment variables for Supabase connection
@@ -11,16 +11,27 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
-// Public client for client-side operations
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
-// Admin client for server-side operations (API routes)
-export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
-
-// Check if Supabase is configured
+// Check if Supabase is configured (must check BEFORE creating clients)
 export const isSupabaseConfigured = (): boolean => {
   return !!(supabaseUrl && (supabaseAnonKey || supabaseServiceKey));
 };
+
+// Create clients only if Supabase is configured, otherwise create dummy placeholder
+// This prevents errors during build time when env vars aren't set
+const createSupabaseClient = (url: string, key: string): SupabaseClient => {
+  if (url && key) {
+    return createClient(url, key);
+  }
+  // Return a placeholder that won't throw during build
+  // Actual operations will check isSupabaseConfigured() first
+  return createClient('https://placeholder.supabase.co', 'placeholder-key');
+};
+
+// Public client for client-side operations
+export const supabase = createSupabaseClient(supabaseUrl, supabaseAnonKey);
+
+// Admin client for server-side operations (API routes)
+export const supabaseAdmin = createSupabaseClient(supabaseUrl, supabaseServiceKey);
 
 // Types for our database tables
 export interface Lead {
@@ -330,6 +341,251 @@ export const feedbackService = {
     } catch (error) {
       logger.error('Get feedback stats error', error);
       return { total: 0, byType: {}, avgRating: 0 };
+    }
+  }
+};
+
+// =============================================================================
+// USER PROFILES SERVICE - Onboarding data storage
+// =============================================================================
+
+export interface UserProfile {
+  id?: string;
+  email?: string;
+  display_name?: string;
+  session_id?: string;
+  age_range?: '12-14' | '15-16' | '17-18';
+  country?: string;
+  has_part_time_job?: boolean;
+  has_savings_goal?: boolean;
+  family_discusses_finances?: boolean;
+  risk_personality?: 'guardian' | 'builder' | 'explorer' | 'pioneer';
+  risk_score?: number;
+  risk_answers?: number[];
+  learning_style?: 'visual' | 'auditory' | 'reading' | 'kinesthetic';
+  preferred_session_length?: 'short' | 'medium' | 'long';
+  selected_coach?: string;
+  terms_accepted?: boolean;
+  terms_accepted_at?: string;
+  marketing_consent?: boolean;
+  marketing_consent_at?: string;
+  total_xp?: number;
+  player_level?: number;
+  completed_missions?: string[];
+  daily_streak?: number;
+  source?: string;
+  utm_source?: string;
+  utm_medium?: string;
+  utm_campaign?: string;
+  referral_code?: string;
+  onboarding_completed_at?: string;
+  last_active_at?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export const userProfilesService = {
+  /**
+   * Create or update a user profile from onboarding data
+   */
+  async saveOnboarding(profile: Omit<UserProfile, 'id' | 'created_at' | 'updated_at'>): Promise<{ success: boolean; error?: string; data?: UserProfile }> {
+    if (!isSupabaseConfigured()) {
+      logger.debug('Supabase not configured, skipping profile save');
+      return { success: true, data: profile as UserProfile };
+    }
+
+    try {
+      // Convert camelCase to snake_case for database
+      const dbProfile = {
+        email: profile.email?.toLowerCase(),
+        display_name: profile.display_name,
+        session_id: profile.session_id,
+        age_range: profile.age_range,
+        country: profile.country,
+        has_part_time_job: profile.has_part_time_job,
+        has_savings_goal: profile.has_savings_goal,
+        family_discusses_finances: profile.family_discusses_finances,
+        risk_personality: profile.risk_personality,
+        risk_score: profile.risk_score,
+        risk_answers: profile.risk_answers,
+        learning_style: profile.learning_style,
+        preferred_session_length: profile.preferred_session_length,
+        selected_coach: profile.selected_coach,
+        terms_accepted: profile.terms_accepted,
+        terms_accepted_at: profile.terms_accepted ? new Date().toISOString() : null,
+        marketing_consent: profile.marketing_consent,
+        marketing_consent_at: profile.marketing_consent ? new Date().toISOString() : null,
+        source: profile.source,
+        utm_source: profile.utm_source,
+        utm_medium: profile.utm_medium,
+        utm_campaign: profile.utm_campaign,
+        referral_code: profile.referral_code,
+        onboarding_completed_at: new Date().toISOString(),
+        last_active_at: new Date().toISOString()
+      };
+
+      // If email provided, upsert by email
+      if (profile.email) {
+        const { data, error } = await supabaseAdmin
+          .from('user_profiles')
+          .upsert(dbProfile, { onConflict: 'email' })
+          .select()
+          .single();
+
+        if (error) throw error;
+        return { success: true, data };
+      }
+
+      // Otherwise insert new profile (anonymous)
+      const { data, error } = await supabaseAdmin
+        .from('user_profiles')
+        .insert(dbProfile)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return { success: true, data };
+
+    } catch (error) {
+      logger.error('Save onboarding profile error', error);
+      return { success: false, error: 'Failed to save profile' };
+    }
+  },
+
+  /**
+   * Get profile by email
+   */
+  async getByEmail(email: string): Promise<UserProfile | null> {
+    if (!isSupabaseConfigured()) return null;
+
+    try {
+      const { data, error } = await supabaseAdmin
+        .from('user_profiles')
+        .select('*')
+        .eq('email', email.toLowerCase())
+        .single();
+
+      if (error) {
+        if (error.code === 'PGRST116') return null; // Not found
+        throw error;
+      }
+      return data;
+
+    } catch (error) {
+      logger.error('Get profile by email error', error);
+      return null;
+    }
+  },
+
+  /**
+   * Get profile by session ID (for anonymous users)
+   */
+  async getBySession(sessionId: string): Promise<UserProfile | null> {
+    if (!isSupabaseConfigured()) return null;
+
+    try {
+      const { data, error } = await supabaseAdmin
+        .from('user_profiles')
+        .select('*')
+        .eq('session_id', sessionId)
+        .single();
+
+      if (error) {
+        if (error.code === 'PGRST116') return null;
+        throw error;
+      }
+      return data;
+
+    } catch (error) {
+      logger.error('Get profile by session error', error);
+      return null;
+    }
+  },
+
+  /**
+   * Update game progress
+   */
+  async updateProgress(identifier: { email?: string; sessionId?: string }, progress: {
+    total_xp?: number;
+    player_level?: number;
+    completed_missions?: string[];
+    daily_streak?: number;
+  }): Promise<{ success: boolean }> {
+    if (!isSupabaseConfigured()) return { success: true };
+
+    try {
+      let query = supabaseAdmin.from('user_profiles').update({
+        ...progress,
+        last_active_at: new Date().toISOString()
+      });
+
+      if (identifier.email) {
+        query = query.eq('email', identifier.email.toLowerCase());
+      } else if (identifier.sessionId) {
+        query = query.eq('session_id', identifier.sessionId);
+      } else {
+        return { success: false };
+      }
+
+      const { error } = await query;
+      if (error) throw error;
+      return { success: true };
+
+    } catch (error) {
+      logger.error('Update progress error', error);
+      return { success: false };
+    }
+  },
+
+  /**
+   * Get onboarding stats (for admin)
+   */
+  async getStats(): Promise<{
+    total: number;
+    byAgeRange: Record<string, number>;
+    byRiskPersonality: Record<string, number>;
+    byCoach: Record<string, number>;
+    marketingConsent: number;
+  }> {
+    if (!isSupabaseConfigured()) {
+      return { total: 0, byAgeRange: {}, byRiskPersonality: {}, byCoach: {}, marketingConsent: 0 };
+    }
+
+    try {
+      const { data, error } = await supabaseAdmin
+        .from('user_profiles')
+        .select('age_range, risk_personality, selected_coach, marketing_consent');
+
+      if (error) throw error;
+
+      const stats = {
+        total: data?.length || 0,
+        byAgeRange: {} as Record<string, number>,
+        byRiskPersonality: {} as Record<string, number>,
+        byCoach: {} as Record<string, number>,
+        marketingConsent: 0
+      };
+
+      data?.forEach(profile => {
+        if (profile.age_range) {
+          stats.byAgeRange[profile.age_range] = (stats.byAgeRange[profile.age_range] || 0) + 1;
+        }
+        if (profile.risk_personality) {
+          stats.byRiskPersonality[profile.risk_personality] = (stats.byRiskPersonality[profile.risk_personality] || 0) + 1;
+        }
+        if (profile.selected_coach) {
+          stats.byCoach[profile.selected_coach] = (stats.byCoach[profile.selected_coach] || 0) + 1;
+        }
+        if (profile.marketing_consent) {
+          stats.marketingConsent++;
+        }
+      });
+
+      return stats;
+
+    } catch (error) {
+      logger.error('Get profile stats error', error);
+      return { total: 0, byAgeRange: {}, byRiskPersonality: {}, byCoach: {}, marketingConsent: 0 };
     }
   }
 };

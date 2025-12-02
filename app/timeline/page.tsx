@@ -245,7 +245,7 @@ export default function TimelinePage() {
     : null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950">
+    <div className="min-h-screen bg-linear-to-br from-slate-950 via-slate-900 to-emerald-950">
       <GameHeader
         playerLevel={playerLevel}
         playerXP={playerXP}
@@ -296,7 +296,7 @@ export default function TimelinePage() {
               <Link href="/library">
                 <Button 
                   variant="outline" 
-                  className="w-full bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-amber-500/30 text-amber-400 hover:bg-amber-500/20 hover:text-amber-300"
+                  className="w-full bg-linear-to-r from-amber-500/10 to-orange-500/10 border-amber-500/30 text-amber-400 hover:bg-amber-500/20 hover:text-amber-300"
                 >
                   <BookOpen className="h-4 w-4 mr-2" />
                   📚 Explore Wealth Library

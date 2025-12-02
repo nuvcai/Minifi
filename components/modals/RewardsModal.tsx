@@ -144,7 +144,7 @@ export function RewardsModal({
 
             <div className="space-y-4">
               {/* Current XP Display */}
-              <div className="bg-gradient-to-r from-green-50 to-blue-50 p-3 sm:p-4 rounded-lg border">
+              <div className="bg-linear-to-r from-green-50 to-blue-50 p-3 sm:p-4 rounded-lg border">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                   <div>
                     <p className="text-sm text-muted-foreground">
@@ -177,7 +177,7 @@ export function RewardsModal({
                     <CardContent className="p-3 sm:p-4">
                       <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
                         {/* Icon */}
-                        <div className="text-3xl sm:text-4xl flex-shrink-0">
+                        <div className="text-3xl sm:text-4xl shrink-0">
                           {reward.image}
                         </div>
 
@@ -207,7 +207,7 @@ export function RewardsModal({
                         </div>
 
                         {/* Action Button */}
-                        <div className="flex-shrink-0 w-full sm:w-auto">
+                        <div className="shrink-0 w-full sm:w-auto">
                           <Button
                             onClick={() => handleRedeemClick(reward)}
                             disabled={

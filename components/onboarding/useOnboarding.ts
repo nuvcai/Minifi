@@ -98,7 +98,7 @@ export function useOnboarding(): UseOnboardingReturn {
         setSelectedCoach(data.selectedCoach);
       }
 
-      // Send to backend API for marketing integration
+      // Send to backend API for database storage and marketing integration
       try {
         const response = await fetch('/api/onboarding/complete', {
           method: 'POST',
@@ -113,9 +113,10 @@ export function useOnboarding(): UseOnboardingReturn {
             hasSavingsGoal: data.hasSavingsGoal,
             familyDiscussesFinances: data.familyDiscussesFinances,
             
-            // Risk profile
+            // Risk profile (include raw answers for analytics)
             riskPersonality: data.riskPersonality,
             riskScore: data.riskScore,
+            riskAnswers: data.riskAnswers,
             
             // Learning preferences
             learningStyle: data.learningStyle,
@@ -131,6 +132,7 @@ export function useOnboarding(): UseOnboardingReturn {
             // Metadata
             completedAt: data.completedAt?.toISOString(),
             source: data.source,
+            sessionId: getOrCreateSessionId(),
             
             // UTM tracking from URL
             ...getUtmParams()
@@ -139,6 +141,9 @@ export function useOnboarding(): UseOnboardingReturn {
 
         if (!response.ok) {
           console.warn('Failed to sync onboarding to backend');
+        } else {
+          const result = await response.json();
+          console.log('✅ Onboarding synced:', result.data);
         }
       } catch (apiError) {
         // Don't fail the onboarding if API call fails
@@ -221,6 +226,25 @@ function getUtmParams(): Record<string, string> {
   });
   
   return utm;
+}
+
+/**
+ * Get or create a session ID for anonymous user tracking
+ * Persists in localStorage so the same user can be identified across sessions
+ */
+function getOrCreateSessionId(): string {
+  if (typeof window === 'undefined') return '';
+  
+  const SESSION_KEY = 'lg_session_id';
+  let sessionId = localStorage.getItem(SESSION_KEY);
+  
+  if (!sessionId) {
+    // Generate a unique session ID
+    sessionId = `sess_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
+    localStorage.setItem(SESSION_KEY, sessionId);
+  }
+  
+  return sessionId;
 }
 
 export default useOnboarding;

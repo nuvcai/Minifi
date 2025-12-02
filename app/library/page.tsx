@@ -9,7 +9,7 @@ import { DailyWisdom } from "@/components/library/DailyWisdom";
 
 export default function LibraryPage() {
   return (
-    <main className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-orange-50">
+    <main className="min-h-screen bg-linear-to-br from-amber-50 via-white to-orange-50">
       {/* Navigation Header */}
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-amber-100">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
@@ -49,7 +49,7 @@ export default function LibraryPage() {
           </p>
           <div className="flex justify-center gap-4">
             <Link href="/timeline">
-              <Button className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600">
+              <Button className="bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600">
                 📚 Historical Missions
               </Button>
             </Link>
@@ -64,4 +64,5 @@ export default function LibraryPage() {
     </main>
   );
 }
+
 

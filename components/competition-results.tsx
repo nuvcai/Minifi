@@ -145,9 +145,9 @@ export default function CompetitionResults({
 
   const getRankBadge = (rank: number) => {
     if (rank <= 3) {
-      return "bg-gradient-to-r from-yellow-400 to-yellow-600 text-white";
+      return "bg-linear-to-r from-yellow-400 to-yellow-600 text-white";
     } else if (rank <= 10) {
-      return "bg-gradient-to-r from-blue-500 to-blue-600 text-white";
+      return "bg-linear-to-r from-blue-500 to-blue-600 text-white";
     } else {
       return "bg-muted text-muted-foreground";
     }
@@ -167,11 +167,11 @@ export default function CompetitionResults({
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950">
+    <div className="min-h-screen bg-linear-to-br from-slate-950 via-slate-900 to-emerald-950">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-6 sm:mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-primary to-secondary rounded-full mb-3 sm:mb-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-linear-to-br from-primary to-secondary rounded-full mb-3 sm:mb-4">
             <Trophy className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
           </div>
           <h1 className="text-2xl sm:text-4xl font-serif font-bold text-foreground mb-2">
@@ -184,7 +184,7 @@ export default function CompetitionResults({
 
         {/* User Performance Summary */}
         <div className="max-w-4xl mx-auto mb-6 sm:mb-8">
-          <Card className="bg-gradient-to-br from-card to-card/80 border-2 border-primary/20 shadow-xl">
+          <Card className="bg-linear-to-br from-card to-card/80 border-2 border-primary/20 shadow-xl">
             <CardHeader className="text-center pb-3 sm:pb-4">
               <CardTitle className="text-lg sm:text-2xl font-serif text-foreground flex items-center justify-center gap-1 sm:gap-2">
                 <Target className="h-4 w-4 sm:h-6 sm:w-6 text-primary" />
@@ -310,7 +310,7 @@ export default function CompetitionResults({
                       key={index}
                       className={`flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 rounded-lg transition-all hover:shadow-md ${
                         player.name === "You"
-                          ? "bg-gradient-to-r from-primary/10 to-secondary/10 border-2 border-primary/30"
+                          ? "bg-linear-to-r from-primary/10 to-secondary/10 border-2 border-primary/30"
                           : "bg-muted/50 hover:bg-muted"
                       }`}
                     >
@@ -372,7 +372,7 @@ export default function CompetitionResults({
           <Button
             onClick={onBackToHome}
             size="lg"
-            className="bg-gradient-to-r from-primary to-secondary text-white hover:from-primary/90 hover:to-secondary/90 px-6 sm:px-8 py-2 sm:py-3 text-base sm:text-lg font-semibold shadow-lg"
+            className="bg-linear-to-r from-primary to-secondary text-white hover:from-primary/90 hover:to-secondary/90 px-6 sm:px-8 py-2 sm:py-3 text-base sm:text-lg font-semibold shadow-lg"
           >
             Back to Home
           </Button>

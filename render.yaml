@@ -48,7 +48,7 @@ services:
     schedule: "0 10 * * 2"  # Every Tuesday at 10:00 AM UTC
     buildCommand: pip install httpx
     # Use curl to call your API endpoint
-    command: |
+    startCommand: |
       curl -X POST "https://minifi-backend.onrender.com/cron/newsletter?secret=$CRON_SECRET"
     envVars:
       - key: CRON_SECRET
@@ -59,7 +59,7 @@ services:
     runtime: python
     plan: starter
     schedule: "0 9 * * *"  # Daily at 9:00 AM UTC
-    command: |
+    startCommand: |
       curl -X POST "https://minifi-backend.onrender.com/cron/reengagement?secret=$CRON_SECRET"
     envVars:
       - key: CRON_SECRET

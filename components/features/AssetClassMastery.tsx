@@ -239,7 +239,7 @@ export function AssetClassMastery({
     <div className={`${className}`}>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500">
+          <div className="p-2 rounded-xl bg-linear-to-br from-amber-500 to-orange-500">
             <Trophy className="h-5 w-5 text-white" />
           </div>
           <div>
@@ -333,4 +333,5 @@ export function AssetClassMastery({
 }
 
 export default AssetClassMastery;
+
 

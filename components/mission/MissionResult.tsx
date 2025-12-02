@@ -110,7 +110,7 @@ export function MissionResult({
 
       {/* Wisdom Tip Banner - Shows after confetti settles */}
       {wisdomTip && !showConfetti && (
-        <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/30 rounded-lg p-4 mb-4 animate-bounce-in">
+        <div className="bg-linear-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/30 rounded-lg p-4 mb-4 animate-bounce-in">
           <div className="flex items-start gap-3">
             <span className="text-2xl">✨</span>
             <div>

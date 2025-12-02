@@ -186,7 +186,7 @@ export function AICoach({
                 <ul className="space-y-2">
                   {advice.recommendations.map((rec, index) => (
                     <li key={index} className="flex items-start space-x-2">
-                      <div className="w-2 h-2 bg-yellow-600 rounded-full mt-2 flex-shrink-0" />
+                      <div className="w-2 h-2 bg-yellow-600 rounded-full mt-2 shrink-0" />
                       <span className="text-sm">{rec}</span>
                     </li>
                   ))}
@@ -204,7 +204,7 @@ export function AICoach({
                 <ul className="space-y-2">
                   {advice.next_steps.map((step, index) => (
                     <li key={index} className="flex items-start space-x-2">
-                      <div className="w-2 h-2 bg-green-600 rounded-full mt-2 flex-shrink-0" />
+                      <div className="w-2 h-2 bg-green-600 rounded-full mt-2 shrink-0" />
                       <span className="text-sm">{step}</span>
                     </li>
                   ))}
@@ -237,7 +237,7 @@ export function AICoach({
                 <ul className="space-y-2">
                   {advice.educational_insights.map((insight, index) => (
                     <li key={index} className="flex items-start space-x-2">
-                      <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 flex-shrink-0" />
+                      <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 shrink-0" />
                       <span className="text-sm">{insight}</span>
                     </li>
                   ))}

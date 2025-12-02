@@ -199,7 +199,7 @@ export function DailyStreak({ onBonusClaimed }: DailyStreakProps) {
   return (
     <>
       {/* Streak Display Card */}
-      <Card className="bg-gradient-to-br from-orange-500/10 to-red-500/10 border-orange-500/30">
+      <Card className="bg-linear-to-br from-orange-500/10 to-red-500/10 border-orange-500/30">
         <CardContent className="p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -208,10 +208,10 @@ export function DailyStreak({ onBonusClaimed }: DailyStreakProps) {
                 <div className={`
                   p-2 rounded-full 
                   ${streakData.currentStreak >= 7 
-                    ? "bg-gradient-to-br from-orange-400 to-red-500" 
+                    ? "bg-linear-to-br from-orange-400 to-red-500" 
                     : streakData.currentStreak >= 3 
-                      ? "bg-gradient-to-br from-orange-400 to-amber-500"
-                      : "bg-gradient-to-br from-amber-400 to-orange-400"
+                      ? "bg-linear-to-br from-orange-400 to-amber-500"
+                      : "bg-linear-to-br from-amber-400 to-orange-400"
                   }
                 `}>
                   <Flame className={`h-5 w-5 text-white ${streakData.currentStreak >= 3 ? "animate-pulse" : ""}`} />
@@ -242,7 +242,7 @@ export function DailyStreak({ onBonusClaimed }: DailyStreakProps) {
               <Button
                 size="sm"
                 onClick={() => setShowClaimModal(true)}
-                className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
+                className="bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
               >
                 <Gift className="h-4 w-4 mr-1" />
                 +{todayBonus} XP
@@ -268,8 +268,8 @@ export function DailyStreak({ onBonusClaimed }: DailyStreakProps) {
                     flex-1 h-2 rounded-full transition-all
                     ${isAchieved
                       ? isMilestone
-                        ? "bg-gradient-to-r from-amber-400 to-orange-500"
-                        : "bg-gradient-to-r from-orange-400 to-red-400"
+                        ? "bg-linear-to-r from-amber-400 to-orange-500"
+                        : "bg-linear-to-r from-orange-400 to-red-400"
                       : "bg-slate-700"
                     }
                   `}
@@ -282,12 +282,12 @@ export function DailyStreak({ onBonusClaimed }: DailyStreakProps) {
 
       {/* Claim Modal */}
       <Dialog open={showClaimModal} onOpenChange={setShowClaimModal}>
-        <DialogContent className="sm:max-w-md bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-2 border-amber-500/50">
+        <DialogContent className="sm:max-w-md bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 border-2 border-amber-500/50">
           <DialogHeader>
             <DialogTitle className="text-center">
               <div className="flex items-center justify-center gap-2 mb-4">
                 <Flame className="h-6 w-6 text-orange-500 animate-pulse" />
-                <span className="text-2xl font-black bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent">
+                <span className="text-2xl font-black bg-linear-to-r from-orange-400 to-red-400 bg-clip-text text-transparent">
                   Daily Streak Bonus!
                 </span>
                 <Flame className="h-6 w-6 text-orange-500 animate-pulse" />
@@ -298,7 +298,7 @@ export function DailyStreak({ onBonusClaimed }: DailyStreakProps) {
           <div className="space-y-4">
             {/* Streak count */}
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-orange-400 to-red-500 mb-2">
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-linear-to-br from-orange-400 to-red-500 mb-2">
                 <span className="text-3xl font-black text-white">
                   {streakData.currentStreak}
                 </span>
@@ -322,7 +322,7 @@ export function DailyStreak({ onBonusClaimed }: DailyStreakProps) {
 
               {/* Milestone badge */}
               {currentMilestone?.badge && (
-                <Badge className="w-full justify-center py-1 bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-300 border-amber-500/30">
+                <Badge className="w-full justify-center py-1 bg-linear-to-r from-amber-500/20 to-orange-500/20 text-amber-300 border-amber-500/30">
                   {currentMilestone.badge}
                 </Badge>
               )}
@@ -367,7 +367,7 @@ export function DailyStreak({ onBonusClaimed }: DailyStreakProps) {
               <Button
                 onClick={claimBonus}
                 disabled={streakData.claimedToday || showFloatingXp}
-                className={`w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold py-3 ${
+                className={`w-full bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold py-3 ${
                   showFloatingXp ? "animate-pulse-glow" : ""
                 }`}
               >

@@ -35,7 +35,7 @@ export default function SupportPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-purple-950">
+    <div className="min-h-screen bg-linear-to-br from-slate-950 via-slate-900 to-purple-950">
       {/* Animated Background */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-20 left-10 w-64 h-64 bg-pink-500/10 rounded-full blur-3xl animate-pulse" />
@@ -43,7 +43,7 @@ export default function SupportPage() {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-violet-500/5 rounded-full blur-3xl animate-pulse delay-500" />
         
         {/* Grid overlay */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(168,85,247,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(168,85,247,0.03)_1px,transparent_1px)] bg-[size:60px_60px]" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(168,85,247,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(168,85,247,0.03)_1px,transparent_1px)] bg-size-[60px_60px]" />
       </div>
 
       <div className="relative container mx-auto px-4 py-8">
@@ -90,7 +90,7 @@ export default function SupportPage() {
                 className="rounded-xl"
               />
               <div className="text-left">
-                <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">
+                <h1 className="text-3xl sm:text-4xl font-bold bg-linear-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">
                   Support Legacy Guardians
                 </h1>
                 <p className="text-slate-400">Help us make financial literacy free for every teen</p>
@@ -98,7 +98,7 @@ export default function SupportPage() {
             </div>
             
             {/* Impact statement */}
-            <div className="max-w-3xl mx-auto p-6 rounded-2xl bg-gradient-to-r from-pink-500/10 to-purple-500/10 border border-pink-500/20">
+            <div className="max-w-3xl mx-auto p-6 rounded-2xl bg-linear-to-r from-pink-500/10 to-purple-500/10 border border-pink-500/20">
               <p className="text-lg text-slate-300">
                 <span className="text-2xl mr-2">💚</span>
                 Every sponsorship directly funds free financial education for teenagers who don&apos;t have access to wealth-building knowledge.
@@ -250,4 +250,5 @@ export default function SupportPage() {
     </div>
   );
 }
+
 

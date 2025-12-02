@@ -143,7 +143,7 @@ export function SummaryModal({
 
         <div className="space-y-6">
           {/* Achievement Banner */}
-          <Card className="bg-gradient-to-r from-primary/10 to-secondary/10 border-primary/20">
+          <Card className="bg-linear-to-r from-primary/10 to-secondary/10 border-primary/20">
             <CardContent className="pt-6">
               <div className="text-center space-y-4">
                 <div className="text-6xl">🎓</div>

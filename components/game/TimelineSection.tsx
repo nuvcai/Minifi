@@ -33,7 +33,7 @@ export function TimelineSection({
       <CardContent>
         <div className="relative">
           {/* Timeline Line */}
-          <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-emerald-500/50 via-teal-500/50 to-cyan-500/50"></div>
+          <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-linear-to-b from-emerald-500/50 via-teal-500/50 to-cyan-500/50"></div>
 
           {/* Timeline Events */}
           <div className="space-y-8">

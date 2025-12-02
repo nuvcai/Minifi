@@ -46,7 +46,7 @@ export function SocialProof({ variant = 'toast' }: SocialProofProps) {
 
   if (variant === 'banner') {
     return (
-      <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white py-2 px-4">
+      <div className="bg-linear-to-r from-purple-600 to-blue-600 text-white py-2 px-4">
         <div className="flex items-center justify-center gap-6 text-sm overflow-x-auto">
           <span className="flex items-center gap-2 whitespace-nowrap">
             <span className="animate-pulse">🟢</span>
@@ -128,7 +128,7 @@ export function SocialProof({ variant = 'toast' }: SocialProofProps) {
       `}
     >
       <div className="bg-slate-900 border border-white/20 rounded-lg shadow-2xl p-3 flex items-center gap-3">
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white text-lg">
+        <div className="w-10 h-10 rounded-full bg-linear-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white text-lg">
           {activity.type === 'signup' && '👋'}
           {activity.type === 'mission' && '🎯'}
           {activity.type === 'badge' && '🏆'}
@@ -202,7 +202,7 @@ function StatCard({
 function ActivityItem(activity: typeof RECENT_ACTIVITY[0]) {
   return (
     <div className="flex items-center gap-3 px-3 py-2 border-b border-white/5 hover:bg-white/5 transition-colors">
-      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-slate-700 to-slate-600 flex items-center justify-center text-sm">
+      <div className="w-8 h-8 rounded-full bg-linear-to-br from-slate-700 to-slate-600 flex items-center justify-center text-sm">
         {activity.type === 'signup' && '👋'}
         {activity.type === 'mission' && '🎯'}
         {activity.type === 'badge' && '🏆'}
@@ -223,4 +223,5 @@ function ActivityItem(activity: typeof RECENT_ACTIVITY[0]) {
     </div>
   );
 }
+
 

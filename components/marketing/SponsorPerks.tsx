@@ -157,7 +157,7 @@ export function SponsorPerks({
   if (variant === "compact") {
     return (
       <div className={`${className}`}>
-        <div className="p-4 rounded-xl bg-gradient-to-br from-pink-500/10 to-purple-500/10 border border-pink-500/20">
+        <div className="p-4 rounded-xl bg-linear-to-br from-pink-500/10 to-purple-500/10 border border-pink-500/20">
           <div className="flex items-center gap-2 mb-3">
             <Heart className="h-4 w-4 text-pink-400" />
             <span className="text-sm font-semibold text-slate-200">Why Sponsor?</span>
@@ -182,7 +182,7 @@ export function SponsorPerks({
             href="https://github.com/sponsors/nuvcai"
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white text-sm font-medium rounded-lg transition-all hover:scale-105"
+            className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 bg-linear-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white text-sm font-medium rounded-lg transition-all hover:scale-105"
           >
             <Heart className="h-4 w-4" />
             From $5/mo
@@ -203,7 +203,7 @@ export function SponsorPerks({
               key={tier.id}
               className={`
                 relative p-6 rounded-2xl border transition-all duration-300
-                bg-gradient-to-br ${tier.bgGradient} ${tier.borderColor}
+                bg-linear-to-br ${tier.bgGradient} ${tier.borderColor}
                 ${hoveredTier === tier.id ? 'scale-105 shadow-2xl' : ''}
                 ${tier.highlighted ? 'ring-2 ring-violet-500/50' : ''}
               `}
@@ -221,7 +221,7 @@ export function SponsorPerks({
               
               {/* Header */}
               <div className="text-center mb-4">
-                <div className={`w-14 h-14 mx-auto rounded-2xl bg-gradient-to-br ${tier.bgGradient} ${tier.borderColor} border flex items-center justify-center mb-3 ${tier.color}`}>
+                <div className={`w-14 h-14 mx-auto rounded-2xl bg-linear-to-br ${tier.bgGradient} ${tier.borderColor} border flex items-center justify-center mb-3 ${tier.color}`}>
                   {tier.icon}
                 </div>
                 <h3 className={`text-xl font-bold ${tier.color}`}>{tier.name}</h3>
@@ -233,7 +233,7 @@ export function SponsorPerks({
               <ul className="space-y-2 mb-6">
                 {tier.perks.map((perk, index) => (
                   <li key={index} className="flex items-start gap-2 text-sm text-slate-300">
-                    <CheckCircle2 className={`h-4 w-4 flex-shrink-0 mt-0.5 ${tier.color}`} />
+                    <CheckCircle2 className={`h-4 w-4 shrink-0 mt-0.5 ${tier.color}`} />
                     <span>{perk}</span>
                   </li>
                 ))}
@@ -248,7 +248,7 @@ export function SponsorPerks({
                   w-full inline-flex items-center justify-center gap-2 px-4 py-3 
                   font-semibold rounded-xl transition-all
                   ${tier.highlighted 
-                    ? 'bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-white' 
+                    ? 'bg-linear-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-white' 
                     : `bg-slate-800 hover:bg-slate-700 ${tier.color} border ${tier.borderColor}`
                   }
                 `}
@@ -269,12 +269,12 @@ export function SponsorPerks({
     <div className={`${className}`}>
       {/* Header Section */}
       <div className="text-center mb-10">
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-pink-500/10 to-purple-500/10 border border-pink-500/20 mb-4">
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-linear-to-r from-pink-500/10 to-purple-500/10 border border-pink-500/20 mb-4">
           <Heart className="h-4 w-4 text-pink-400 animate-pulse" />
           <span className="text-sm font-semibold text-pink-300">Support Our Mission</span>
         </div>
         <h2 className="text-3xl sm:text-4xl font-bold text-slate-100 mb-3">
-          Join Our <span className="bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">Community of Supporters</span>
+          Join Our <span className="bg-linear-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">Community of Supporters</span>
         </h2>
         <p className="text-slate-400 max-w-2xl mx-auto">
           Your support helps us make financial literacy accessible to every teenager. 
@@ -305,7 +305,7 @@ export function SponsorPerks({
             key={tier.id}
             className={`
               relative p-6 sm:p-8 rounded-2xl border-2 transition-all duration-300
-              bg-gradient-to-br from-slate-800/80 to-slate-900/80
+              bg-linear-to-br from-slate-800/80 to-slate-900/80
               ${hoveredTier === tier.id 
                 ? `${tier.borderColor} scale-[1.02] shadow-2xl shadow-${tier.color}/20` 
                 : 'border-slate-700/50'
@@ -320,8 +320,8 @@ export function SponsorPerks({
               <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                 <Badge className={`
                   ${tier.highlighted 
-                    ? 'bg-gradient-to-r from-violet-500 to-purple-500 text-white' 
-                    : 'bg-gradient-to-r from-amber-500 to-orange-500 text-white'
+                    ? 'bg-linear-to-r from-violet-500 to-purple-500 text-white' 
+                    : 'bg-linear-to-r from-amber-500 to-orange-500 text-white'
                   } text-xs px-4 py-1
                 `}>
                   <Sparkles className="h-3 w-3 mr-1" />
@@ -333,7 +333,7 @@ export function SponsorPerks({
             {/* Tier header */}
             <div className="flex items-center gap-4 mb-6">
               <div className={`
-                w-16 h-16 rounded-2xl bg-gradient-to-br ${tier.bgGradient}
+                w-16 h-16 rounded-2xl bg-linear-to-br ${tier.bgGradient}
                 flex items-center justify-center ${tier.color}
                 border ${tier.borderColor}
               `}>
@@ -353,7 +353,7 @@ export function SponsorPerks({
             <div className="space-y-3 mb-8">
               {tier.perks.map((perk, index) => (
                 <div key={index} className="flex items-start gap-3">
-                  <div className={`p-1 rounded-full bg-gradient-to-br ${tier.bgGradient}`}>
+                  <div className={`p-1 rounded-full bg-linear-to-br ${tier.bgGradient}`}>
                     <CheckCircle2 className={`h-4 w-4 ${tier.color}`} />
                   </div>
                   <span className="text-slate-300 text-sm">{perk}</span>
@@ -370,8 +370,8 @@ export function SponsorPerks({
                 w-full inline-flex items-center justify-center gap-2 px-6 py-4 
                 font-bold rounded-xl transition-all hover:scale-[1.02]
                 ${tier.highlighted 
-                  ? 'bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-white shadow-lg shadow-purple-500/25' 
-                  : `bg-gradient-to-br ${tier.bgGradient} ${tier.color} border-2 ${tier.borderColor} hover:bg-slate-800`
+                  ? 'bg-linear-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-white shadow-lg shadow-purple-500/25' 
+                  : `bg-linear-to-br ${tier.bgGradient} ${tier.color} border-2 ${tier.borderColor} hover:bg-slate-800`
                 }
               `}
             >
@@ -384,14 +384,14 @@ export function SponsorPerks({
       </div>
 
       {/* Trust & Social Proof */}
-      <div className="bg-gradient-to-r from-slate-800/50 to-slate-900/50 rounded-2xl p-6 border border-slate-700/50">
+      <div className="bg-linear-to-r from-slate-800/50 to-slate-900/50 rounded-2xl p-6 border border-slate-700/50">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <div className="flex -space-x-2">
               {[...Array(5)].map((_, i) => (
                 <div 
                   key={i} 
-                  className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-500 to-purple-500 border-2 border-slate-900 flex items-center justify-center text-white text-xs font-bold"
+                  className="w-10 h-10 rounded-full bg-linear-to-br from-pink-500 to-purple-500 border-2 border-slate-900 flex items-center justify-center text-white text-xs font-bold"
                 >
                   {['👨‍💻', '👩‍🎓', '🧑‍💼', '👨‍🏫', '👩‍🔬'][i]}
                 </div>
@@ -434,4 +434,5 @@ export function SponsorPerks({
 }
 
 export default SponsorPerks;
+
 

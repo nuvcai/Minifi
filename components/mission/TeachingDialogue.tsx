@@ -1130,7 +1130,7 @@ export function TeachingDialogue({
     return (
       <div className="w-full max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg">
         {/* Coach Header */}
-        <div className="flex items-center gap-3 mb-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
+        <div className="flex items-center gap-3 mb-6 p-4 bg-linear-to-r from-blue-50 to-purple-50 rounded-lg">
           <div className="relative w-20 h-20 shrink-0">
             {/* Simple glow effect based on performance */}
             <div
@@ -1183,7 +1183,7 @@ export function TeachingDialogue({
   return (
     <div className="w-full max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg">
       {/* Coach Header */}
-      <div className="flex items-center gap-3 mb-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
+      <div className="flex items-center gap-3 mb-6 p-4 bg-linear-to-r from-blue-50 to-purple-50 rounded-lg">
         <div className="relative w-20 h-20 shrink-0">
           {/* Simple glow effect based on performance */}
           <div
@@ -1271,10 +1271,10 @@ export function TeachingDialogue({
                         hoveredMetric === button.key ? "shadow-md scale-105" : ""
                       } ${
                         selectedMetric === button.key
-                          ? "bg-gradient-to-r from-indigo-400 to-purple-500 text-white border-indigo-500 shadow-lg"
+                          ? "bg-linear-to-r from-indigo-400 to-purple-500 text-white border-indigo-500 shadow-lg"
                           : isViewed
-                          ? "bg-gradient-to-r from-green-50 to-emerald-50 text-emerald-700 border-emerald-200 hover:from-green-100 hover:to-emerald-100"
-                          : "bg-gradient-to-r from-sky-50 to-blue-50 text-blue-700 border-blue-200 hover:from-sky-100 hover:to-blue-100"
+                          ? "bg-linear-to-r from-green-50 to-emerald-50 text-emerald-700 border-emerald-200 hover:from-green-100 hover:to-emerald-100"
+                          : "bg-linear-to-r from-sky-50 to-blue-50 text-blue-700 border-blue-200 hover:from-sky-100 hover:to-blue-100"
                       } ${isCoachTyping ? "opacity-50 cursor-not-allowed" : ""}`}
                       onClick={() => !isCoachTyping && handleMetricClick(button.key, button.targetMetric)}
                       onMouseEnter={() => !isCoachTyping && handleMetricHover(button.key)}
@@ -1284,10 +1284,10 @@ export function TeachingDialogue({
                       {/* Cloud bubble pointer */}
                       <div className={`absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 rotate-45 ${
                         selectedMetric === button.key
-                          ? "bg-gradient-to-r from-indigo-400 to-purple-500 border-r border-b border-indigo-500"
+                          ? "bg-linear-to-r from-indigo-400 to-purple-500 border-r border-b border-indigo-500"
                           : isViewed
-                          ? "bg-gradient-to-r from-green-50 to-emerald-50 border-r border-b border-emerald-200"
-                          : "bg-gradient-to-r from-sky-50 to-blue-50 border-r border-b border-blue-200"
+                          ? "bg-linear-to-r from-green-50 to-emerald-50 border-r border-b border-emerald-200"
+                          : "bg-linear-to-r from-sky-50 to-blue-50 border-r border-b border-blue-200"
                       }`}></div>
                       
                       <div className="flex items-center gap-1 justify-center">
@@ -1322,10 +1322,10 @@ export function TeachingDialogue({
                           hoveredMetric === extraMetricButton.key ? "shadow-md scale-105" : ""
                         } ${
                           selectedMetric === extraMetricButton.key
-                            ? "bg-gradient-to-r from-purple-400 to-pink-500 text-white border-purple-500 shadow-lg"
+                            ? "bg-linear-to-r from-purple-400 to-pink-500 text-white border-purple-500 shadow-lg"
                             : isViewed
-                            ? "bg-gradient-to-r from-green-50 to-emerald-50 text-emerald-700 border-emerald-200 hover:from-green-100 hover:to-emerald-100"
-                            : "bg-gradient-to-r from-purple-50 to-pink-50 text-purple-700 border-purple-200 hover:from-purple-100 hover:to-pink-100"
+                            ? "bg-linear-to-r from-green-50 to-emerald-50 text-emerald-700 border-emerald-200 hover:from-green-100 hover:to-emerald-100"
+                            : "bg-linear-to-r from-purple-50 to-pink-50 text-purple-700 border-purple-200 hover:from-purple-100 hover:to-pink-100"
                         } ${isCoachTyping ? "opacity-50 cursor-not-allowed" : ""}`}
                         onClick={() => !isCoachTyping && handleMetricClick(extraMetricButton.key, extraMetricButton.targetMetric)}
                         onMouseEnter={() => !isCoachTyping && handleMetricHover(extraMetricButton.key)}
@@ -1335,10 +1335,10 @@ export function TeachingDialogue({
                         {/* Cloud bubble pointer */}
                         <div className={`absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 rotate-45 ${
                           selectedMetric === extraMetricButton.key
-                            ? "bg-gradient-to-r from-purple-400 to-pink-500 border-r border-b border-purple-500"
+                            ? "bg-linear-to-r from-purple-400 to-pink-500 border-r border-b border-purple-500"
                             : isViewed
-                            ? "bg-gradient-to-r from-green-50 to-emerald-50 border-r border-b border-emerald-200"
-                            : "bg-gradient-to-r from-purple-50 to-pink-50 border-r border-b border-purple-200"
+                            ? "bg-linear-to-r from-green-50 to-emerald-50 border-r border-b border-emerald-200"
+                            : "bg-linear-to-r from-purple-50 to-pink-50 border-r border-b border-purple-200"
                         }`}></div>
                         
                         <div className="flex items-center gap-2 justify-center">

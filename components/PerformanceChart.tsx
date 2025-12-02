@@ -238,7 +238,7 @@ export function PerformanceChart({
             <CardContent className="px-2 py-1 sm:px-2 sm:py-1">
               <div className="flex flex-col space-y-0.5 sm:space-y-0.5">
                 <div className="flex items-center space-x-1 justify-center">
-                  <DollarSign className="h-3 w-3 sm:h-3 sm:w-3 text-green-600 flex-shrink-0" />
+                  <DollarSign className="h-3 w-3 sm:h-3 sm:w-3 text-green-600 shrink-0" />
                   <p className="text-xs font-medium text-muted-foreground">
                     Final Value
                   </p>
@@ -261,9 +261,9 @@ export function PerformanceChart({
               <div className="flex flex-col space-y-0.5 sm:space-y-0.5">
                 <div className="flex items-center space-x-1 justify-center">
                   {totalReturn >= 0 ? (
-                    <TrendingUp className="h-3 w-3 sm:h-3 sm:w-3 text-green-600 flex-shrink-0" />
+                    <TrendingUp className="h-3 w-3 sm:h-3 sm:w-3 text-green-600 shrink-0" />
                   ) : (
-                    <TrendingDown className="h-3 w-3 sm:h-3 sm:w-3 text-red-600 flex-shrink-0" />
+                    <TrendingDown className="h-3 w-3 sm:h-3 sm:w-3 text-red-600 shrink-0" />
                   )}
                   <p className="text-xs font-medium text-muted-foreground">
                     Total Return
@@ -290,7 +290,7 @@ export function PerformanceChart({
             <CardContent className="px-2 py-1 sm:px-2 sm:py-1">
               <div className="flex flex-col space-y-0.5 sm:space-y-0.5">
                 <div className="flex items-center space-x-1 justify-center">
-                  <BarChart3 className="h-3 w-3 sm:h-3 sm:w-3 text-blue-600 flex-shrink-0" />
+                  <BarChart3 className="h-3 w-3 sm:h-3 sm:w-3 text-blue-600 shrink-0" />
                   <p className="text-xs font-medium text-muted-foreground">
                     Volatility
                   </p>

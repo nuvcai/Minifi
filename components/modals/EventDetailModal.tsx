@@ -79,10 +79,10 @@ export function EventDetailModal({
             />
           </div>
 
-          <Card className="bg-gradient-to-r from-primary/5 to-accent/5 border-primary/20">
+          <Card className="bg-linear-to-r from-primary/5 to-accent/5 border-primary/20">
             <CardContent className="p-6">
               <div className="flex items-start gap-6">
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                   <div className="relative">
                     <Image
                       src={selectedCoach.avatar}

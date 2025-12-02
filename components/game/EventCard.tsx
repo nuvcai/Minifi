@@ -65,7 +65,7 @@ export function EventCard({ event, onEventClick }: EventCardProps) {
         {isNewEvent && (
           <div className="absolute -top-1 -right-1 z-20">
             <Badge 
-              className="px-1.5 py-0.5 text-[10px] font-bold bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0 shadow-lg animate-pulse"
+              className="px-1.5 py-0.5 text-[10px] font-bold bg-linear-to-r from-amber-500 to-orange-500 text-white border-0 shadow-lg animate-pulse"
             >
               <Sparkles className="h-2.5 w-2.5 mr-0.5" />
               NEW

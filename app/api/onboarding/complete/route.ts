@@ -1,10 +1,11 @@
 /**
  * Onboarding Completion API Endpoint
- * Stores user profile and syncs with marketing systems
+ * Stores user profile in Supabase and syncs with marketing systems
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { loopsHelpers, LOOPS_EVENTS } from '@/lib/loops';
+import { userProfilesService, isSupabaseConfigured } from '@/lib/supabase';
+import { loopsHelpers } from '@/lib/loops';
 import { MARKETING_EVENTS } from '@/components/data/marketingData';
 
 interface OnboardingPayload {
@@ -20,6 +21,7 @@ interface OnboardingPayload {
   // Risk profile
   riskPersonality: string;
   riskScore: number;
+  riskAnswers?: number[];
   
   // Learning preferences
   learningStyle: string;
@@ -35,6 +37,7 @@ interface OnboardingPayload {
   // Metadata
   completedAt: string;
   source: string;
+  sessionId?: string;  // For anonymous tracking
   
   // UTM tracking
   utm_source?: string;
@@ -44,6 +47,7 @@ interface OnboardingPayload {
   
   // Optional email (if collected)
   email?: string;
+  firstName?: string;
 }
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
@@ -58,27 +62,54 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       );
     }
 
-    // Log onboarding completion for analytics
-    console.log('📋 Onboarding completed:', {
-      event: MARKETING_EVENTS.ONBOARDING_COMPLETED,
-      ageRange: body.ageRange,
-      riskPersonality: body.riskPersonality,
-      learningStyle: body.learningStyle,
-      selectedCoach: body.selectedCoach,
-      marketingConsent: body.marketingConsent,
+    // ==========================================================================
+    // 1. SAVE TO SUPABASE (Primary storage)
+    // ==========================================================================
+    const profileResult = await userProfilesService.saveOnboarding({
+      email: body.email,
+      display_name: body.firstName,
+      session_id: body.sessionId,
+      age_range: body.ageRange,
+      country: body.country || 'AU',
+      has_part_time_job: body.hasPartTimeJob,
+      has_savings_goal: body.hasSavingsGoal,
+      family_discusses_finances: body.familyDiscussesFinances,
+      risk_personality: body.riskPersonality as 'guardian' | 'builder' | 'explorer' | 'pioneer',
+      risk_score: body.riskScore,
+      risk_answers: body.riskAnswers,
+      learning_style: body.learningStyle as 'visual' | 'auditory' | 'reading' | 'kinesthetic',
+      preferred_session_length: body.preferredSessionLength as 'short' | 'medium' | 'long',
+      selected_coach: body.selectedCoach,
+      terms_accepted: body.termsAccepted,
+      marketing_consent: body.marketingConsent,
       source: body.source,
-      utm_source: body.utm_source
+      utm_source: body.utm_source,
+      utm_medium: body.utm_medium,
+      utm_campaign: body.utm_campaign,
+      referral_code: body.ref
     });
 
-    // If user provided email and consented to marketing, sync to Loops
+    if (!profileResult.success) {
+      console.error('❌ Failed to save profile to Supabase:', profileResult.error);
+      // Continue anyway - don't block user experience
+    } else {
+      console.log('✅ Profile saved to Supabase', { 
+        email: body.email || 'anonymous',
+        supabaseConfigured: isSupabaseConfigured()
+      });
+    }
+
+    // ==========================================================================
+    // 2. SYNC TO LOOPS.SO (Email marketing)
+    // ==========================================================================
     if (body.email && body.marketingConsent) {
       try {
         await loopsHelpers.onAppSignup(body.email, {
-          firstName: undefined, // Would need to collect in onboarding
+          firstName: body.firstName,
           coach: body.selectedCoach
         });
         
-        // Also update with profile data
+        // Update with profile data
         const { loops } = await import('@/lib/loops');
         await loops.updateContact(body.email, {
           ageRange: body.ageRange,
@@ -98,10 +129,27 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       }
     }
 
-    // Generate user segment based on profile
+    // ==========================================================================
+    // 3. ANALYTICS LOGGING
+    // ==========================================================================
+    console.log('📋 Onboarding completed:', {
+      event: MARKETING_EVENTS.ONBOARDING_COMPLETED,
+      ageRange: body.ageRange,
+      riskPersonality: body.riskPersonality,
+      learningStyle: body.learningStyle,
+      selectedCoach: body.selectedCoach,
+      marketingConsent: body.marketingConsent,
+      source: body.source,
+      utm_source: body.utm_source,
+      savedToSupabase: profileResult.success
+    });
+
+    // Generate user segment
     const userSegment = determineUserSegment(body);
 
-    // Send Discord notification if configured
+    // ==========================================================================
+    // 4. DISCORD NOTIFICATION (Optional)
+    // ==========================================================================
     if (process.env.DISCORD_WEBHOOK_URL) {
       try {
         await fetch(process.env.DISCORD_WEBHOOK_URL, {
@@ -110,7 +158,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           body: JSON.stringify({
             embeds: [{
               title: '🎯 New User Onboarded!',
-              color: 0x10b981, // Emerald
+              color: 0x10b981,
               fields: [
                 { name: 'Age Range', value: body.ageRange, inline: true },
                 { name: 'Personality', value: `${body.riskPersonality} (${body.riskScore}%)`, inline: true },
@@ -118,7 +166,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
                 { name: 'Learning Style', value: body.learningStyle, inline: true },
                 { name: 'Session Length', value: body.preferredSessionLength, inline: true },
                 { name: 'Marketing Consent', value: body.marketingConsent ? '✅ Yes' : '❌ No', inline: true },
-                { name: 'Source', value: body.utm_source || body.source || 'direct', inline: true }
+                { name: 'Source', value: body.utm_source || body.source || 'direct', inline: true },
+                { name: 'Saved to DB', value: profileResult.success ? '✅' : '❌', inline: true }
               ],
               timestamp: new Date().toISOString()
             }]
@@ -135,7 +184,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       data: {
         userSegment,
         riskPersonality: body.riskPersonality,
-        selectedCoach: body.selectedCoach
+        selectedCoach: body.selectedCoach,
+        profileId: profileResult.data?.id
       }
     });
 
@@ -164,4 +214,5 @@ function determineUserSegment(data: OnboardingPayload): string {
   
   return `${ageSegments[data.ageRange]}_${riskModifier}`;
 }
+
 

@@ -37,7 +37,7 @@ export function EraTimeline({ onEraSelect, highlightCurrent = true }: EraTimelin
       {/* Visual Timeline */}
       <div className="relative">
         {/* Timeline Line */}
-        <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-amber-400 via-blue-400 to-purple-400" />
+        <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-0.5 bg-linear-to-b from-amber-400 via-blue-400 to-purple-400" />
         
         {/* Era Cards */}
         <div className="space-y-4">
@@ -56,7 +56,7 @@ export function EraTimeline({ onEraSelect, highlightCurrent = true }: EraTimelin
                 <div className={`absolute left-4 md:left-1/2 transform -translate-x-1/2 z-10`}>
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center text-lg
                     ${isCurrent 
-                      ? "bg-gradient-to-r from-purple-500 to-pink-500 animate-pulse" 
+                      ? "bg-linear-to-r from-purple-500 to-pink-500 animate-pulse" 
                       : "bg-white border-2 border-gray-300"
                     }`}
                   >
@@ -89,7 +89,7 @@ export function EraTimeline({ onEraSelect, highlightCurrent = true }: EraTimelin
                       </div>
                       
                       {isCurrent && (
-                        <Badge className="mt-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white">
+                        <Badge className="mt-2 bg-linear-to-r from-purple-500 to-pink-500 text-white">
                           🚀 YOUR ERA!
                         </Badge>
                       )}
@@ -104,7 +104,7 @@ export function EraTimeline({ onEraSelect, highlightCurrent = true }: EraTimelin
       
       {/* Selected Era Details */}
       {selectedEra && (
-        <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
+        <Card className="bg-linear-to-br from-blue-50 to-indigo-50 border-blue-200">
           <CardContent className="p-6 space-y-4">
             <div className="flex items-center gap-3">
               <span className="text-4xl">{selectedEra.emoji}</span>
@@ -160,4 +160,5 @@ export function EraTimeline({ onEraSelect, highlightCurrent = true }: EraTimelin
 }
 
 export default EraTimeline;
+
 

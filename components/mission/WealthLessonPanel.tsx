@@ -56,7 +56,7 @@ export function WealthLessonPanel({
   
   if (compact) {
     return (
-      <Card className="bg-gradient-to-r from-amber-50 to-orange-50 border-amber-200">
+      <Card className="bg-linear-to-r from-amber-50 to-orange-50 border-amber-200">
         <CardContent className="p-4">
           <button
             onClick={() => setIsExpanded(!isExpanded)}
@@ -97,7 +97,7 @@ export function WealthLessonPanel({
   return (
     <Card className="overflow-hidden border-2 border-amber-200 shadow-lg">
       {/* Gradient Header */}
-      <div className="bg-gradient-to-r from-amber-400 to-orange-500 text-white p-4">
+      <div className="bg-linear-to-r from-amber-400 to-orange-500 text-white p-4">
         <div className="flex items-center gap-3">
           <div className="bg-white/20 rounded-full p-2">
             <GraduationCap className="h-6 w-6" />
@@ -154,7 +154,7 @@ export function WealthLessonPanel({
         </div>
         
         {/* Hope Message */}
-        <div className="bg-gradient-to-r from-rose-50 to-orange-50 rounded-lg p-4 border border-rose-200">
+        <div className="bg-linear-to-r from-rose-50 to-orange-50 rounded-lg p-4 border border-rose-200">
           <div className="flex items-start gap-2">
             <Star className="h-5 w-5 text-rose-500 mt-0.5" />
             <div>
@@ -169,7 +169,7 @@ export function WealthLessonPanel({
           <div className="pt-2">
             <Button 
               onClick={onExploreLibrary}
-              className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
+              className="w-full bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
             >
               <BookOpen className="h-4 w-4 mr-2" />
               Explore Full Wisdom Library
@@ -182,4 +182,5 @@ export function WealthLessonPanel({
 }
 
 export default WealthLessonPanel;
+
 

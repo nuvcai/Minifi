@@ -62,7 +62,7 @@ export function ProgressCard({
           <div className="space-y-4">
             {/* Level Display */}
             <div className="flex items-center gap-3 p-3 bg-slate-900/50 rounded-lg border border-slate-700/30">
-              <div className={`bg-gradient-to-br ${levelInfo.color} rounded-full p-2`}>
+              <div className={`bg-linear-to-br ${levelInfo.color} rounded-full p-2`}>
                 {levelInfo.icon}
               </div>
               <div className="flex-1">

@@ -52,3 +52,4 @@ echo "   2. Test the AI coach functionality"
 echo "   3. Verify trading simulation works"
 echo ""
 
+

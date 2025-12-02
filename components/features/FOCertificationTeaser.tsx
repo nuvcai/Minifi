@@ -106,10 +106,10 @@ export function FOCertificationTeaser({
   if (variant === "compact") {
     return (
       <div className={`${className}`}>
-        <div className="p-3 rounded-xl bg-gradient-to-br from-amber-500/10 to-orange-500/10 border border-amber-500/20">
+        <div className="p-3 rounded-xl bg-linear-to-br from-amber-500/10 to-orange-500/10 border border-amber-500/20">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <div className="p-1.5 rounded-lg bg-gradient-to-br from-amber-500 to-orange-500">
+              <div className="p-1.5 rounded-lg bg-linear-to-br from-amber-500 to-orange-500">
                 <GraduationCap className="h-4 w-4 text-white" />
               </div>
               <div>
@@ -149,7 +149,7 @@ export function FOCertificationTeaser({
     <div className={`${className}`}>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500">
+          <div className="p-2 rounded-xl bg-linear-to-br from-amber-500 to-orange-500">
             <GraduationCap className="h-5 w-5 text-white" />
           </div>
           <div>
@@ -178,7 +178,7 @@ export function FOCertificationTeaser({
               className={`
                 relative p-4 rounded-xl border transition-all duration-200
                 ${isActive 
-                  ? 'bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-amber-500/30' 
+                  ? 'bg-linear-to-r from-amber-500/10 to-orange-500/10 border-amber-500/30' 
                   : isCompleted
                     ? 'bg-green-500/5 border-green-500/20'
                     : 'bg-slate-800/30 border-slate-700/50 opacity-60'
@@ -198,8 +198,8 @@ export function FOCertificationTeaser({
               <div className="flex items-start gap-3">
                 {/* Badge */}
                 <div className={`
-                  flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center text-2xl
-                  bg-gradient-to-br ${level.color}
+                  shrink-0 w-12 h-12 rounded-xl flex items-center justify-center text-2xl
+                  bg-linear-to-br ${level.color}
                   ${isCompleted ? 'ring-2 ring-green-400/50' : ''}
                 `}>
                   {isCompleted ? <CheckCircle2 className="h-6 w-6 text-white" /> : level.badge}
@@ -232,9 +232,9 @@ export function FOCertificationTeaser({
                           }`}
                         >
                           {isReqCompleted ? (
-                            <CheckCircle2 className="h-3 w-3 flex-shrink-0" />
+                            <CheckCircle2 className="h-3 w-3 shrink-0" />
                           ) : (
-                            <div className="w-3 h-3 rounded-full border border-slate-600 flex-shrink-0" />
+                            <div className="w-3 h-3 rounded-full border border-slate-600 shrink-0" />
                           )}
                           <span className={isReqCompleted ? 'line-through' : ''}>{req}</span>
                         </li>
@@ -254,7 +254,7 @@ export function FOCertificationTeaser({
       </div>
       
       {/* Motivation footer */}
-      <div className="mt-4 p-3 rounded-lg bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20">
+      <div className="mt-4 p-3 rounded-lg bg-linear-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20">
         <div className="flex items-center gap-2">
           <Sparkles className="h-4 w-4 text-purple-400" />
           <span className="text-xs text-slate-300">
@@ -267,4 +267,5 @@ export function FOCertificationTeaser({
 }
 
 export default FOCertificationTeaser;
+
 

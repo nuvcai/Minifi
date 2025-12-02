@@ -99,7 +99,7 @@ export function CoachSidebar({
       </CardHeader>
       <CardContent className="space-y-3">
         {/* Coach Quote Banner */}
-        <div className="relative p-3 rounded-lg bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 mb-4">
+        <div className="relative p-3 rounded-lg bg-linear-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 mb-4">
           <Quote className="absolute top-2 left-2 h-3 w-3 text-emerald-500/50" />
           <div className="flex items-start gap-2 pl-4">
             <Image
@@ -107,7 +107,7 @@ export function CoachSidebar({
               alt={selectedCoach.name}
               width={24}
               height={24}
-              className="rounded-full flex-shrink-0 mt-0.5"
+              className="rounded-full shrink-0 mt-0.5"
             />
             <div className="flex-1 min-w-0">
               <p className={`text-xs text-emerald-300 italic transition-opacity duration-300 ${
@@ -156,7 +156,7 @@ export function CoachSidebar({
 
         {/* Wealth Wisdom Tip */}
         {investorTip && (
-          <div className="mt-4 p-3 rounded-lg bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20">
+          <div className="mt-4 p-3 rounded-lg bg-linear-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20">
             <div className="flex items-center gap-2 mb-2">
               <BookOpen className="h-3.5 w-3.5 text-purple-400" />
               <span className="text-[10px] text-purple-400 font-medium uppercase tracking-wide">

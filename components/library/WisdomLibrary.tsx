@@ -57,7 +57,7 @@ export function WisdomLibrary({ initialTab = "pillars" }: WisdomLibraryProps) {
     <div className="space-y-6">
       {/* Header */}
       <div className="text-center space-y-2">
-        <h2 className="text-3xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
+        <h2 className="text-3xl font-bold bg-linear-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
           📚 Wealth Wisdom Library
         </h2>
         <p className="text-gray-600 max-w-2xl mx-auto">
@@ -275,4 +275,5 @@ export function WisdomLibrary({ initialTab = "pillars" }: WisdomLibraryProps) {
 }
 
 export default WisdomLibrary;
+
 

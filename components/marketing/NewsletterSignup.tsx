@@ -193,7 +193,7 @@ export function NewsletterSignup({
   if (variant === "compact") {
     return (
       <div className={`${className}`}>
-        <div className="relative p-4 rounded-xl bg-gradient-to-br from-cyan-500/10 to-blue-500/10 border border-cyan-500/20 overflow-hidden">
+        <div className="relative p-4 rounded-xl bg-linear-to-br from-cyan-500/10 to-blue-500/10 border border-cyan-500/20 overflow-hidden">
           {/* Glow */}
           <div className="absolute top-0 right-0 w-24 h-24 bg-cyan-500/10 rounded-full blur-2xl" />
           
@@ -209,7 +209,7 @@ export function NewsletterSignup({
             ) : (
               <>
                 <div className="flex items-center gap-2 mb-3">
-                  <div className="p-1.5 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-500">
+                  <div className="p-1.5 rounded-lg bg-linear-to-br from-cyan-500 to-blue-500">
                     <Mail className="h-4 w-4 text-white" />
                   </div>
                   <span className="text-sm font-semibold text-slate-200">Stay in the Loop</span>
@@ -233,7 +233,7 @@ export function NewsletterSignup({
                   />
                   <Button
                     type="submit"
-                    className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white text-sm"
+                    className="w-full bg-linear-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white text-sm"
                     disabled={status === "loading"}
                   >
                     {status === "loading" ? (
@@ -266,15 +266,15 @@ export function NewsletterSignup({
   // Full detailed variant
   return (
     <div className={`${className}`}>
-      <div className="relative bg-gradient-to-br from-slate-800/80 to-slate-900/80 rounded-2xl p-6 sm:p-8 border border-slate-700/50 overflow-hidden">
+      <div className="relative bg-linear-to-br from-slate-800/80 to-slate-900/80 rounded-2xl p-6 sm:p-8 border border-slate-700/50 overflow-hidden">
         {/* Decorative background */}
-        <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-full blur-3xl" />
+        <div className="absolute top-0 right-0 w-40 h-40 bg-linear-to-br from-cyan-500/20 to-blue-500/20 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-32 h-32 bg-linear-to-br from-purple-500/10 to-pink-500/10 rounded-full blur-3xl" />
         
         <div className="relative">
           {status === "success" ? (
             <div className="text-center py-8">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center mx-auto mb-4 animate-bounce">
+              <div className="w-20 h-20 rounded-full bg-linear-to-br from-emerald-500 to-teal-500 flex items-center justify-center mx-auto mb-4 animate-bounce">
                 <CheckCircle2 className="h-10 w-10 text-white" />
               </div>
               <h3 className="text-2xl font-bold text-slate-100 mb-2">You&apos;re In! 🎉</h3>
@@ -295,7 +295,7 @@ export function NewsletterSignup({
                   <span className="text-sm font-semibold text-cyan-300">Join 1,000+ Future Investors</span>
                 </div>
                 <h2 className="text-2xl sm:text-3xl font-bold text-slate-100 mb-2">
-                  Level Up Your <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">Financial IQ</span>
+                  Level Up Your <span className="bg-linear-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">Financial IQ</span>
                 </h2>
                 <p className="text-slate-400">
                   Get weekly insights, exclusive features, and be first to know about new missions!
@@ -309,7 +309,7 @@ export function NewsletterSignup({
                     key={index}
                     className="flex items-start gap-3 p-3 rounded-xl bg-slate-800/50 border border-slate-700/50"
                   >
-                    <div className="p-2 rounded-lg bg-gradient-to-br from-cyan-500/20 to-blue-500/20 text-cyan-400">
+                    <div className="p-2 rounded-lg bg-linear-to-br from-cyan-500/20 to-blue-500/20 text-cyan-400">
                       {benefit.icon}
                     </div>
                     <div>
@@ -344,7 +344,7 @@ export function NewsletterSignup({
                 
                 <Button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white py-6 text-lg font-semibold rounded-xl shadow-lg shadow-cyan-500/25 hover:shadow-xl hover:shadow-cyan-500/40 transition-all hover:scale-[1.02]"
+                  className="w-full bg-linear-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white py-6 text-lg font-semibold rounded-xl shadow-lg shadow-cyan-500/25 hover:shadow-xl hover:shadow-cyan-500/40 transition-all hover:scale-[1.02]"
                   disabled={status === "loading"}
                 >
                   {status === "loading" ? (

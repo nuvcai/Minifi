@@ -48,9 +48,9 @@ export function Leaderboard({
   };
 
   return (
-    <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl border border-white/10 overflow-hidden">
+    <div className="bg-linear-to-br from-slate-900 to-slate-800 rounded-2xl border border-white/10 overflow-hidden">
       {/* Header */}
-      <div className="p-4 bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border-b border-white/10">
+      <div className="p-4 bg-linear-to-r from-yellow-600/20 to-orange-600/20 border-b border-white/10">
         <h2 className="text-xl font-bold text-white flex items-center gap-2">
           🏆 {leaderboard?.name || 'Leaderboard'}
         </h2>
@@ -96,14 +96,14 @@ export function Leaderboard({
               className={`flex flex-col items-center ${order === 0 ? 'order-2' : order === 1 ? 'order-1' : 'order-3'}`}
             >
               <div className="text-4xl mb-1">{getRankBadge(podiumEntry.rank)}</div>
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-bold">
+              <div className="w-12 h-12 rounded-full bg-linear-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-bold">
                 {podiumEntry.displayName.substring(0, 2).toUpperCase()}
               </div>
               <div className="text-xs text-white mt-1 font-medium text-center max-w-[80px] truncate">
                 {podiumEntry.displayName}
               </div>
               <div className="text-xs text-yellow-400">{podiumEntry.score.toLocaleString()} XP</div>
-              <div className={`${height} w-16 bg-gradient-to-t from-yellow-600/50 to-yellow-400/30 rounded-t-lg mt-2`} />
+              <div className={`${height} w-16 bg-linear-to-t from-yellow-600/50 to-yellow-400/30 rounded-t-lg mt-2`} />
             </div>
           );
         })}
@@ -137,7 +137,7 @@ export function Leaderboard({
               </div>
 
               {/* Avatar */}
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-slate-700 to-slate-600 flex items-center justify-center text-white text-sm font-medium">
+              <div className="w-10 h-10 rounded-full bg-linear-to-br from-slate-700 to-slate-600 flex items-center justify-center text-white text-sm font-medium">
                 {entry.displayName.substring(0, 2).toUpperCase()}
               </div>
 
@@ -180,7 +180,7 @@ export function Leaderboard({
       )}
 
       {/* Footer CTA */}
-      <div className="p-4 bg-gradient-to-r from-purple-600/10 to-blue-600/10">
+      <div className="p-4 bg-linear-to-r from-purple-600/10 to-blue-600/10">
         <p className="text-center text-sm text-gray-400">
           Complete missions to climb the leaderboard! 🚀
         </p>
@@ -188,4 +188,5 @@ export function Leaderboard({
     </div>
   );
 }
+
 

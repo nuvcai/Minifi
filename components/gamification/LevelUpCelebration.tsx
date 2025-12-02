@@ -135,7 +135,7 @@ export function LevelUpCelebration({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-2 border-amber-500/50">
+      <DialogContent className="sm:max-w-md overflow-hidden bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 border-2 border-amber-500/50">
         {/* Confetti Container */}
         {open && (
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -153,7 +153,7 @@ export function LevelUpCelebration({
         )}
 
         {/* Glow effect */}
-        <div className="absolute inset-0 bg-gradient-to-t from-amber-500/10 via-transparent to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-linear-to-t from-amber-500/10 via-transparent to-transparent pointer-events-none" />
 
         <DialogHeader className="relative z-10">
           <DialogTitle className="text-center">
@@ -166,7 +166,7 @@ export function LevelUpCelebration({
               {/* Level Up Text */}
               <div className="flex items-center justify-center gap-2 mb-4">
                 <Sparkles className="h-6 w-6 text-amber-400 animate-pulse" />
-                <span className="text-2xl font-black bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-400 bg-clip-text text-transparent">
+                <span className="text-2xl font-black bg-linear-to-r from-amber-400 via-yellow-400 to-amber-400 bg-clip-text text-transparent">
                   LEVEL UP!
                 </span>
                 <Sparkles className="h-6 w-6 text-amber-400 animate-pulse" />
@@ -174,8 +174,8 @@ export function LevelUpCelebration({
 
               {/* Level Badge */}
               <div className="relative mx-auto w-24 h-24 mb-4">
-                <div className={`absolute inset-0 bg-gradient-to-br ${levelInfo.color} rounded-full animate-pulse opacity-50`} />
-                <div className={`absolute inset-2 bg-gradient-to-br ${levelInfo.color} rounded-full flex items-center justify-center shadow-lg`}>
+                <div className={`absolute inset-0 bg-linear-to-br ${levelInfo.color} rounded-full animate-pulse opacity-50`} />
+                <div className={`absolute inset-2 bg-linear-to-br ${levelInfo.color} rounded-full flex items-center justify-center shadow-lg`}>
                   <span className="text-3xl font-black text-white">{newLevel}</span>
                 </div>
                 {/* Orbiting stars */}
@@ -242,7 +242,7 @@ export function LevelUpCelebration({
           {/* Continue Button */}
           <Button
             onClick={onClose}
-            className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold"
+            className="w-full bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold"
           >
             <Rocket className="h-4 w-4 mr-2" />
             Let's Keep Going! 🚀

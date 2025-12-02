@@ -38,7 +38,7 @@ export function GameHeader({
       <div className="container mx-auto sm:px-4 py-4">
         <div className="flex flex-col items-center gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="text-center sm:text-left">
-            <h1 className="text-2xl sm:text-3xl font-black bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent flex items-center justify-center sm:justify-start gap-2">
+            <h1 className="text-2xl sm:text-3xl font-black bg-linear-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent flex items-center justify-center sm:justify-start gap-2">
               <Image
                 src="/favicon.png"
                 alt="NUVC Icon"
@@ -63,7 +63,7 @@ export function GameHeader({
                 variant="outline"
                 size="sm"
                 onClick={onRewardsClick}
-                className="flex items-center gap-2 bg-gradient-to-r from-amber-500/10 to-amber-500/20 border-amber-500/30 hover:from-amber-500/20 hover:to-amber-500/30 text-amber-400"
+                className="flex items-center gap-2 bg-linear-to-r from-amber-500/10 to-amber-500/20 border-amber-500/30 hover:from-amber-500/20 hover:to-amber-500/30 text-amber-400"
               >
                 <Gift className="h-4 w-4" />
                 <span className="font-medium hidden sm:inline">
@@ -78,7 +78,7 @@ export function GameHeader({
                 <TooltipTrigger asChild>
                   <div className="flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2 bg-slate-800/50 border border-slate-700/50 rounded-lg cursor-help">
                     {/* Level Badge */}
-                    <div className={`bg-gradient-to-br ${levelInfo.color} rounded-full p-1.5 sm:p-2`}>
+                    <div className={`bg-linear-to-br ${levelInfo.color} rounded-full p-1.5 sm:p-2`}>
                       <span className="text-sm sm:text-base font-bold text-white">{playerLevel}</span>
                     </div>
                     
@@ -94,7 +94,7 @@ export function GameHeader({
                       {/* Mini progress bar */}
                       <div className="w-16 sm:w-20 h-1.5 bg-slate-700 rounded-full overflow-hidden">
                         <div
-                          className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full transition-all duration-500"
+                          className="h-full bg-linear-to-r from-emerald-500 to-teal-500 rounded-full transition-all duration-500"
                           style={{ width: `${xpProgress}%` }}
                         />
                       </div>
@@ -114,7 +114,7 @@ export function GameHeader({
                     </div>
                     <div className="w-40 bg-slate-700 rounded-full h-2">
                       <div
-                        className="bg-gradient-to-r from-emerald-500 to-teal-500 h-2 rounded-full transition-all"
+                        className="bg-linear-to-r from-emerald-500 to-teal-500 h-2 rounded-full transition-all"
                         style={{ width: `${xpProgress}%` }}
                       />
                     </div>

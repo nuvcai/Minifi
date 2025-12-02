@@ -160,7 +160,7 @@ export function DailyWisdom({ showControls = true, compact = false }: DailyWisdo
   return (
     <Card className={`overflow-hidden ${compact ? "" : "shadow-lg"}`}>
       {/* Gradient Header */}
-      <div className={`bg-gradient-to-r ${typeColors[wisdom.type]} p-4 text-white`}>
+      <div className={`bg-linear-to-r ${typeColors[wisdom.type]} p-4 text-white`}>
         <div className="flex items-center justify-between">
           <div>
             <Badge className="bg-white/20 text-white border-white/30 mb-2">
@@ -203,7 +203,7 @@ export function DailyWisdom({ showControls = true, compact = false }: DailyWisdo
         
         {/* For Teens Section */}
         {wisdom.forTeens && !compact && (
-          <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg p-4 border border-gray-200">
+          <div className="bg-linear-to-r from-gray-50 to-gray-100 rounded-lg p-4 border border-gray-200">
             <div className="flex items-center gap-2 mb-2">
               <span className="text-lg">🎯</span>
               <span className="font-semibold text-gray-800">What This Means For You</span>
@@ -227,4 +227,5 @@ export function DailyWisdom({ showControls = true, compact = false }: DailyWisdo
 }
 
 export default DailyWisdom;
+
 

@@ -144,13 +144,13 @@ export function SupportTeaser({
   if (variant === "banner") {
     return (
       <div className={`${className}`}>
-        <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-pink-500/10 via-purple-500/10 to-indigo-500/10 border border-pink-500/20 p-4">
+        <div className="relative overflow-hidden rounded-xl bg-linear-to-r from-pink-500/10 via-purple-500/10 to-indigo-500/10 border border-pink-500/20 p-4">
           {/* Animated background */}
-          <div className="absolute inset-0 bg-gradient-to-r from-pink-500/5 via-purple-500/5 to-indigo-500/5 animate-pulse" />
+          <div className="absolute inset-0 bg-linear-to-r from-pink-500/5 via-purple-500/5 to-indigo-500/5 animate-pulse" />
           
           <div className="relative flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-xl bg-gradient-to-br from-pink-500 to-purple-500">
+              <div className="p-2 rounded-xl bg-linear-to-br from-pink-500 to-purple-500">
                 <Crown className="h-5 w-5 text-white" />
               </div>
               <div>
@@ -171,7 +171,7 @@ export function SupportTeaser({
               href="https://github.com/sponsors/nuvcai"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white font-semibold rounded-xl shadow-lg shadow-pink-500/25 hover:shadow-xl hover:shadow-pink-500/40 transition-all hover:scale-105 whitespace-nowrap"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-linear-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white font-semibold rounded-xl shadow-lg shadow-pink-500/25 hover:shadow-xl hover:shadow-pink-500/40 transition-all hover:scale-105 whitespace-nowrap"
             >
               <Heart className="h-4 w-4" />
               Become a Sponsor
@@ -187,14 +187,14 @@ export function SupportTeaser({
   if (variant === "compact") {
     return (
       <div className={`${className}`}>
-        <div className="relative p-4 rounded-xl bg-gradient-to-br from-slate-800/80 to-slate-900/80 border border-slate-700/50 overflow-hidden">
+        <div className="relative p-4 rounded-xl bg-linear-to-br from-slate-800/80 to-slate-900/80 border border-slate-700/50 overflow-hidden">
           {/* Glow effect */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-pink-500/20 to-purple-500/20 rounded-full blur-3xl" />
+          <div className="absolute top-0 right-0 w-32 h-32 bg-linear-to-br from-pink-500/20 to-purple-500/20 rounded-full blur-3xl" />
           
           <div className="relative">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded-lg bg-gradient-to-br from-pink-500 to-purple-500">
+                <div className="p-1.5 rounded-lg bg-linear-to-br from-pink-500 to-purple-500">
                   <Crown className="h-4 w-4 text-white" />
                 </div>
                 <span className="text-sm font-semibold text-slate-200">Go Premium</span>
@@ -225,7 +225,7 @@ export function SupportTeaser({
               href="https://github.com/sponsors/nuvcai"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-500/20 to-purple-500/20 hover:from-pink-500/30 hover:to-purple-500/30 text-pink-300 text-sm font-medium rounded-lg border border-pink-500/30 transition-all"
+              className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 bg-linear-to-r from-pink-500/20 to-purple-500/20 hover:from-pink-500/30 hover:to-purple-500/30 text-pink-300 text-sm font-medium rounded-lg border border-pink-500/30 transition-all"
             >
               <Heart className="h-3.5 w-3.5" />
               Unlock from $5/mo
@@ -241,12 +241,12 @@ export function SupportTeaser({
     <div className={`${className}`}>
       {/* Header */}
       <div className="text-center mb-8">
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-pink-500/10 to-purple-500/10 border border-pink-500/20 mb-4">
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-linear-to-r from-pink-500/10 to-purple-500/10 border border-pink-500/20 mb-4">
           <Sparkles className="h-4 w-4 text-pink-400 animate-pulse" />
           <span className="text-sm font-semibold text-pink-300">Support Our Mission</span>
         </div>
         <h2 className="text-3xl font-bold text-slate-100 mb-2">
-          Unlock the <span className="bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">Full Experience</span>
+          Unlock the <span className="bg-linear-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">Full Experience</span>
         </h2>
         <p className="text-slate-400 max-w-2xl mx-auto">
           Your sponsorship helps us make financial literacy free for every teen. 
@@ -279,7 +279,7 @@ export function SupportTeaser({
                 </div>
               )}
               <div className="flex items-center gap-2">
-                <div className={`p-1.5 rounded-lg bg-gradient-to-br ${config.color}`}>
+                <div className={`p-1.5 rounded-lg bg-linear-to-br ${config.color}`}>
                   {config.icon}
                 </div>
                 <div className="text-left">
@@ -319,7 +319,7 @@ export function SupportTeaser({
               {/* Lock/Unlock indicator */}
               <div className="absolute -top-2 -right-2">
                 {isUnlocked ? (
-                  <div className={`p-1 rounded-full bg-gradient-to-br ${tierConf.color}`}>
+                  <div className={`p-1 rounded-full bg-linear-to-br ${tierConf.color}`}>
                     <Unlock className="h-3 w-3 text-white" />
                   </div>
                 ) : (
@@ -333,7 +333,7 @@ export function SupportTeaser({
               <div className={`
                 w-10 h-10 rounded-xl flex items-center justify-center mb-3
                 ${isUnlocked 
-                  ? `bg-gradient-to-br ${tierConf.color} text-white` 
+                  ? `bg-linear-to-br ${tierConf.color} text-white` 
                   : 'bg-slate-700 text-slate-400'
                 }
               `}>
@@ -366,9 +366,9 @@ export function SupportTeaser({
       </div>
 
       {/* Impact Statement */}
-      <div className="bg-gradient-to-r from-emerald-500/10 to-teal-500/10 rounded-xl p-6 border border-emerald-500/20 mb-8">
+      <div className="bg-linear-to-r from-emerald-500/10 to-teal-500/10 rounded-xl p-6 border border-emerald-500/20 mb-8">
         <div className="flex items-start gap-4">
-          <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500">
+          <div className="p-3 rounded-xl bg-linear-to-br from-emerald-500 to-teal-500">
             <Target className="h-6 w-6 text-white" />
           </div>
           <div>
@@ -378,15 +378,15 @@ export function SupportTeaser({
             </p>
             <div className="grid sm:grid-cols-3 gap-3">
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-emerald-400 flex-shrink-0" />
+                <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
                 <span className="text-xs text-slate-300">Keep the platform 100% free for teens</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-emerald-400 flex-shrink-0" />
+                <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
                 <span className="text-xs text-slate-300">Build more educational content</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-emerald-400 flex-shrink-0" />
+                <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
                 <span className="text-xs text-slate-300">Expand to schools & communities</span>
               </div>
             </div>
@@ -400,7 +400,7 @@ export function SupportTeaser({
           href="https://github.com/sponsors/nuvcai"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 hover:from-pink-600 hover:via-purple-600 hover:to-indigo-600 text-white font-bold text-lg rounded-2xl shadow-xl shadow-purple-500/25 hover:shadow-2xl hover:shadow-purple-500/40 transition-all hover:scale-105"
+          className="inline-flex items-center gap-3 px-8 py-4 bg-linear-to-r from-pink-500 via-purple-500 to-indigo-500 hover:from-pink-600 hover:via-purple-600 hover:to-indigo-600 text-white font-bold text-lg rounded-2xl shadow-xl shadow-purple-500/25 hover:shadow-2xl hover:shadow-purple-500/40 transition-all hover:scale-105"
         >
           <Heart className="h-5 w-5" />
           Become a {tierConfig[selectedTier].name}
@@ -415,4 +415,5 @@ export function SupportTeaser({
 }
 
 export default SupportTeaser;
+
 

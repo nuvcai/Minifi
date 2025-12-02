@@ -92,11 +92,11 @@ export function CourageXpNotification({
           ${getAnimationClass()}
         `}
       >
-        <div className="bg-gradient-to-br from-amber-400 via-orange-400 to-yellow-500 rounded-2xl p-1 shadow-2xl shadow-amber-500/50">
-          <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl px-8 py-6">
+        <div className="bg-linear-to-br from-amber-400 via-orange-400 to-yellow-500 rounded-2xl p-1 shadow-2xl shadow-amber-500/50">
+          <div className="bg-linear-to-br from-amber-50 to-orange-50 rounded-xl px-8 py-6">
             {/* Top decoration */}
             <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-              <div className="bg-gradient-to-r from-amber-400 to-orange-400 rounded-full p-2 shadow-lg">
+              <div className="bg-linear-to-r from-amber-400 to-orange-400 rounded-full p-2 shadow-lg">
                 <Zap className="h-5 w-5 text-white" />
               </div>
             </div>
@@ -106,7 +106,7 @@ export function CourageXpNotification({
               {/* XP Amount */}
               <div className="flex items-center justify-center gap-2 mb-2">
                 <Star className="h-5 w-5 text-amber-500 animate-pulse" />
-                <span className="text-4xl font-black bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
+                <span className="text-4xl font-black bg-linear-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
                   +{xp} XP
                 </span>
                 <Star className="h-5 w-5 text-amber-500 animate-pulse" />
@@ -179,7 +179,7 @@ export function MiniCourageXp({ xp, className = "" }: MiniCourageXpProps) {
     <div
       className={`
         inline-flex items-center gap-1 px-2 py-1 
-        bg-gradient-to-r from-amber-100 to-orange-100 
+        bg-linear-to-r from-amber-100 to-orange-100 
         text-amber-700 rounded-full text-xs font-bold
         animate-bounce shadow-sm border border-amber-200
         ${className}

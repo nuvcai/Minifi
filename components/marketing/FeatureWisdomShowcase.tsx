@@ -84,8 +84,8 @@ export function FeatureWisdomShowcase({
           {featureBenefits.map((feature) => (
             <div
               key={feature.featureId}
-              className="flex-shrink-0 w-64 p-4 rounded-xl border border-slate-700/50 
-                         bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur
+              className="shrink-0 w-64 p-4 rounded-xl border border-slate-700/50 
+                         bg-linear-to-br from-slate-800/80 to-slate-900/80 backdrop-blur
                          hover:border-purple-500/30 transition-all duration-300"
             >
               <div className="flex items-center gap-2 mb-3">
@@ -106,7 +106,7 @@ export function FeatureWisdomShowcase({
               </p>
               
               <Badge 
-                className={`text-[10px] bg-gradient-to-r ${PILLAR_COLORS[feature.wisdomPillar]} text-white border-0`}
+                className={`text-[10px] bg-linear-to-r ${PILLAR_COLORS[feature.wisdomPillar]} text-white border-0`}
               >
                 {PILLAR_ICONS[feature.wisdomPillar]}
                 <span className="ml-1 capitalize">{feature.wisdomPillar}</span>
@@ -152,7 +152,7 @@ export function FeatureWisdomShowcase({
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500">
+          <div className="p-2 rounded-xl bg-linear-to-br from-purple-500 to-pink-500">
             <BookOpen className="h-5 w-5 text-white" />
           </div>
           <div>
@@ -179,7 +179,7 @@ export function FeatureWisdomShowcase({
               onClick={() => setSelectedPillar(pillar.id === selectedPillar ? null : pillar.id)}
               className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all flex items-center gap-1 ${
                 selectedPillar === pillar.id 
-                  ? `bg-gradient-to-r ${PILLAR_COLORS[pillar.id]} text-white` 
+                  ? `bg-linear-to-r ${PILLAR_COLORS[pillar.id]} text-white` 
                   : 'bg-slate-700/50 text-slate-400 hover:text-white'
               }`}
             >
@@ -192,7 +192,7 @@ export function FeatureWisdomShowcase({
 
       {/* Selected pillar context */}
       {showPillarContext && selectedPillar && (
-        <div className={`mb-6 p-4 rounded-xl border border-slate-700/50 bg-gradient-to-r ${PILLAR_COLORS[selectedPillar].replace('from-', 'from-').replace('to-', 'to-')}/10`}>
+        <div className={`mb-6 p-4 rounded-xl border border-slate-700/50 bg-linear-to-r ${PILLAR_COLORS[selectedPillar].replace('from-', 'from-').replace('to-', 'to-')}/10`}>
           {(() => {
             const pillarInfo = getPillarInfo(selectedPillar);
             if (!pillarInfo) return null;
@@ -221,14 +221,14 @@ export function FeatureWisdomShowcase({
           >
             <div className={`
               relative h-full p-4 rounded-xl border border-slate-700/50 
-              bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur
+              bg-linear-to-br from-slate-800/80 to-slate-900/80 backdrop-blur
               hover:border-purple-500/30 transition-all duration-300
               ${hoveredFeature === feature.featureId ? 'scale-[1.02]' : ''}
             `}>
               {/* Glow effect */}
               <div className={`
                 absolute inset-0 rounded-xl opacity-0 group-hover:opacity-20 
-                transition-opacity duration-300 bg-gradient-to-br ${PILLAR_COLORS[feature.wisdomPillar]}
+                transition-opacity duration-300 bg-linear-to-br ${PILLAR_COLORS[feature.wisdomPillar]}
               `} />
               
               <div className="relative">
@@ -238,7 +238,7 @@ export function FeatureWisdomShowcase({
                     {feature.emoji}
                   </span>
                   <Badge 
-                    className={`text-[10px] bg-gradient-to-r ${PILLAR_COLORS[feature.wisdomPillar]} text-white border-0`}
+                    className={`text-[10px] bg-linear-to-r ${PILLAR_COLORS[feature.wisdomPillar]} text-white border-0`}
                   >
                     {PILLAR_ICONS[feature.wisdomPillar]}
                   </Badge>
@@ -251,7 +251,7 @@ export function FeatureWisdomShowcase({
                 
                 {/* Marketing benefit */}
                 <div className="flex items-start gap-2 mb-2">
-                  <Target className="h-3 w-3 text-emerald-400 flex-shrink-0 mt-0.5" />
+                  <Target className="h-3 w-3 text-emerald-400 shrink-0 mt-0.5" />
                   <p className="text-xs text-emerald-400 font-medium">
                     {feature.marketingBenefit}
                   </p>
@@ -268,7 +268,7 @@ export function FeatureWisdomShowcase({
       </div>
 
       {/* Bottom CTA */}
-      <div className="mt-6 p-4 rounded-xl bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20">
+      <div className="mt-6 p-4 rounded-xl bg-linear-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <Zap className="h-5 w-5 text-emerald-400" />

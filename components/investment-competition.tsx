@@ -327,7 +327,7 @@ export default function InvestmentCompetition({
     ].join(" ");
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950">
+    <div className="min-h-screen bg-linear-to-br from-slate-950 via-slate-900 to-emerald-950">
       <div className="container mx-auto px-4 py-4 sm:py-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-center justify-between mb-8 sm:mb-8 gap-6 sm:gap-0">
@@ -778,7 +778,7 @@ export default function InvestmentCompetition({
             <Card className="mt-6 sm:mt-8 border-primary/20">
               <CardContent className="pt-4 sm:pt-6">
                 <Button
-                  className="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 text-sm sm:text-base"
+                  className="w-full bg-linear-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 text-sm sm:text-base"
                   disabled={!canStartCompetition}
                   onClick={startCompetition}
                 >
