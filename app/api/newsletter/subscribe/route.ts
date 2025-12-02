@@ -135,8 +135,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
   // Check specific email subscription status
   if (email) {
-    const leads = await leadsService.getAll({ limit: 1 });
-    const isSubscribed = leads.some(l => l.email === email.toLowerCase() && l.status === 'subscribed');
+    // Query leads filtered by the specific email address
+    const leads = await leadsService.getAll({ email: email.toLowerCase() });
+    const isSubscribed = leads.some(l => l.status === 'subscribed');
     
     return NextResponse.json({
       success: true,

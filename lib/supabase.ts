@@ -141,7 +141,7 @@ export const leadsService = {
   /**
    * Get all leads (for admin)
    */
-  async getAll(filters?: { status?: string; source?: string; limit?: number }): Promise<Lead[]> {
+  async getAll(filters?: { status?: string; source?: string; email?: string; limit?: number }): Promise<Lead[]> {
     if (!isSupabaseConfigured()) return [];
 
     try {
@@ -150,6 +150,9 @@ export const leadsService = {
         .select('*')
         .order('created_at', { ascending: false });
 
+      if (filters?.email) {
+        query = query.eq('email', filters.email.toLowerCase());
+      }
       if (filters?.status) {
         query = query.eq('status', filters.status);
       }

@@ -20,24 +20,39 @@ import {
 } from '@/lib/newsletter-generator';
 import { substack, medium, whatsapp, resend } from '@/lib/marketing-stack';
 import { leadsService, isSupabaseConfigured } from '@/lib/supabase';
+import { secureCompare } from '@/lib/validation';
 
-// Admin key check
-const ADMIN_KEY = process.env.ADMIN_API_KEY || 'dev-admin-key';
-const CRON_SECRET = process.env.CRON_SECRET || 'dev-cron-secret';
+// Admin key check - NO FALLBACK VALUES for security
+const ADMIN_KEY = process.env.ADMIN_API_KEY;
+const CRON_SECRET = process.env.CRON_SECRET;
 
 function isAuthorized(request: NextRequest): boolean {
+  // If keys are not configured, deny all requests
+  if (!ADMIN_KEY && !CRON_SECRET) {
+    console.warn('⚠️ ADMIN_API_KEY and CRON_SECRET not configured - all requests denied');
+    return false;
+  }
+
   const authHeader = request.headers.get('authorization');
   const apiKey = request.headers.get('x-api-key');
   const cronSecret = request.headers.get('x-cron-secret');
   
-  // Check cron secret (for automated runs)
-  if (cronSecret === CRON_SECRET) return true;
-  
-  // Check admin key
-  if (authHeader?.startsWith('Bearer ')) {
-    return authHeader.slice(7) === ADMIN_KEY;
+  // Check cron secret (for automated runs) using timing-safe comparison
+  if (cronSecret && CRON_SECRET && secureCompare(cronSecret, CRON_SECRET)) {
+    return true;
   }
-  return apiKey === ADMIN_KEY;
+  
+  // Check admin key using timing-safe comparison
+  if (ADMIN_KEY) {
+    if (authHeader?.startsWith('Bearer ')) {
+      return secureCompare(authHeader.slice(7), ADMIN_KEY);
+    }
+    if (apiKey) {
+      return secureCompare(apiKey, ADMIN_KEY);
+    }
+  }
+  
+  return false;
 }
 
 /**
