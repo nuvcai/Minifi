@@ -24,3 +24,9 @@ export * from './rewards';
 // Wealth Wisdom - Generational wealth building knowledge
 export * from './wealthWisdom';
 
+// Personalized Coaching - User profiles, learning styles, risk assessment
+export * from './personalizedCoaching';
+
+// Marketing Data - Analytics, consent, attribution, security
+export * from './marketingData';
+

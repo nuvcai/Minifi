@@ -1,16 +1,10 @@
 /**
  * Feedback Collection API Endpoint
- * Collects user feedback for product improvement
- * 
- * Integration options:
- * - Notion Database
- * - Airtable
- * - Google Sheets
- * - Discord Webhook
- * - Your own database
+ * Stores user feedback in Supabase for product improvement
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { feedbackService, isSupabaseConfigured } from '@/lib/supabase';
 
 // Types
 interface FeedbackRequest {
@@ -20,6 +14,7 @@ interface FeedbackRequest {
   pageContext?: string;
   timestamp?: string;
   userAgent?: string;
+  email?: string;
 }
 
 interface FeedbackResponse {
@@ -28,18 +23,10 @@ interface FeedbackResponse {
   feedbackId?: string;
 }
 
-// In-memory storage for demo (replace with database in production)
-const feedbackStore: Map<string, FeedbackRequest & { id: string; createdAt: string }> = new Map();
-
-// Generate simple ID
-function generateId(): string {
-  return `fb_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-}
-
 export async function POST(request: NextRequest): Promise<NextResponse<FeedbackResponse>> {
   try {
     const body: FeedbackRequest = await request.json();
-    const { type, message, rating, pageContext, userAgent } = body;
+    const { type, message, rating, pageContext, userAgent, email } = body;
 
     // Validate required fields
     if (!type || !message?.trim()) {
@@ -58,146 +45,77 @@ export async function POST(request: NextRequest): Promise<NextResponse<FeedbackR
       );
     }
 
-    // Create feedback record
-    const id = generateId();
-    const createdAt = new Date().toISOString();
-    const feedback = {
-      id,
+    // Validate rating if provided
+    if (rating !== undefined && (rating < 1 || rating > 5)) {
+      return NextResponse.json(
+        { success: false, message: 'Rating must be between 1 and 5' },
+        { status: 400 }
+      );
+    }
+
+    // Store in Supabase
+    const result = await feedbackService.submit({
       type,
       message: message.trim(),
       rating,
-      pageContext: pageContext || 'unknown',
-      userAgent,
-      createdAt
-    };
+      page_context: pageContext || 'unknown',
+      user_agent: userAgent,
+      email
+    });
 
-    // Store feedback (replace with actual storage)
-    feedbackStore.set(id, feedback);
+    if (!result.success) {
+      return NextResponse.json(
+        { success: false, message: result.error || 'Submission failed' },
+        { status: 500 }
+      );
+    }
 
-    // === INTEGRATION OPTIONS ===
-
-    // Option 1: Discord Webhook (recommended for real-time alerts)
-    /*
-    if (process.env.DISCORD_FEEDBACK_WEBHOOK) {
-      const typeEmojis = {
+    // Send Discord notification if configured
+    if (process.env.DISCORD_FEEDBACK_WEBHOOK || process.env.DISCORD_WEBHOOK_URL) {
+      const webhookUrl = process.env.DISCORD_FEEDBACK_WEBHOOK || process.env.DISCORD_WEBHOOK_URL;
+      const typeEmojis: Record<string, string> = {
         love: '💖',
         idea: '💡',
         issue: '🐛',
         general: '💬'
       };
-      
-      await fetch(process.env.DISCORD_FEEDBACK_WEBHOOK, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          embeds: [{
-            title: `${typeEmojis[type]} New ${type.charAt(0).toUpperCase() + type.slice(1)} Feedback`,
-            description: message,
-            color: type === 'love' ? 0xff69b4 : type === 'idea' ? 0xffa500 : type === 'issue' ? 0xff0000 : 0x00bfff,
-            fields: [
-              { name: 'Rating', value: rating ? '⭐'.repeat(rating) : 'N/A', inline: true },
-              { name: 'Page', value: pageContext || 'Unknown', inline: true },
-              { name: 'Time', value: new Date().toLocaleString(), inline: true }
-            ],
-            footer: { text: `Feedback ID: ${id}` }
-          }]
-        }),
-      });
-    }
-    */
+      const typeColors: Record<string, number> = {
+        love: 0xff69b4,
+        idea: 0xffa500,
+        issue: 0xff4444,
+        general: 0x00bfff
+      };
 
-    // Option 2: Notion Database
-    /*
-    if (process.env.NOTION_API_KEY && process.env.NOTION_FEEDBACK_DB) {
-      await fetch('https://api.notion.com/v1/pages', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${process.env.NOTION_API_KEY}`,
-          'Content-Type': 'application/json',
-          'Notion-Version': '2022-06-28'
-        },
-        body: JSON.stringify({
-          parent: { database_id: process.env.NOTION_FEEDBACK_DB },
-          properties: {
-            'Type': { select: { name: type } },
-            'Message': { rich_text: [{ text: { content: message } }] },
-            'Rating': { number: rating || null },
-            'Page': { rich_text: [{ text: { content: pageContext || '' } }] },
-            'Date': { date: { start: createdAt } }
-          }
-        }),
-      });
+      try {
+        await fetch(webhookUrl!, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            embeds: [{
+              title: `${typeEmojis[type]} New ${type.charAt(0).toUpperCase() + type.slice(1)} Feedback`,
+              description: message.length > 500 ? message.substring(0, 500) + '...' : message,
+              color: typeColors[type],
+              fields: [
+                { name: 'Rating', value: rating ? '⭐'.repeat(rating) : 'N/A', inline: true },
+                { name: 'Page', value: pageContext || 'Unknown', inline: true },
+                { name: 'ID', value: result.id || 'N/A', inline: true }
+              ],
+              timestamp: new Date().toISOString(),
+              footer: { text: 'Legacy Guardians Feedback' }
+            }]
+          }),
+        });
+      } catch (webhookError) {
+        console.warn('Discord webhook failed:', webhookError);
+      }
     }
-    */
 
-    // Option 3: Airtable
-    /*
-    if (process.env.AIRTABLE_API_KEY && process.env.AIRTABLE_BASE_ID) {
-      await fetch(`https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/Feedback`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          fields: {
-            'Type': type,
-            'Message': message,
-            'Rating': rating,
-            'Page Context': pageContext,
-            'Created At': createdAt
-          }
-        }),
-      });
-    }
-    */
-
-    // Option 4: Google Sheets via Apps Script
-    /*
-    if (process.env.GOOGLE_SHEETS_FEEDBACK_WEBHOOK) {
-      await fetch(process.env.GOOGLE_SHEETS_FEEDBACK_WEBHOOK, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          id,
-          type,
-          message,
-          rating,
-          pageContext,
-          timestamp: createdAt
-        }),
-      });
-    }
-    */
-
-    // Option 5: Email notification
-    /*
-    if (process.env.FEEDBACK_EMAIL && process.env.SENDGRID_API_KEY) {
-      await fetch('https://api.sendgrid.com/v3/mail/send', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${process.env.SENDGRID_API_KEY}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          personalizations: [{ to: [{ email: process.env.FEEDBACK_EMAIL }] }],
-          from: { email: 'feedback@minifi.app' },
-          subject: `[${type.toUpperCase()}] New Feedback from Legacy Guardians`,
-          content: [{
-            type: 'text/plain',
-            value: `Type: ${type}\nRating: ${rating || 'N/A'}\nPage: ${pageContext}\n\nMessage:\n${message}`
-          }]
-        }),
-      });
-    }
-    */
-
-    console.log(`📝 New feedback [${type}]: ${message.substring(0, 50)}...`);
+    console.log(`📝 New feedback [${type}]: ${message.substring(0, 50)}... | Supabase: ${isSupabaseConfigured() ? 'yes' : 'no'}`);
 
     return NextResponse.json({
       success: true,
       message: 'Thank you for your feedback! 🙏',
-      feedbackId: id
+      feedbackId: result.id
     });
 
   } catch (error) {
@@ -213,29 +131,68 @@ export async function POST(request: NextRequest): Promise<NextResponse<FeedbackR
 export async function GET(request: NextRequest): Promise<NextResponse> {
   const { searchParams } = new URL(request.url);
   const type = searchParams.get('type');
+  const limit = parseInt(searchParams.get('limit') || '10');
+  const stats = searchParams.get('stats');
 
-  const allFeedback = Array.from(feedbackStore.values());
-  const filteredFeedback = type 
-    ? allFeedback.filter(f => f.type === type)
-    : allFeedback;
+  // Return stats if requested
+  if (stats === 'true') {
+    const feedbackStats = await feedbackService.getStats();
+    return NextResponse.json({
+      success: true,
+      stats: feedbackStats,
+      supabaseConfigured: isSupabaseConfigured()
+    });
+  }
 
-  const stats = {
-    total: allFeedback.length,
-    byType: {
-      love: allFeedback.filter(f => f.type === 'love').length,
-      idea: allFeedback.filter(f => f.type === 'idea').length,
-      issue: allFeedback.filter(f => f.type === 'issue').length,
-      general: allFeedback.filter(f => f.type === 'general').length
-    },
-    averageRating: allFeedback
-      .filter(f => f.rating)
-      .reduce((sum, f) => sum + (f.rating || 0), 0) / allFeedback.filter(f => f.rating).length || 0
-  };
+  // Get recent feedback
+  const feedback = await feedbackService.getAll({
+    type: type || undefined,
+    limit
+  });
+
+  const feedbackStats = await feedbackService.getStats();
 
   return NextResponse.json({
     success: true,
-    stats,
-    recent: filteredFeedback.slice(-10).reverse()
+    stats: feedbackStats,
+    recent: feedback,
+    supabaseConfigured: isSupabaseConfigured()
   });
 }
 
+// PATCH endpoint to update feedback status (admin)
+export async function PATCH(request: NextRequest): Promise<NextResponse> {
+  try {
+    const body = await request.json();
+    const { id, status } = body;
+
+    if (!id || !status) {
+      return NextResponse.json(
+        { success: false, message: 'ID and status are required' },
+        { status: 400 }
+      );
+    }
+
+    const validStatuses = ['new', 'reviewed', 'actioned', 'archived'];
+    if (!validStatuses.includes(status)) {
+      return NextResponse.json(
+        { success: false, message: 'Invalid status' },
+        { status: 400 }
+      );
+    }
+
+    const result = await feedbackService.updateStatus(id, status);
+
+    return NextResponse.json({
+      success: result.success,
+      message: result.success ? 'Status updated' : 'Update failed'
+    });
+
+  } catch (error) {
+    console.error('Feedback update error:', error);
+    return NextResponse.json(
+      { success: false, message: 'An error occurred' },
+      { status: 500 }
+    );
+  }
+}

@@ -1,15 +1,10 @@
 /**
  * Newsletter Subscription API Endpoint
- * Handles email capture for marketing automation
- * 
- * Integration options:
- * - Mailchimp (uncomment relevant section)
- * - Sendinblue/Brevo
- * - ConvertKit
- * - Your own database
+ * Stores leads in Supabase for marketing automation
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { leadsService, isSupabaseConfigured } from '@/lib/supabase';
 
 // Types
 interface SubscribeRequest {
@@ -31,9 +26,6 @@ interface SubscribeResponse {
 // Email validation regex
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// In-memory storage for demo (replace with database in production)
-const subscribers: Map<string, { email: string; firstName?: string; source?: string; subscribedAt: string }> = new Map();
-
 export async function POST(request: NextRequest): Promise<NextResponse<SubscribeResponse>> {
   try {
     const body: SubscribeRequest = await request.json();
@@ -50,130 +42,48 @@ export async function POST(request: NextRequest): Promise<NextResponse<Subscribe
     // Normalize email
     const normalizedEmail = email.toLowerCase().trim();
 
-    // Check for existing subscriber
-    if (subscribers.has(normalizedEmail)) {
+    // Store in Supabase
+    const result = await leadsService.subscribe(normalizedEmail, firstName, source || 'website');
+
+    if (!result.success) {
       return NextResponse.json(
-        { success: true, message: 'You are already subscribed!' },
-        { status: 200 }
+        { success: false, message: result.error || 'Subscription failed' },
+        { status: 500 }
       );
     }
 
-    // Create subscriber record
-    const subscribedAt = new Date().toISOString();
-    const subscriber = {
-      email: normalizedEmail,
-      firstName: firstName?.trim(),
-      source: source || 'website',
-      subscribedAt
-    };
-
-    // Store subscriber (replace with actual storage)
-    subscribers.set(normalizedEmail, subscriber);
-
-    // === INTEGRATION OPTIONS ===
-    
-    // Option 1: Mailchimp Integration
-    // Uncomment and configure for production
-    /*
-    if (process.env.MAILCHIMP_API_KEY && process.env.MAILCHIMP_LIST_ID) {
-      const MAILCHIMP_DC = process.env.MAILCHIMP_API_KEY.split('-')[1];
-      await fetch(
-        `https://${MAILCHIMP_DC}.api.mailchimp.com/3.0/lists/${process.env.MAILCHIMP_LIST_ID}/members`,
-        {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${process.env.MAILCHIMP_API_KEY}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email_address: normalizedEmail,
-            status: 'subscribed',
-            merge_fields: {
-              FNAME: firstName || '',
-              SOURCE: source || 'website',
-            },
-            tags: ['legacy-guardians', source || 'website'],
-          }),
-        }
-      );
-    }
-    */
-
-    // Option 2: Sendinblue/Brevo Integration
-    /*
-    if (process.env.BREVO_API_KEY) {
-      await fetch('https://api.brevo.com/v3/contacts', {
-        method: 'POST',
-        headers: {
-          'api-key': process.env.BREVO_API_KEY,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: normalizedEmail,
-          attributes: {
-            FIRSTNAME: firstName || '',
-            SOURCE: source || 'website',
-          },
-          listIds: [parseInt(process.env.BREVO_LIST_ID || '1')],
-          updateEnabled: true,
-        }),
-      });
-    }
-    */
-
-    // Option 3: ConvertKit Integration
-    /*
-    if (process.env.CONVERTKIT_API_KEY && process.env.CONVERTKIT_FORM_ID) {
-      await fetch(`https://api.convertkit.com/v3/forms/${process.env.CONVERTKIT_FORM_ID}/subscribe`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          api_key: process.env.CONVERTKIT_API_KEY,
-          email: normalizedEmail,
-          first_name: firstName || '',
-          tags: [source || 'website'],
-        }),
-      });
-    }
-    */
-
-    // Option 4: Discord Webhook (for instant notifications)
-    /*
+    // Send Discord notification if configured
     if (process.env.DISCORD_WEBHOOK_URL) {
-      await fetch(process.env.DISCORD_WEBHOOK_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          content: `🎉 New Newsletter Subscriber!\n**Email:** ${normalizedEmail}\n**Name:** ${firstName || 'Not provided'}\n**Source:** ${source || 'website'}`,
-        }),
-      });
+      try {
+        await fetch(process.env.DISCORD_WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            embeds: [{
+              title: '📧 New Newsletter Subscriber!',
+              color: 0x00ff88,
+              fields: [
+                { name: 'Email', value: normalizedEmail, inline: true },
+                { name: 'Name', value: firstName || 'Not provided', inline: true },
+                { name: 'Source', value: source || 'website', inline: true }
+              ],
+              timestamp: new Date().toISOString()
+            }]
+          }),
+        });
+      } catch (webhookError) {
+        console.warn('Discord webhook failed:', webhookError);
+      }
     }
-    */
 
-    // Option 5: Google Sheets via Apps Script
-    /*
-    if (process.env.GOOGLE_SHEETS_WEBHOOK) {
-      await fetch(process.env.GOOGLE_SHEETS_WEBHOOK, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: normalizedEmail,
-          firstName: firstName || '',
-          source: source || 'website',
-          timestamp: subscribedAt,
-        }),
-      });
-    }
-    */
-
-    console.log(`✅ New subscriber: ${normalizedEmail} from ${source || 'website'}`);
+    console.log(`✅ New subscriber: ${normalizedEmail} from ${source || 'website'} | Supabase: ${isSupabaseConfigured() ? 'yes' : 'no'}`);
 
     return NextResponse.json({
       success: true,
       message: 'Successfully subscribed! Welcome to Legacy Guardians 🎉',
       subscriber: {
         email: normalizedEmail,
-        subscribedAt
+        subscribedAt: result.data?.subscribed_at || new Date().toISOString()
       }
     });
 
@@ -186,26 +96,77 @@ export async function POST(request: NextRequest): Promise<NextResponse<Subscribe
   }
 }
 
-// GET endpoint to check subscription status (for debugging)
+// GET endpoint to check subscription status or get stats
 export async function GET(request: NextRequest): Promise<NextResponse> {
   const { searchParams } = new URL(request.url);
   const email = searchParams.get('email');
+  const stats = searchParams.get('stats');
 
-  if (!email) {
+  // Return stats if requested (for admin dashboard)
+  if (stats === 'true') {
+    const leadStats = await leadsService.getStats();
     return NextResponse.json({
       success: true,
-      totalSubscribers: subscribers.size,
-      message: 'Newsletter API is running'
+      stats: leadStats,
+      supabaseConfigured: isSupabaseConfigured()
     });
   }
 
-  const normalizedEmail = email.toLowerCase().trim();
-  const isSubscribed = subscribers.has(normalizedEmail);
+  // Check specific email subscription status
+  if (email) {
+    const leads = await leadsService.getAll({ limit: 1 });
+    const isSubscribed = leads.some(l => l.email === email.toLowerCase() && l.status === 'subscribed');
+    
+    return NextResponse.json({
+      success: true,
+      isSubscribed,
+      message: isSubscribed ? 'Email is subscribed' : 'Email is not subscribed'
+    });
+  }
 
+  // Return general API info
+  const stats_data = await leadsService.getStats();
   return NextResponse.json({
     success: true,
-    isSubscribed,
-    message: isSubscribed ? 'Email is subscribed' : 'Email is not subscribed'
+    totalSubscribers: stats_data.total,
+    activeSubscribers: stats_data.subscribed,
+    message: 'Newsletter API is running',
+    supabaseConfigured: isSupabaseConfigured()
   });
 }
 
+// Unsubscribe endpoint
+export async function DELETE(request: NextRequest): Promise<NextResponse> {
+  try {
+    const { searchParams } = new URL(request.url);
+    const email = searchParams.get('email');
+
+    if (!email) {
+      return NextResponse.json(
+        { success: false, message: 'Email is required' },
+        { status: 400 }
+      );
+    }
+
+    const result = await leadsService.unsubscribe(email);
+
+    if (!result.success) {
+      return NextResponse.json(
+        { success: false, message: result.error || 'Unsubscribe failed' },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: 'Successfully unsubscribed'
+    });
+
+  } catch (error) {
+    console.error('Unsubscribe error:', error);
+    return NextResponse.json(
+      { success: false, message: 'An error occurred' },
+      { status: 500 }
+    );
+  }
+}
