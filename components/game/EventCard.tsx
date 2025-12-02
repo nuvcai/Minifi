@@ -7,6 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { StatusBadge, StatusType } from "@/components/shared/StatusBadge";
 import {
   TrendingUp,
@@ -16,7 +17,7 @@ import {
   Play,
   AlertTriangle,
   RotateCcw,
-  CheckCircle,
+  Sparkles,
 } from "lucide-react";
 import { FinancialEvent } from "@/components/data/events";
 
@@ -47,6 +48,9 @@ export function EventCard({ event, onEventClick }: EventCardProps) {
     return "bg-slate-800 border-slate-600 text-slate-500";
   };
 
+  // Check if this is a "new" event (unlocked but not completed)
+  const isNewEvent = event.unlocked && !event.completed;
+
   return (
     <div className="relative flex items-start gap-6">
       {/* Timeline Node */}
@@ -55,6 +59,18 @@ export function EventCard({ event, onEventClick }: EventCardProps) {
         onClick={() => onEventClick(event)}
       >
         {event.completed ? <Trophy className="h-6 w-6" /> : getImpactIcon()}
+        
+        {/* NEW Badge - Pulsing indicator for available missions */}
+        {isNewEvent && (
+          <div className="absolute -top-1 -right-1 z-20">
+            <Badge 
+              className="px-1.5 py-0.5 text-[10px] font-bold bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0 shadow-lg animate-pulse"
+            >
+              <Sparkles className="h-2.5 w-2.5 mr-0.5" />
+              NEW
+            </Badge>
+          </div>
+        )}
       </div>
 
       {/* Event Card */}
@@ -69,6 +85,11 @@ export function EventCard({ event, onEventClick }: EventCardProps) {
     ${
       event.unlocked
         ? "hover:shadow-lg hover:shadow-emerald-500/10 hover:-translate-y-1 hover:scale-[1.01] cursor-pointer hover:border-emerald-500/30"
+        : ""
+    }
+    ${
+      isNewEvent
+        ? "ring-2 ring-amber-500/30 ring-offset-2 ring-offset-slate-900"
         : ""
     }
   `}
