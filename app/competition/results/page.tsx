@@ -1,15 +1,15 @@
 /**
- * ╔══════════════════════════════════════════════════════════════════════════════╗
- * ║   MiniFi Competition Results (MVP - Hackathon Edition)                       ║
- * ║   ✨ Vibe-coded by Tick.AI ✨                                                ║
- * ║   Copyright (c) 2025 NUVC.AI / Tick.AI. All Rights Reserved.                ║
- * ╚══════════════════════════════════════════════════════════════════════════════╝
+ * Mini.Fi Competition Results
+ * © 2025 NUVC.AI. All Rights Reserved.
  */
 
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, Suspense } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import CompetitionResults from "@/components/competition-results";
 
 function ResultsContent() {
@@ -39,7 +39,6 @@ function ResultsContent() {
         router.push("/competition");
       }
     } else {
-      // Redirect to competition setup if no results data
       router.push("/competition");
     }
   }, [searchParams, router]);
@@ -50,10 +49,10 @@ function ResultsContent() {
 
   if (!resultsData) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 flex items-center justify-center">
+      <div className="flex items-center justify-center pt-32">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mx-auto mb-4"></div>
-          <p className="text-slate-400">Loading results...</p>
+          <Loader2 className="h-8 w-8 animate-spin text-indigo-400 mx-auto mb-4" />
+          <p className="text-white/40">Loading results...</p>
         </div>
       </div>
     );
@@ -70,17 +69,47 @@ function ResultsContent() {
 
 export default function ResultsPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mx-auto mb-4"></div>
-            <p className="text-slate-400">Loading...</p>
+    <div className="min-h-screen bg-[#0a0a0f]">
+      {/* Subtle gradient */}
+      <div className="fixed inset-0 bg-gradient-to-b from-indigo-950/10 via-transparent to-violet-950/5 pointer-events-none" />
+      
+      {/* Header */}
+      <nav className="sticky top-0 z-50 border-b border-white/5 bg-[#0a0a0f]/80 backdrop-blur-xl">
+        <div className="container mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <Link href="/timeline" className="flex items-center gap-2 text-white/50 hover:text-white/90 transition-colors group">
+              <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
+              <span className="text-sm">Back</span>
+            </Link>
+            
+            <div className="flex items-center gap-3">
+              <Image
+                src="/favicon.png"
+                alt="Mini.Fi"
+                width={32}
+                height={32}
+                className="rounded-lg"
+              />
+              <span className="text-white/70 font-medium">Results</span>
+            </div>
+            
+            <div className="w-16" />
           </div>
         </div>
-      }
-    >
-      <ResultsContent />
-    </Suspense>
+      </nav>
+
+      <Suspense
+        fallback={
+          <div className="flex items-center justify-center pt-32">
+            <div className="text-center">
+              <Loader2 className="h-8 w-8 animate-spin text-indigo-400 mx-auto mb-4" />
+              <p className="text-white/40">Loading...</p>
+            </div>
+          </div>
+        }
+      >
+        <ResultsContent />
+      </Suspense>
+    </div>
   );
 }

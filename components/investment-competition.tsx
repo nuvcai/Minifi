@@ -327,26 +327,19 @@ export default function InvestmentCompetition({
     ].join(" ");
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950">
+    <div className="relative">
       <div className="container mx-auto px-4 py-4 sm:py-8">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row items-center justify-between mb-8 sm:mb-8 gap-6 sm:gap-0">
-          <Button
-            variant="outline"
-            onClick={onBack}
-            className="flex items-center gap-2 bg-transparent w-full sm:w-auto justify-center order-2 sm:order-none py-3 sm:py-2"
-          >
-            <ArrowLeft className="h-4 w-4" /> Back to Timeline
-          </Button>
-          <div className="text-center order-1 sm:order-none flex-1">
-            <h1 className="text-2xl sm:text-3xl font-serif font-bold text-foreground mb-2 sm:mb-1">
+        <div className="flex flex-col items-center mb-8 sm:mb-10 gap-4">
+          <div className="text-center">
+            <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">
               Investment Competition
             </h1>
-            <p className="text-sm sm:text-base text-muted-foreground">
+            <p className="text-white/50">
               Use your $5,000 starting capital to begin your investment journey
             </p>
           </div>
-          <div className="w-full sm:w-auto order-3 sm:order-none flex justify-end">
+          <div className="flex justify-center">
             <Button
               variant="destructive"
               className="w-full sm:w-auto py-3 sm:py-2"

@@ -167,17 +167,17 @@ export default function CompetitionResults({
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950">
+    <div className="relative">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-6 sm:mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-primary to-secondary rounded-full mb-3 sm:mb-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-indigo-500 to-violet-500 rounded-full mb-3 sm:mb-4">
             <Trophy className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
           </div>
-          <h1 className="text-2xl sm:text-4xl font-serif font-bold text-foreground mb-2">
+          <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2">
             Competition Results
           </h1>
-          <p className="text-base sm:text-lg text-muted-foreground">
+          <p className="text-base sm:text-lg text-white/50">
             Congratulations on completing the investment competition!
           </p>
         </div>

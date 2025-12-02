@@ -526,7 +526,7 @@ export default function TradingDashboard({
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950">
+    <div className="relative">
       <div className="container mx-auto px-4 py-4 sm:py-8">
         {/* Header */}
         <div className="mb-6 sm:mb-8">
@@ -534,10 +534,10 @@ export default function TradingDashboard({
           <div className="sm:hidden space-y-3">
             {/* Title Section */}
             <div className="text-center">
-              <h1 className="text-lg font-serif font-bold text-foreground mb-1">
+              <h1 className="text-lg font-bold text-white mb-1">
                 Investment Competition - Day {day}
               </h1>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-white/50">
                 Investing with {selectedCoach.name}
               </p>
             </div>
