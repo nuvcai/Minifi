@@ -134,13 +134,13 @@ export function InvestmentDecision({
       )}
 
       {/* Effort-Based Rewards Banner */}
-      <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-lg p-3">
+      <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/30 rounded-lg p-3">
         <div className="flex items-center gap-2 justify-center">
-          <Sparkles className="h-4 w-4 text-amber-500" />
-          <span className="text-sm font-medium text-amber-800">
+          <Sparkles className="h-4 w-4 text-amber-400" />
+          <span className="text-sm font-medium text-amber-300">
             Every choice earns Courage XP! The more you try, the more you learn. 🎯
           </span>
-          <Sparkles className="h-4 w-4 text-amber-500" />
+          <Sparkles className="h-4 w-4 text-amber-400" />
         </div>
       </div>
 

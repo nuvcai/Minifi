@@ -152,9 +152,9 @@ export function DailyStreak({ onBonusClaimed }: DailyStreakProps) {
         setStreakData(data);
         setTodayBonus(getStreakBonus(data.currentStreak));
         
-        // Show modal after state updates
+        // Show modal after a delay to not interrupt initial page load
         if (shouldShowModal) {
-          setShowClaimModal(true);
+          setTimeout(() => setShowClaimModal(true), 1500);
         }
       } catch (e) {
         console.error("Failed to load streak data:", e);
