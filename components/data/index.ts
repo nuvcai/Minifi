@@ -30,3 +30,6 @@ export * from './personalizedCoaching';
 // Marketing Data - Analytics, consent, attribution, security
 export * from './marketingData';
 
+// Marketing Messages - Value propositions, taglines, feature benefits, teasers
+export * from './marketingMessages';
+

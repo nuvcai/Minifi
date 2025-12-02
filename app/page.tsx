@@ -18,6 +18,8 @@ import { UpcomingFeatures } from "@/components/features/UpcomingFeatures";
 import { AssetClassMastery } from "@/components/features/AssetClassMastery";
 import { SupportTeaser } from "@/components/marketing/SupportTeaser";
 import { NewsletterSignup } from "@/components/marketing/NewsletterSignup";
+import { RoadmapTeaser } from "@/components/marketing/RoadmapTeaser";
+import { FeatureWisdomShowcase } from "@/components/marketing/FeatureWisdomShowcase";
 import { DailyWisdom } from "@/components/library/DailyWisdom";
 import { BookOpen } from "lucide-react";
 
@@ -404,9 +406,19 @@ export default function HomePage() {
             <div className="bg-slate-800/30 backdrop-blur rounded-2xl p-6 border border-slate-700/50">
               <UpcomingFeatures variant="compact" maxItems={4} />
               
+              {/* Roadmap Teaser Banner */}
+              <div className="mt-6 pt-6 border-t border-slate-700/50">
+                <RoadmapTeaser variant="banner" maxItems={3} />
+              </div>
+              
               {/* Asset Class Mastery Preview */}
               <div className="mt-6 pt-6 border-t border-slate-700/50">
                 <AssetClassMastery variant="compact" />
+              </div>
+              
+              {/* Feature Wisdom Showcase - Shows how features connect to learning */}
+              <div className="mt-6 pt-6 border-t border-slate-700/50">
+                <FeatureWisdomShowcase variant="carousel" />
               </div>
 
               {/* Wisdom Library Teaser */}
