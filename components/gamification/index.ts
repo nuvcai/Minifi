@@ -12,6 +12,13 @@ export { CourageXpNotification, MiniCourageXp } from "./CourageXpNotification";
 export { LevelUpCelebration, levelTitles } from "./LevelUpCelebration";
 export { XpProgressBar, XpBadge } from "./XpProgressBar";
 export { DailyStreak, StreakBadge } from "./DailyStreak";
+export { 
+  FloatingXp, 
+  InlineFloatingXp, 
+  FloatingXpContainer, 
+  useFloatingXp,
+  type FloatingXpItem 
+} from "./FloatingXp";
 
 // Effort Rewards Data & Utilities
 export {

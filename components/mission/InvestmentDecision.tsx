@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -7,6 +7,7 @@ import { DollarSign, BarChart3, InfoIcon, Clock, TrendingUp, Sparkles } from "lu
 import { InvestmentOption, AssetClass, TimeHorizon } from "@/components/data/missions";
 import { RiskPreviewCard } from "@/components/gamification/RiskPreviewCard";
 import { CourageXpNotification } from "@/components/gamification/CourageXpNotification";
+import { InlineFloatingXp } from "@/components/gamification/FloatingXp";
 import { getCourageXpForRisk } from "@/components/gamification/effortRewards";
 
 // Asset class display configuration
@@ -48,10 +49,19 @@ export function InvestmentDecision({
     xp: number;
     label: string;
   } | null>(null);
+  
+  // Track which card is showing floating XP
+  const [floatingXpCard, setFloatingXpCard] = useState<string | null>(null);
 
   const selectedOption = selectedInvestment
     ? options.find((o) => o.id === selectedInvestment)
     : null;
+    
+  // Handle card selection with floating XP feedback
+  const handleCardSelect = useCallback((optionId: string) => {
+    onInvestmentSelect(optionId);
+    setFloatingXpCard(optionId);
+  }, [onInvestmentSelect]);
 
   const getRiskBadgeVariant = (risk: string) => {
     switch (risk.toLowerCase()) {
@@ -147,16 +157,28 @@ export function InvestmentDecision({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {options.map((option) => {
           const courageReward = getCourageXpForRisk(option.risk);
+          const isSelected = selectedInvestment === option.id;
+          const showFloating = floatingXpCard === option.id;
+          
           return (
             <Card
               key={option.id}
-              className={`cursor-pointer transition-all hover:shadow-md ${
-                selectedInvestment === option.id
-                  ? "border-primary bg-primary/5"
+              className={`cursor-pointer transition-all hover:shadow-md relative ${
+                isSelected
+                  ? "border-primary bg-primary/5 animate-xp-shake"
                   : ""
               }`}
-              onClick={() => onInvestmentSelect(option.id)}
+              onClick={() => handleCardSelect(option.id)}
             >
+              {/* Floating XP on selection */}
+              <InlineFloatingXp
+                show={showFloating}
+                amount={courageReward.xp}
+                type="courage"
+                onComplete={() => setFloatingXpCard(null)}
+                className="z-10"
+              />
+              
               <CardContent>
                 <div className="space-y-3">
                   <div className="space-y-2">
@@ -168,8 +190,10 @@ export function InvestmentDecision({
                     </div>
                     
                     {/* Courage XP Preview */}
-                    <div className="flex items-center gap-1 text-xs text-amber-600">
-                      <Sparkles className="h-3 w-3" />
+                    <div className={`flex items-center gap-1 text-xs transition-colors ${
+                      isSelected ? "text-amber-400" : "text-amber-600"
+                    }`}>
+                      <Sparkles className={`h-3 w-3 ${isSelected ? "animate-pulse" : ""}`} />
                       <span>+{courageReward.xp} Courage XP</span>
                     </div>
                     

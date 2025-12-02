@@ -167,3 +167,82 @@
 .text-glow {
   text-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Gamification Animations - FloatingXp & XP Notifications
+   GPU-accelerated with transform + opacity for smooth 60fps
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Float up and fade out - for XP notifications */
+@keyframes float-up-fade {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-30px) scale(1.1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-60px) scale(0.9);
+  }
+}
+
+.animate-float-up-fade {
+  animation: float-up-fade 1.5s ease-out forwards;
+}
+
+/* Bounce in for celebrations */
+@keyframes bounce-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-bounce-in {
+  animation: bounce-in 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+}
+
+/* Pulse glow for active elements */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(16, 185, 129, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.6), 0 0 30px rgba(16, 185, 129, 0.3);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* XP shake for button feedback */
+@keyframes xp-shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  20%, 60% {
+    transform: translateX(-2px);
+  }
+  40%, 80% {
+    transform: translateX(2px);
+  }
+}
+
+.animate-xp-shake {
+  animation: xp-shake 0.4s ease-in-out;
+}

@@ -29,6 +29,7 @@ import {
   Star,
   Zap,
 } from "lucide-react";
+import { InlineFloatingXp } from "./FloatingXp";
 
 // Streak milestone rewards
 const streakMilestones: Record<number, { bonus: number; badge?: string; special?: string }> = {
@@ -96,6 +97,8 @@ export function DailyStreak({ onBonusClaimed }: DailyStreakProps) {
   const [showClaimModal, setShowClaimModal] = useState(false);
   const [todayBonus, setTodayBonus] = useState(0);
   const [isNewStreak, setIsNewStreak] = useState(false);
+  const [showFloatingXp, setShowFloatingXp] = useState(false);
+  const [claimedBonus, setClaimedBonus] = useState(0);
 
   // Load streak data and check if we need to update
   useEffect(() => {
@@ -177,12 +180,17 @@ export function DailyStreak({ onBonusClaimed }: DailyStreakProps) {
     setStreakData(newData);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(newData));
 
-    // Notify parent
-    if (onBonusClaimed) {
-      onBonusClaimed(bonus);
-    }
+    // Show floating XP animation
+    setClaimedBonus(bonus);
+    setShowFloatingXp(true);
 
-    setShowClaimModal(false);
+    // Notify parent after a brief delay for the animation
+    setTimeout(() => {
+      if (onBonusClaimed) {
+        onBonusClaimed(bonus);
+      }
+      setShowClaimModal(false);
+    }, 800);
   };
 
   const nextMilestone = getNextMilestone(streakData.currentStreak);
@@ -349,23 +357,38 @@ export function DailyStreak({ onBonusClaimed }: DailyStreakProps) {
             </div>
 
             {/* Claim button */}
-            <Button
-              onClick={claimBonus}
-              disabled={streakData.claimedToday}
-              className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold py-3"
-            >
-              {streakData.claimedToday ? (
-                <>
-                  <Trophy className="h-4 w-4 mr-2" />
-                  Already Claimed Today!
-                </>
-              ) : (
-                <>
-                  <Gift className="h-4 w-4 mr-2" />
-                  Claim +{todayBonus} XP
-                </>
-              )}
-            </Button>
+            <div className="relative">
+              <InlineFloatingXp
+                show={showFloatingXp}
+                amount={claimedBonus}
+                type="streak"
+                onComplete={() => setShowFloatingXp(false)}
+              />
+              <Button
+                onClick={claimBonus}
+                disabled={streakData.claimedToday || showFloatingXp}
+                className={`w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold py-3 ${
+                  showFloatingXp ? "animate-pulse-glow" : ""
+                }`}
+              >
+                {streakData.claimedToday ? (
+                  <>
+                    <Trophy className="h-4 w-4 mr-2" />
+                    Already Claimed Today!
+                  </>
+                ) : showFloatingXp ? (
+                  <>
+                    <Sparkles className="h-4 w-4 mr-2 animate-spin" />
+                    XP Claimed!
+                  </>
+                ) : (
+                  <>
+                    <Gift className="h-4 w-4 mr-2" />
+                    Claim +{todayBonus} XP
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
