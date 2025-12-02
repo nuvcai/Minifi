@@ -416,6 +416,20 @@ CREATE TRIGGER sponsors_updated_at
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at();
 
+-- Trigger for user_profiles table
+DROP TRIGGER IF EXISTS user_profiles_updated_at ON user_profiles;
+CREATE TRIGGER user_profiles_updated_at
+  BEFORE UPDATE ON user_profiles
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at();
+
+-- Trigger for daily_streaks table
+DROP TRIGGER IF EXISTS daily_streaks_updated_at ON daily_streaks;
+CREATE TRIGGER daily_streaks_updated_at
+  BEFORE UPDATE ON daily_streaks
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at();
+
 -- =============================================================================
 -- SAMPLE DATA (for testing - remove in production)
 -- =============================================================================
