@@ -29,7 +29,7 @@ const plusJakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "MiniFi by NUVC.AI - Financial Literacy Platform",
+  title: "Mini.Fi by NUVC.AI - Financial Literacy Platform",
   description: "Empowering Australian teens with AI-powered investment education through gamified learning. © 2025 NUVC.AI / Tick.AI",
   icons: {
     icon: '/favicon.png',

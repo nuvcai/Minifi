@@ -46,7 +46,7 @@ export function GameHeader({
                 height={48}
                 className="object-contain w-8 h-8 sm:w-12 sm:h-12"
               />
-              MiniFi
+              Mini.Fi
             </h1>
             <p className="text-xs sm:text-sm text-slate-400">
               Travel through time, master the markets! 🚀

@@ -29,7 +29,7 @@ export default function HomePage() {
   const [copied, setCopied] = useState(false);
 
   const shareUrl = "https://minifi.vercel.app";
-  const shareText = "🎮 Check out MiniFi - a free game that teaches teens about investing through time-travel adventures! Built with AI for the AWS Hackathon 2025 🚀";
+  const shareText = "🎮 Check out Mini.Fi - a free game that teaches teens about investing through time-travel adventures! Built with AI for the AWS Hackathon 2025 🚀";
   
   const handleCopyLink = async () => {
     try {
@@ -137,8 +137,8 @@ export default function HomePage() {
                   className="relative object-contain w-20 h-20 sm:w-24 sm:h-24 drop-shadow-lg"
                 />
               </div>
-              <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent leading-tight">
-                MiniFi
+              <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black bg-gradient-to-r from-indigo-400 via-violet-400 to-purple-400 bg-clip-text text-transparent leading-tight">
+                Mini.Fi
               </h1>
               <p className="text-xl sm:text-2xl font-medium text-slate-300 flex items-center gap-2">
                 <Sparkles className="h-5 w-5 text-emerald-400 animate-pulse" />

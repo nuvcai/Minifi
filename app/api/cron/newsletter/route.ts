@@ -84,7 +84,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
               'Content-Type': 'application/json'
             },
             body: JSON.stringify(batch.map(email => ({
-              from: process.env.EMAIL_FROM || 'MiniFi <news@nuvc.ai>',
+              from: process.env.EMAIL_FROM || 'Mini.Fi <news@nuvc.ai>',
               to: email,
               subject: edition.title,
               html

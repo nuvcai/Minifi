@@ -87,7 +87,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<Subscribe
 
     return NextResponse.json({
       success: true,
-      message: 'Successfully subscribed! Welcome to MiniFi 🎉',
+      message: 'Successfully subscribed! Welcome to Mini.Fi 🎉',
       subscriber: {
         email: normalizedEmail,
         subscribedAt: result.data?.subscribed_at || new Date().toISOString()
