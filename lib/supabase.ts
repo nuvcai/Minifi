@@ -396,7 +396,7 @@ export const userProfilesService = {
 
     try {
       // Convert camelCase to snake_case for database
-      const dbProfile = {
+      const dbProfile: Record<string, unknown> = {
         email: profile.email?.toLowerCase(),
         display_name: profile.display_name,
         session_id: profile.session_id,
@@ -415,6 +415,12 @@ export const userProfilesService = {
         terms_accepted_at: profile.terms_accepted ? new Date().toISOString() : null,
         marketing_consent: profile.marketing_consent,
         marketing_consent_at: profile.marketing_consent ? new Date().toISOString() : null,
+        // Game progress fields
+        total_xp: profile.total_xp ?? 0,
+        player_level: profile.player_level ?? 1,
+        daily_streak: profile.daily_streak ?? 0,
+        completed_missions: profile.completed_missions ?? [],
+        // Attribution and metadata
         source: profile.source,
         utm_source: profile.utm_source,
         utm_medium: profile.utm_medium,
@@ -423,6 +429,13 @@ export const userProfilesService = {
         onboarding_completed_at: new Date().toISOString(),
         last_active_at: new Date().toISOString()
       };
+      
+      // Remove undefined values to avoid database errors
+      Object.keys(dbProfile).forEach(key => {
+        if (dbProfile[key] === undefined) {
+          delete dbProfile[key];
+        }
+      });
 
       // If email provided, upsert by email
       if (profile.email) {

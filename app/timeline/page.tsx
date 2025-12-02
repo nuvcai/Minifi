@@ -28,6 +28,22 @@ import { financialEvents, FinancialEvent } from "@/components/data/events";
 import { aiCoaches } from "@/components/data/coaches";
 import { missionData } from "@/components/data/missions";
 
+// Local storage keys
+const GAME_PROGRESS_KEY = "minifi_game_progress";
+const USER_EMAIL_KEY = "minifi_user_email";
+const SESSION_KEY = "minifi_session_id";
+
+// Generate or get session ID for anonymous users
+const getOrCreateSessionId = () => {
+  if (typeof window === 'undefined') return null;
+  let sessionId = localStorage.getItem(SESSION_KEY);
+  if (!sessionId) {
+    sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    localStorage.setItem(SESSION_KEY, sessionId);
+  }
+  return sessionId;
+};
+
 export default function TimelinePage() {
   // State
   const [selectedEvent, setSelectedEvent] = useState<FinancialEvent | null>(null);
@@ -50,6 +66,124 @@ export default function TimelinePage() {
   const [selectedInvestment, setSelectedInvestment] = useState<string | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [missionResult, setMissionResult] = useState<any>(null);
+
+  // Load saved progress on mount
+  useEffect(() => {
+    const loadProgress = async () => {
+      const savedEmail = localStorage.getItem(USER_EMAIL_KEY);
+      const sessionId = getOrCreateSessionId(); // Create session ID if needed
+      
+      let dbXP = 0;
+      let dbLevel = 1;
+      let loadedFromDb = false;
+      
+      // Try to load from database first
+      if (savedEmail || sessionId) {
+        try {
+          const params = new URLSearchParams();
+          if (savedEmail) params.append('email', savedEmail);
+          else if (sessionId) params.append('sessionId', sessionId);
+          
+          const response = await fetch(`/api/streak?${params.toString()}`);
+          const result = await response.json();
+          
+          if (result.success && result.data) {
+            const data = result.data;
+            if (data.totalXP > 0) {
+              dbXP = data.totalXP;
+              dbLevel = data.playerLevel || Math.floor(data.totalXP / 1000) + 1;
+              loadedFromDb = true;
+            }
+          }
+        } catch (e) {
+          console.log("Falling back to localStorage for game progress");
+        }
+      }
+      
+      // Also check localStorage for completed missions and compare XP
+      try {
+        const saved = localStorage.getItem(GAME_PROGRESS_KEY);
+        if (saved) {
+          const progress = JSON.parse(saved);
+          if (progress.completedMissions) {
+            setCompletedMissions(progress.completedMissions);
+            // Restore completed status on events
+            progress.completedMissions.forEach((title: string) => {
+              const event = financialEvents.find(e => e.title === title);
+              if (event) event.completed = true;
+            });
+            updateUnlockStatus();
+          }
+          
+          // Use higher XP value between DB and localStorage
+          const localXP = progress.playerXP || 0;
+          const localLevel = progress.playerLevel || 1;
+          
+          if (localXP > dbXP) {
+            setPlayerXP(localXP);
+            setTotalScore(localXP);
+            setPlayerLevel(localLevel);
+          } else if (loadedFromDb) {
+            setPlayerXP(dbXP);
+            setTotalScore(dbXP);
+            setPlayerLevel(dbLevel);
+          }
+        } else if (loadedFromDb) {
+          // No local storage, use DB values
+          setPlayerXP(dbXP);
+          setTotalScore(dbXP);
+          setPlayerLevel(dbLevel);
+        }
+      } catch (e) {
+        console.error("Failed to load game progress:", e);
+        // Still apply DB values if available
+        if (loadedFromDb) {
+          setPlayerXP(dbXP);
+          setTotalScore(dbXP);
+          setPlayerLevel(dbLevel);
+        }
+      }
+    };
+    
+    loadProgress();
+  }, []);
+
+  // Save progress to localStorage and database when it changes
+  const saveProgress = async (xp: number, level: number, missions: string[]) => {
+    // Save to localStorage
+    const progress = {
+      playerXP: xp,
+      playerLevel: level,
+      completedMissions: missions,
+      lastUpdated: new Date().toISOString(),
+    };
+    localStorage.setItem(GAME_PROGRESS_KEY, JSON.stringify(progress));
+    
+    // Sync to database - always try (will create profile if needed)
+    const savedEmail = localStorage.getItem(USER_EMAIL_KEY);
+    const sessionId = getOrCreateSessionId();
+    
+    if (savedEmail || sessionId) {
+      try {
+        await fetch('/api/streak', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'sync',
+            email: savedEmail,
+            sessionId,
+            streakData: {
+              totalXP: xp,
+              playerLevel: level,
+              completedMissions: missions,
+            },
+          }),
+        });
+      } catch (e) {
+        console.log("Failed to sync progress to database");
+      }
+    }
+  };
 
   const updateUnlockStatus = () => {
     financialEvents.forEach((event) => {
@@ -135,10 +269,12 @@ export default function TimelinePage() {
   const completeMission = () => {
     if (missionEvent && missionResult) {
       const missionReward = missionEvent.reward;
+      const newXP = playerXP + missionReward;
+      const newMissions = [...completedMissions, missionEvent.title];
 
-      setPlayerXP((prev) => prev + missionReward);
-      setTotalScore((prev) => prev + missionReward);
-      setCompletedMissions((prev) => [...prev, missionEvent.title]);
+      setPlayerXP(newXP);
+      setTotalScore(newXP);
+      setCompletedMissions(newMissions);
 
       const eventIndex = financialEvents.findIndex((e) => e.year === missionEvent.year);
       if (eventIndex !== -1) {
@@ -146,11 +282,16 @@ export default function TimelinePage() {
         updateUnlockStatus();
       }
 
-      const newLevel = Math.floor((playerXP + missionReward) / 1000) + 1;
+      const newLevel = Math.floor(newXP / 1000) + 1;
       if (newLevel > playerLevel) {
         setLevelUpInfo({ newLevel, previousLevel: playerLevel });
         setPlayerLevel(newLevel);
         setTimeout(() => setShowLevelUp(true), 500);
+        // Save with new level
+        saveProgress(newXP, newLevel, newMissions);
+      } else {
+        // Save with current level
+        saveProgress(newXP, playerLevel, newMissions);
       }
 
       if (missionEvent.year === 2025 && missionEvent.title === "Current Challenges") {
@@ -167,19 +308,41 @@ export default function TimelinePage() {
 
   const redeemReward = (reward: { id: string; cost: number }) => {
     if (playerXP >= reward.cost && !redeemedRewards.includes(reward.id)) {
-      setPlayerXP((prev) => prev - reward.cost);
+      const newXP = playerXP - reward.cost;
+      setPlayerXP(newXP);
+      setTotalScore(newXP); // Keep score in sync with XP
       setRedeemedRewards((prev) => [...prev, reward.id]);
+      // Save progress after redeeming
+      saveProgress(newXP, playerLevel, completedMissions);
     }
   };
 
   const handleXpEarned = (amount: number) => {
-    setPlayerXP((prev) => prev + amount);
-    setTotalScore((prev) => prev + amount);
+    const newXP = playerXP + amount;
+    setPlayerXP(newXP);
+    setTotalScore(newXP);
+    
+    const newLevel = Math.floor(newXP / 1000) + 1;
+    if (newLevel > playerLevel) {
+      setPlayerLevel(newLevel);
+    }
+    
+    // Save progress
+    saveProgress(newXP, Math.max(newLevel, playerLevel), completedMissions);
   };
 
   const handleStreakBonus = (bonus: number) => {
-    setPlayerXP((prev) => prev + bonus);
-    setTotalScore((prev) => prev + bonus);
+    const newXP = playerXP + bonus;
+    setPlayerXP(newXP);
+    setTotalScore(newXP);
+    
+    const newLevel = Math.floor(newXP / 1000) + 1;
+    if (newLevel > playerLevel) {
+      setPlayerLevel(newLevel);
+    }
+    
+    // Save progress
+    saveProgress(newXP, Math.max(newLevel, playerLevel), completedMissions);
   };
 
   const closeMissionModal = () => {

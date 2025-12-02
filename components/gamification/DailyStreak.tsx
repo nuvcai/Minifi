@@ -62,14 +62,30 @@ function getNextMilestone(days: number): { day: number; bonus: number } | null {
   return null;
 }
 
-const STORAGE_KEY = "minifi_streak";
+// Use consistent storage key across all streak components
+const STORAGE_KEY = "minifi_streak_data";
+const USER_EMAIL_KEY = "minifi_user_email";
+const SESSION_KEY = "minifi_session_id";
 
+// Generate or get session ID for anonymous users
+const getOrCreateSessionId = () => {
+  if (typeof window === 'undefined') return null;
+  let sessionId = localStorage.getItem(SESSION_KEY);
+  if (!sessionId) {
+    sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    localStorage.setItem(SESSION_KEY, sessionId);
+  }
+  return sessionId;
+};
+
+// Aligned with app/page.tsx structure for consistency
 interface StreakData {
   currentStreak: number;
-  lastPlayDate: string | null;
+  lastClaimDate: string | null; // Renamed from lastClaimDate for consistency
   longestStreak: number;
   totalDaysPlayed: number;
-  claimedToday: boolean;
+  todayClaimed: boolean; // Renamed from todayClaimed for consistency
+  totalXP?: number; // Added for consistency with homepage
 }
 
 interface DailyStreakProps {
@@ -79,49 +95,93 @@ interface DailyStreakProps {
 export function DailyStreak({ onBonusClaimed }: DailyStreakProps) {
   const [streakData, setStreakData] = useState<StreakData>({
     currentStreak: 0,
-    lastPlayDate: null,
+    lastClaimDate: null,
     longestStreak: 0,
     totalDaysPlayed: 0,
-    claimedToday: false,
+    todayClaimed: false,
+    totalXP: 0,
   });
   const [showClaimModal, setShowClaimModal] = useState(false);
   const [todayBonus, setTodayBonus] = useState(0);
   const [showFloatingXp, setShowFloatingXp] = useState(false);
   const [claimedBonus, setClaimedBonus] = useState(0);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
 
   useEffect(() => {
-    const loadAndUpdateStreak = () => {
+    const loadAndUpdateStreak = async () => {
       const today = new Date().toDateString();
+      const savedEmail = localStorage.getItem(USER_EMAIL_KEY);
+      const sessionId = getOrCreateSessionId(); // Generate session ID if needed
+      
+      if (savedEmail) {
+        setUserEmail(savedEmail);
+      }
       
       try {
+        // Try to load from database first
+        if (savedEmail || sessionId) {
+          try {
+            const params = new URLSearchParams();
+            if (savedEmail) params.append('email', savedEmail);
+            else if (sessionId) params.append('sessionId', sessionId);
+            
+            const response = await fetch(`/api/streak?${params.toString()}`);
+            const result = await response.json();
+            
+            if (result.success && result.data && (result.data.currentStreak > 0 || result.data.totalXP > 0)) {
+              const dbStreak = result.data.currentStreak || 0;
+              const data: StreakData = {
+                currentStreak: dbStreak,
+                lastClaimDate: result.data.lastClaimDate ? new Date(result.data.lastClaimDate).toDateString() : null,
+                longestStreak: Math.max(dbStreak, 0),
+                totalDaysPlayed: dbStreak,
+                todayClaimed: result.data.todayClaimed || false,
+              };
+              
+              setStreakData(data);
+              setTodayBonus(getStreakBonus(data.currentStreak));
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+              
+              // Show modal if not claimed today
+              if (!data.todayClaimed && data.currentStreak > 0) {
+                setTimeout(() => setShowClaimModal(true), 1500);
+              }
+              return;
+            }
+          } catch (e) {
+            console.log("Falling back to localStorage for streak");
+          }
+        }
+        
+        // Fallback to localStorage
         const saved = localStorage.getItem(STORAGE_KEY);
         let data: StreakData = saved ? JSON.parse(saved) : {
           currentStreak: 0,
-          lastPlayDate: null,
+          lastClaimDate: null,
           longestStreak: 0,
           totalDaysPlayed: 0,
-          claimedToday: false,
+          todayClaimed: false,
         };
 
         let shouldShowModal = false;
 
-        if (data.lastPlayDate !== today) {
+        if (data.lastClaimDate !== today) {
           const yesterday = new Date();
           yesterday.setDate(yesterday.getDate() - 1);
-          const wasYesterday = data.lastPlayDate === yesterday.toDateString();
+          const wasYesterday = data.lastClaimDate === yesterday.toDateString();
 
           if (wasYesterday) {
             data.currentStreak += 1;
-          } else if (data.lastPlayDate) {
+          } else if (data.lastClaimDate) {
             data.currentStreak = 1;
           } else {
             data.currentStreak = 1;
           }
 
-          data.lastPlayDate = today;
+          data.lastClaimDate = today;
           data.totalDaysPlayed += 1;
           data.longestStreak = Math.max(data.longestStreak, data.currentStreak);
-          data.claimedToday = false;
+          data.todayClaimed = false;
 
           localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
           shouldShowModal = true;
@@ -141,14 +201,33 @@ export function DailyStreak({ onBonusClaimed }: DailyStreakProps) {
     loadAndUpdateStreak();
   }, []);
 
-  const claimBonus = () => {
-    if (streakData.claimedToday) return;
+  const claimBonus = async () => {
+    if (streakData.todayClaimed) return;
 
     const bonus = getStreakBonus(streakData.currentStreak);
+    const savedEmail = localStorage.getItem(USER_EMAIL_KEY);
+    const sessionId = getOrCreateSessionId(); // Always have a session ID
+    
+    // Always sync with database (will create profile if needed)
+    if (savedEmail || sessionId) {
+      try {
+        await fetch('/api/streak', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'claim',
+            email: savedEmail,
+            sessionId,
+          }),
+        });
+      } catch (e) {
+        console.log("Failed to sync claim to database, saving locally");
+      }
+    }
     
     const newData = {
       ...streakData,
-      claimedToday: true,
+      todayClaimed: true,
     };
     setStreakData(newData);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(newData));
@@ -209,7 +288,7 @@ export function DailyStreak({ onBonusClaimed }: DailyStreakProps) {
           </div>
 
           {/* Bonus button */}
-          {!streakData.claimedToday && streakData.currentStreak > 0 && (
+          {!streakData.todayClaimed && streakData.currentStreak > 0 && (
             <Button
               size="sm"
               onClick={() => setShowClaimModal(true)}
@@ -219,7 +298,7 @@ export function DailyStreak({ onBonusClaimed }: DailyStreakProps) {
               +{todayBonus} XP
             </Button>
           )}
-          {streakData.claimedToday && (
+          {streakData.todayClaimed && (
             <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200">
               ✓ Claimed
             </Badge>
@@ -334,12 +413,12 @@ export function DailyStreak({ onBonusClaimed }: DailyStreakProps) {
               />
               <Button
                 onClick={claimBonus}
-                disabled={streakData.claimedToday || showFloatingXp}
+                disabled={streakData.todayClaimed || showFloatingXp}
                 className={`w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold py-3 shadow-lg shadow-amber-200 ${
                   showFloatingXp ? "animate-pulse" : ""
                 }`}
               >
-                {streakData.claimedToday ? (
+                {streakData.todayClaimed ? (
                   <>
                     <Trophy className="h-4 w-4 mr-2" />
                     Already Claimed Today!

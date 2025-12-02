@@ -62,11 +62,13 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Check if today has been claimed based on last_active_at
+    // Check if today has been claimed
+    // Must have: last_active_at is today AND daily_streak > 0 (to confirm it was a streak claim)
     const lastActive = profile.last_active_at ? new Date(profile.last_active_at) : null;
     const today = new Date();
     const todayClaimed = lastActive && 
-      lastActive.toDateString() === today.toDateString();
+      lastActive.toDateString() === today.toDateString() &&
+      (profile.daily_streak || 0) > 0;
 
     return NextResponse.json({
       success: true,
@@ -152,18 +154,24 @@ async function handleClaimStreak(email?: string, sessionId?: string) {
     }
 
     const today = new Date();
+    const todayDateStr = today.toDateString();
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayDateStr = yesterday.toDateString();
 
     let currentStreak = 1;
     let bonusEarned = false;
     let xpEarned = 10; // Base XP for daily claim
 
     if (profile) {
+      // Use last_active_at to track streak claims
+      // This is the timestamp of the last streak-related activity
       const lastActive = profile.last_active_at ? new Date(profile.last_active_at) : null;
+      const lastActiveDate = lastActive ? lastActive.toDateString() : null;
       
-      // Check if already claimed today
-      if (lastActive && lastActive.toDateString() === today.toDateString()) {
+      // Check if already claimed today based on last_active_at AND current streak > 0
+      // We also check if daily_streak > 0 to ensure this was an actual streak claim
+      if (lastActiveDate === todayDateStr && (profile.daily_streak || 0) > 0) {
         return NextResponse.json({
           success: true,
           data: {
@@ -177,10 +185,14 @@ async function handleClaimStreak(email?: string, sessionId?: string) {
       }
 
       // Check if streak continues (last active was yesterday)
-      if (lastActive && lastActive.toDateString() === yesterday.toDateString()) {
+      if (lastActiveDate === yesterdayDateStr) {
         currentStreak = (profile.daily_streak || 0) + 1;
+      } else if (lastActiveDate === todayDateStr) {
+        // Same day but streak was 0 (first claim after reset)
+        currentStreak = 1;
       } else {
-        currentStreak = 1; // Streak broken, start fresh
+        // Streak broken (more than 1 day gap), start fresh
+        currentStreak = 1;
       }
 
       // Check for streak milestones
@@ -190,19 +202,56 @@ async function handleClaimStreak(email?: string, sessionId?: string) {
       } else if (currentStreak === 30) {
         xpEarned += 200; // 30-day bonus
         bonusEarned = true;
-      } else if (currentStreak % 7 === 0) {
-        xpEarned += 25; // Weekly bonus
+      } else if (currentStreak % 7 === 0 && currentStreak > 7) {
+        xpEarned += 25; // Weekly bonus after first week
         bonusEarned = true;
       }
-    }
 
-    const totalXP = (profile?.total_xp || 0) + xpEarned;
+      const totalXP = (profile.total_xp || 0) + xpEarned;
 
-    // Update profile if we have an identifier
-    if (identifier.email || identifier.sessionId) {
+      // Update existing profile
       await userProfilesService.updateProgress(identifier, {
         daily_streak: currentStreak,
         total_xp: totalXP,
+      });
+
+      return NextResponse.json({
+        success: true,
+        data: {
+          currentStreak,
+          xpEarned,
+          totalXP,
+          bonusEarned,
+          alreadyClaimed: false,
+        }
+      });
+    }
+
+    // No profile exists - create one for this user
+    const totalXP = xpEarned; // First claim, no existing XP
+    
+    const createResult = await userProfilesService.saveOnboarding({
+      email: identifier.email,
+      session_id: identifier.sessionId,
+      daily_streak: currentStreak,
+      total_xp: totalXP,
+      source: 'streak_claim',
+      terms_accepted: false, // Will need to accept later
+    });
+
+    if (!createResult.success) {
+      logger.error('Failed to create profile for streak claim:', createResult.error);
+      // Return success anyway with calculated data - frontend will use localStorage
+      return NextResponse.json({
+        success: true,
+        data: {
+          currentStreak,
+          xpEarned,
+          totalXP,
+          bonusEarned,
+          alreadyClaimed: false,
+          profileCreated: false,
+        }
       });
     }
 
@@ -214,6 +263,7 @@ async function handleClaimStreak(email?: string, sessionId?: string) {
         totalXP,
         bonusEarned,
         alreadyClaimed: false,
+        profileCreated: true,
       }
     });
 
@@ -329,18 +379,54 @@ async function handleSyncProgress(email?: string, sessionId?: string, streakData
   }
 
   try {
-    const identifier = email ? { email } : { sessionId: sessionId! };
+    // Check if profile exists
+    let profile = null;
+    if (email) {
+      profile = await userProfilesService.getByEmail(email);
+    } else if (sessionId) {
+      profile = await userProfilesService.getBySession(sessionId);
+    }
 
-    await userProfilesService.updateProgress(identifier, {
-      daily_streak: streakData?.currentStreak,
-      total_xp: streakData?.totalXP,
-      player_level: streakData?.playerLevel,
-      completed_missions: streakData?.completedMissions,
+    if (profile) {
+      // Update existing profile
+      const identifier = email ? { email } : { sessionId: sessionId! };
+      await userProfilesService.updateProgress(identifier, {
+        daily_streak: streakData?.currentStreak,
+        total_xp: streakData?.totalXP,
+        player_level: streakData?.playerLevel,
+        completed_missions: streakData?.completedMissions,
+      });
+
+      return NextResponse.json({
+        success: true,
+        message: 'Progress synced successfully',
+      });
+    }
+
+    // No profile exists - create one
+    const createResult = await userProfilesService.saveOnboarding({
+      email: email,
+      session_id: sessionId,
+      daily_streak: streakData?.currentStreak || 0,
+      total_xp: streakData?.totalXP || 0,
+      player_level: streakData?.playerLevel || 1,
+      completed_missions: streakData?.completedMissions || [],
+      source: 'progress_sync',
+      terms_accepted: false,
     });
+
+    if (!createResult.success) {
+      logger.error('Failed to create profile for sync:', createResult.error);
+      return NextResponse.json({
+        success: true, // Return success - frontend will use localStorage
+        message: 'Progress saved locally (profile creation pending)',
+      });
+    }
 
     return NextResponse.json({
       success: true,
-      message: 'Progress synced successfully',
+      message: 'Profile created and progress synced',
+      profileCreated: true,
     });
 
   } catch (error) {

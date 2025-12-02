@@ -16,6 +16,11 @@ import {
   EffortBadge,
   LearningMilestone,
 } from "@/components/gamification/effortRewards";
+import {
+  calculateShareReward,
+  claimShareReward,
+  SHARE_REWARDS,
+} from "@/lib/marketing";
 
 interface EffortStats {
   investmentsMade: number;
@@ -30,6 +35,10 @@ interface EffortStats {
   consecutiveLosses: number;
   missionsCompleted: number;
   currentStreak: number;
+  // Share tracking
+  totalShares: number;
+  sharesByPlatform: Record<string, number>;
+  shareXpEarned: number;
 }
 
 interface EarnedReward {
@@ -50,6 +59,10 @@ interface UseEffortRewardsReturn {
   recordCoachAdviceViewed: (coachId: string) => void;
   recordMissionCompleted: () => void;
   clearPendingNotification: () => void;
+  
+  // Share actions
+  recordShare: (platform: string) => { xp: number; canClaim: boolean; cooldownRemaining: number };
+  getShareRewardInfo: (platform: string) => { xp: number; canClaim: boolean; cooldownRemaining: number };
   
   // Helpers
   getLossEncouragement: () => string;
@@ -73,6 +86,10 @@ const initialStats: EffortStats = {
   consecutiveLosses: 0,
   missionsCompleted: 0,
   currentStreak: 0,
+  // Share tracking
+  totalShares: 0,
+  sharesByPlatform: {},
+  shareXpEarned: 0,
 };
 
 export function useEffortRewards(): UseEffortRewardsReturn {
@@ -316,6 +333,37 @@ export function useEffortRewards(): UseEffortRewardsReturn {
     setPendingNotifications((prev) => prev.slice(1));
   }, []);
 
+  // Get share reward info without claiming
+  const getShareRewardInfo = useCallback((platform: string) => {
+    const streakMultiplier = stats.currentStreak > 0 ? 1 + (stats.currentStreak * 0.05) : 1;
+    return calculateShareReward(platform, Math.min(streakMultiplier, 2)); // Cap at 2x
+  }, [stats.currentStreak]);
+
+  // Record a share and claim reward
+  const recordShare = useCallback((platform: string) => {
+    const rewardInfo = getShareRewardInfo(platform);
+    
+    if (!rewardInfo.canClaim) {
+      return rewardInfo;
+    }
+
+    // Claim the reward
+    const xpEarned = claimShareReward(platform);
+    
+    // Update stats
+    setStats((prev) => ({
+      ...prev,
+      totalShares: prev.totalShares + 1,
+      sharesByPlatform: {
+        ...prev.sharesByPlatform,
+        [platform]: (prev.sharesByPlatform[platform] || 0) + 1,
+      },
+      shareXpEarned: prev.shareXpEarned + xpEarned,
+    }));
+
+    return { ...rewardInfo, xp: xpEarned };
+  }, [getShareRewardInfo]);
+
   // Get random loss encouragement message
   const getLossEncouragement = useCallback(() => {
     return getRandomLossEncouragement();
@@ -379,6 +427,10 @@ export function useEffortRewards(): UseEffortRewardsReturn {
     recordCoachAdviceViewed,
     recordMissionCompleted,
     clearPendingNotification,
+    // Share methods
+    recordShare,
+    getShareRewardInfo,
+    // Helpers
     getLossEncouragement,
     getNextMilestone,
     getProgressToNextMilestone,

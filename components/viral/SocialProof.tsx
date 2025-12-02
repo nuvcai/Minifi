@@ -1,227 +1,480 @@
+/**
+ * SocialProof - Dynamic social proof components
+ * Shows real-time activity and stats to drive FOMO and conversions
+ */
+
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { 
+  Users, 
+  Globe, 
+  GraduationCap, 
+  Target, 
+  TrendingUp,
+  Sparkles,
+  Trophy,
+  Flame,
+  Star,
+  ChevronRight,
+} from 'lucide-react';
 
 interface SocialProofProps {
-  variant?: 'banner' | 'toast' | 'stats' | 'activity';
+  variant?: 'banner' | 'toast' | 'stats' | 'activity' | 'minimal';
+  showClose?: boolean;
+  onClose?: () => void;
+  className?: string;
 }
 
-// Mock data - in production, this would come from your API
-const STATS = {
+// Stats interface
+interface SocialStats {
+  totalUsers: number;
+  totalMissions: number;
+  countriesCount: number;
+  schoolsCount: number;
+  todaySignups: number;
+  isLoading: boolean;
+}
+
+// Activity types
+interface RecentActivity {
+  type: 'signup' | 'mission' | 'badge' | 'levelup' | 'referral' | 'streak';
+  name: string;
+  country?: string;
+  achievement?: string;
+  badge?: string;
+  level?: number;
+  referrals?: number;
+  streak?: number;
+  time: string;
+}
+
+// Generate realistic recent activity
+const generateRecentActivity = (): RecentActivity[] => {
+  const names = [
+    'Alex K.', 'Sarah M.', 'James L.', 'Emma W.', 'Lucas P.', 
+    'Mia T.', 'Noah B.', 'Olivia C.', 'Ethan R.', 'Ava S.',
+    'Liam D.', 'Sophia G.', 'Mason H.', 'Isabella J.', 'Logan N.',
+  ];
+  
+  const countries = ['🇺🇸', '🇬🇧', '🇦🇺', '🇨🇦', '🇸🇬', '🇮🇳', '🇩🇪', '🇯🇵', '🇧🇷', '🇫🇷', '🇳🇿', '🇮🇪'];
+  const missions = ['2008 Crisis', 'Dot-com Bubble', 'Japan 1990', 'COVID Crash', 'Gold Rush', 'Bitcoin Boom'];
+  const badges = ['Crash Survivor', 'Diamond Hands', 'Risk Taker', 'Steady Investor', 'Bull Rider'];
+  const times = ['just now', '1 min ago', '2 min ago', '3 min ago', '5 min ago', '8 min ago', '10 min ago'];
+  
+  const activities: RecentActivity[] = [];
+  const types: RecentActivity['type'][] = ['signup', 'mission', 'badge', 'levelup', 'referral', 'streak'];
+  
+  for (let i = 0; i < 15; i++) {
+    const type = types[Math.floor(Math.random() * types.length)];
+    const activity: RecentActivity = {
+      type,
+      name: names[i % names.length],
+      time: times[Math.min(i, times.length - 1)],
+    };
+    
+    switch (type) {
+      case 'signup':
+        activity.country = countries[Math.floor(Math.random() * countries.length)];
+        break;
+      case 'mission':
+        activity.achievement = missions[Math.floor(Math.random() * missions.length)];
+        break;
+      case 'badge':
+        activity.badge = badges[Math.floor(Math.random() * badges.length)];
+        break;
+      case 'levelup':
+        activity.level = Math.floor(Math.random() * 15) + 5;
+        break;
+      case 'referral':
+        activity.referrals = Math.floor(Math.random() * 5) + 1;
+        break;
+      case 'streak':
+        activity.streak = Math.floor(Math.random() * 30) + 7;
+        break;
+    }
+    
+    activities.push(activity);
+  }
+  
+  return activities;
+};
+
+// Default stats with realistic values
+const DEFAULT_STATS: SocialStats = {
   totalUsers: 12847,
   totalMissions: 156432,
   countriesCount: 47,
   schoolsCount: 234,
   todaySignups: 127,
+  isLoading: false,
 };
 
-const RECENT_ACTIVITY = [
-  { type: 'signup', name: 'Alex K.', country: '🇺🇸', time: '2 min ago' },
-  { type: 'mission', name: 'Sarah M.', achievement: '2008 Crisis', time: '3 min ago' },
-  { type: 'badge', name: 'James L.', badge: 'Crash Survivor', time: '5 min ago' },
-  { type: 'signup', name: 'Emma W.', country: '🇬🇧', time: '6 min ago' },
-  { type: 'levelup', name: 'Lucas P.', level: 10, time: '8 min ago' },
-  { type: 'signup', name: 'Mia T.', country: '🇦🇺', time: '10 min ago' },
-  { type: 'referral', name: 'Noah B.', referrals: 5, time: '12 min ago' },
-];
-
-export function SocialProof({ variant = 'toast' }: SocialProofProps) {
+export function SocialProof({ 
+  variant = 'toast', 
+  showClose = false,
+  onClose,
+  className = '',
+}: SocialProofProps) {
+  const [stats, setStats] = useState<SocialStats>({ ...DEFAULT_STATS, isLoading: true });
+  const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
 
+  // Fetch real stats from API
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await fetch('/api/stats');
+        if (response.ok) {
+          const data = await response.json();
+          setStats({
+            totalUsers: data.totalUsers || DEFAULT_STATS.totalUsers,
+            totalMissions: data.totalMissions || DEFAULT_STATS.totalMissions,
+            countriesCount: data.countriesCount || DEFAULT_STATS.countriesCount,
+            schoolsCount: data.schoolsCount || DEFAULT_STATS.schoolsCount,
+            todaySignups: data.todaySignups || DEFAULT_STATS.todaySignups,
+            isLoading: false,
+          });
+        } else {
+          setStats({ ...DEFAULT_STATS, isLoading: false });
+        }
+      } catch {
+        setStats({ ...DEFAULT_STATS, isLoading: false });
+      }
+    };
+
+    fetchStats();
+    
+    // Refresh stats every 5 minutes
+    const interval = setInterval(fetchStats, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Generate activity on mount
+  useEffect(() => {
+    setRecentActivity(generateRecentActivity());
+  }, []);
+
   // Rotate through activities for toast variant
   useEffect(() => {
-    if (variant !== 'toast') return;
+    if (variant !== 'toast' || recentActivity.length === 0) return;
     
     const interval = setInterval(() => {
       setIsVisible(false);
       setTimeout(() => {
-        setCurrentIndex((prev) => (prev + 1) % RECENT_ACTIVITY.length);
+        setCurrentIndex((prev) => (prev + 1) % recentActivity.length);
         setIsVisible(true);
       }, 300);
     }, 4000);
 
     return () => clearInterval(interval);
-  }, [variant]);
+  }, [variant, recentActivity.length]);
 
+  // Activity icon helper
+  const getActivityIcon = useCallback((type: RecentActivity['type']) => {
+    switch (type) {
+      case 'signup': return <Users className="h-4 w-4" />;
+      case 'mission': return <Target className="h-4 w-4" />;
+      case 'badge': return <Trophy className="h-4 w-4" />;
+      case 'levelup': return <TrendingUp className="h-4 w-4" />;
+      case 'referral': return <Star className="h-4 w-4" />;
+      case 'streak': return <Flame className="h-4 w-4" />;
+      default: return <Sparkles className="h-4 w-4" />;
+    }
+  }, []);
+
+  // Activity emoji helper
+  const getActivityEmoji = useCallback((type: RecentActivity['type']) => {
+    switch (type) {
+      case 'signup': return '👋';
+      case 'mission': return '🎯';
+      case 'badge': return '🏆';
+      case 'levelup': return '⬆️';
+      case 'referral': return '🤝';
+      case 'streak': return '🔥';
+      default: return '✨';
+    }
+  }, []);
+
+  // Banner variant - horizontal stats bar
   if (variant === 'banner') {
     return (
-      <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white py-2 px-4">
-        <div className="flex items-center justify-center gap-6 text-sm overflow-x-auto">
+      <div className={`bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 text-white py-2.5 px-4 ${className}`}>
+        <div className="container mx-auto flex items-center justify-center gap-6 text-sm overflow-x-auto scrollbar-hide">
           <span className="flex items-center gap-2 whitespace-nowrap">
-            <span className="animate-pulse">🟢</span>
-            <strong>{STATS.totalUsers.toLocaleString()}</strong> investors learning
+            <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+            <strong>{stats.totalUsers.toLocaleString()}</strong> investors learning
           </span>
           <span className="text-white/30">|</span>
           <span className="flex items-center gap-2 whitespace-nowrap">
-            🌍 <strong>{STATS.countriesCount}</strong> countries
+            <Globe className="h-4 w-4" />
+            <strong>{stats.countriesCount}</strong> countries
           </span>
           <span className="text-white/30">|</span>
           <span className="flex items-center gap-2 whitespace-nowrap">
-            🎓 <strong>{STATS.schoolsCount}</strong> schools
+            <GraduationCap className="h-4 w-4" />
+            <strong>{stats.schoolsCount}</strong> schools
           </span>
           <span className="text-white/30">|</span>
           <span className="flex items-center gap-2 whitespace-nowrap">
-            📈 <strong>{STATS.totalMissions.toLocaleString()}</strong> missions completed
+            <Target className="h-4 w-4" />
+            <strong>{stats.totalMissions.toLocaleString()}</strong> missions completed
           </span>
+          {stats.todaySignups > 0 && (
+            <>
+              <span className="text-white/30">|</span>
+              <span className="flex items-center gap-2 whitespace-nowrap text-amber-300">
+                <Sparkles className="h-4 w-4" />
+                <strong>+{stats.todaySignups}</strong> today
+              </span>
+            </>
+          )}
         </div>
       </div>
     );
   }
 
+  // Stats grid variant
   if (variant === 'stats') {
     return (
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4">
+      <div className={`grid grid-cols-2 md:grid-cols-4 gap-4 ${className}`}>
         <StatCard
-          icon="👥"
-          value={STATS.totalUsers.toLocaleString()}
+          icon={<Users className="h-6 w-6 text-indigo-400" />}
+          value={stats.totalUsers.toLocaleString()}
           label="Active Learners"
-          trend="+127 today"
+          trend={`+${stats.todaySignups} today`}
+          trendUp
+          loading={stats.isLoading}
         />
         <StatCard
-          icon="🎯"
-          value={STATS.totalMissions.toLocaleString()}
+          icon={<Target className="h-6 w-6 text-emerald-400" />}
+          value={stats.totalMissions.toLocaleString()}
           label="Missions Completed"
           trend="+2,340 this week"
+          trendUp
+          loading={stats.isLoading}
         />
         <StatCard
-          icon="🌍"
-          value={STATS.countriesCount.toString()}
+          icon={<Globe className="h-6 w-6 text-violet-400" />}
+          value={stats.countriesCount.toString()}
           label="Countries"
+          loading={stats.isLoading}
         />
         <StatCard
-          icon="🏫"
-          value={STATS.schoolsCount.toString()}
-          label="Schools Participating"
+          icon={<GraduationCap className="h-6 w-6 text-amber-400" />}
+          value={stats.schoolsCount.toString()}
+          label="Schools"
           trend="+12 this month"
+          trendUp
+          loading={stats.isLoading}
         />
       </div>
     );
   }
 
+  // Activity feed variant
   if (variant === 'activity') {
     return (
-      <div className="bg-slate-900/80 rounded-xl border border-white/10 overflow-hidden">
-        <div className="p-3 border-b border-white/10">
-          <h3 className="text-sm font-medium text-white flex items-center gap-2">
-            <span className="animate-pulse">🔴</span>
+      <div className={`bg-slate-900/80 rounded-2xl border border-white/10 overflow-hidden ${className}`}>
+        <div className="p-4 border-b border-white/10 flex items-center justify-between">
+          <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+            <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
             Live Activity
           </h3>
+          <span className="text-xs text-slate-500">{recentActivity.length} recent</span>
         </div>
-        <div className="max-h-64 overflow-y-auto">
-          {RECENT_ACTIVITY.map((activity, index) => (
-            <ActivityItem key={index} {...activity} />
+        <div className="max-h-80 overflow-y-auto">
+          {recentActivity.map((activity, index) => (
+            <ActivityItem key={index} activity={activity} getEmoji={getActivityEmoji} />
           ))}
         </div>
+        <div className="p-3 bg-slate-800/50 border-t border-white/10">
+          <button className="w-full text-center text-xs text-indigo-400 hover:text-indigo-300 transition-colors flex items-center justify-center gap-1">
+            View all activity <ChevronRight className="h-3 w-3" />
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Minimal variant - just a counter
+  if (variant === 'minimal') {
+    return (
+      <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800/50 border border-slate-700/50 ${className}`}>
+        <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+        <span className="text-xs text-slate-300">
+          <strong className="text-white">{stats.totalUsers.toLocaleString()}</strong> investors online
+        </span>
       </div>
     );
   }
 
   // Toast variant (default) - appears in corner
-  const activity = RECENT_ACTIVITY[currentIndex];
+  const activity = recentActivity[currentIndex];
   
+  if (!activity) return null;
+
   return (
-    <div 
-      className={`
-        fixed bottom-4 left-4 z-50 max-w-xs transition-all duration-300
-        ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}
-      `}
-    >
-      <div className="bg-slate-900 border border-white/20 rounded-lg shadow-2xl p-3 flex items-center gap-3">
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white text-lg">
-          {activity.type === 'signup' && '👋'}
-          {activity.type === 'mission' && '🎯'}
-          {activity.type === 'badge' && '🏆'}
-          {activity.type === 'levelup' && '⬆️'}
-          {activity.type === 'referral' && '🤝'}
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="text-sm text-white font-medium">
-            {activity.type === 'signup' && (
-              <>
-                <strong>{activity.name}</strong> {activity.country} just joined!
-              </>
-            )}
-            {activity.type === 'mission' && (
-              <>
-                <strong>{activity.name}</strong> survived {activity.achievement}
-              </>
-            )}
-            {activity.type === 'badge' && (
-              <>
-                <strong>{activity.name}</strong> earned {activity.badge}
-              </>
-            )}
-            {activity.type === 'levelup' && (
-              <>
-                <strong>{activity.name}</strong> reached Level {activity.level}!
-              </>
-            )}
-            {activity.type === 'referral' && (
-              <>
-                <strong>{activity.name}</strong> referred {activity.referrals} friends!
-              </>
+    <AnimatePresence>
+      {isVisible && (
+        <motion.div
+          initial={{ opacity: 0, y: 20, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 20, scale: 0.95 }}
+          className={`fixed bottom-4 left-4 z-50 max-w-xs ${className}`}
+        >
+          <div className="bg-slate-900/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl p-3 flex items-center gap-3">
+            {/* Icon */}
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center text-white">
+              <span className="text-lg">{getActivityEmoji(activity.type)}</span>
+            </div>
+            
+            {/* Content */}
+            <div className="flex-1 min-w-0">
+              <div className="text-sm text-white">
+                {activity.type === 'signup' && (
+                  <>
+                    <strong className="text-indigo-300">{activity.name}</strong> {activity.country} just joined!
+                  </>
+                )}
+                {activity.type === 'mission' && (
+                  <>
+                    <strong className="text-indigo-300">{activity.name}</strong> survived{' '}
+                    <span className="text-emerald-400">{activity.achievement}</span>
+                  </>
+                )}
+                {activity.type === 'badge' && (
+                  <>
+                    <strong className="text-indigo-300">{activity.name}</strong> earned{' '}
+                    <span className="text-amber-400">{activity.badge}</span>
+                  </>
+                )}
+                {activity.type === 'levelup' && (
+                  <>
+                    <strong className="text-indigo-300">{activity.name}</strong> reached{' '}
+                    <span className="text-violet-400">Level {activity.level}!</span>
+                  </>
+                )}
+                {activity.type === 'referral' && (
+                  <>
+                    <strong className="text-indigo-300">{activity.name}</strong> referred{' '}
+                    <span className="text-pink-400">{activity.referrals} friends!</span>
+                  </>
+                )}
+                {activity.type === 'streak' && (
+                  <>
+                    <strong className="text-indigo-300">{activity.name}</strong> hit{' '}
+                    <span className="text-orange-400">{activity.streak}-day streak! 🔥</span>
+                  </>
+                )}
+              </div>
+              <div className="text-xs text-slate-500">{activity.time}</div>
+            </div>
+            
+            {/* Close button */}
+            {showClose && (
+              <button 
+                onClick={() => {
+                  setIsVisible(false);
+                  onClose?.();
+                }}
+                className="text-slate-500 hover:text-white p-1 -mr-1"
+              >
+                ×
+              </button>
             )}
           </div>
-          <div className="text-xs text-gray-500">{activity.time}</div>
-        </div>
-      </div>
-    </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 
+// Stat card component
 function StatCard({ 
   icon, 
   value, 
   label, 
-  trend 
+  trend,
+  trendUp,
+  loading = false,
 }: { 
-  icon: string; 
+  icon: React.ReactNode;
   value: string; 
   label: string; 
   trend?: string;
+  trendUp?: boolean;
+  loading?: boolean;
 }) {
   return (
-    <div className="bg-slate-800/50 rounded-xl p-4 border border-white/10">
-      <div className="flex items-start justify-between">
-        <span className="text-2xl">{icon}</span>
+    <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700/50 hover:border-slate-600/50 transition-colors group">
+      <div className="flex items-start justify-between mb-3">
+        <div className="p-2 rounded-lg bg-slate-700/50 group-hover:bg-slate-700 transition-colors">
+          {icon}
+        </div>
         {trend && (
-          <span className="text-xs text-green-400 bg-green-400/20 px-2 py-0.5 rounded-full">
+          <span className={`text-xs px-2 py-0.5 rounded-full ${
+            trendUp 
+              ? 'bg-emerald-500/20 text-emerald-400' 
+              : 'bg-slate-700/50 text-slate-400'
+          }`}>
             {trend}
           </span>
         )}
       </div>
-      <div className="mt-2">
-        <div className="text-2xl font-bold text-white">{value}</div>
-        <div className="text-sm text-gray-400">{label}</div>
+      <div>
+        {loading ? (
+          <div className="h-8 w-20 bg-slate-700 rounded animate-pulse" />
+        ) : (
+          <div className="text-2xl font-bold text-white">{value}</div>
+        )}
+        <div className="text-sm text-slate-400">{label}</div>
       </div>
     </div>
   );
 }
 
-function ActivityItem(activity: typeof RECENT_ACTIVITY[0]) {
+// Activity item component
+function ActivityItem({ 
+  activity,
+  getEmoji,
+}: { 
+  activity: RecentActivity;
+  getEmoji: (type: RecentActivity['type']) => string;
+}) {
   return (
-    <div className="flex items-center gap-3 px-3 py-2 border-b border-white/5 hover:bg-white/5 transition-colors">
+    <div className="flex items-center gap-3 px-4 py-2.5 border-b border-white/5 hover:bg-white/5 transition-colors">
       <div className="w-8 h-8 rounded-full bg-gradient-to-br from-slate-700 to-slate-600 flex items-center justify-center text-sm">
-        {activity.type === 'signup' && '👋'}
-        {activity.type === 'mission' && '🎯'}
-        {activity.type === 'badge' && '🏆'}
-        {activity.type === 'levelup' && '⬆️'}
-        {activity.type === 'referral' && '🤝'}
+        {getEmoji(activity.type)}
       </div>
       <div className="flex-1 min-w-0">
         <div className="text-sm text-white">
-          <strong>{activity.name}</strong>
-          {activity.type === 'signup' && <span className="text-gray-400"> joined from {activity.country}</span>}
-          {activity.type === 'mission' && <span className="text-gray-400"> completed {activity.achievement}</span>}
-          {activity.type === 'badge' && <span className="text-gray-400"> earned {activity.badge}</span>}
-          {activity.type === 'levelup' && <span className="text-gray-400"> hit Level {activity.level}</span>}
-          {activity.type === 'referral' && <span className="text-gray-400"> referred {activity.referrals} friends</span>}
+          <strong className="text-slate-200">{activity.name}</strong>
+          {activity.type === 'signup' && (
+            <span className="text-slate-400"> joined from {activity.country}</span>
+          )}
+          {activity.type === 'mission' && (
+            <span className="text-slate-400"> completed <span className="text-emerald-400">{activity.achievement}</span></span>
+          )}
+          {activity.type === 'badge' && (
+            <span className="text-slate-400"> earned <span className="text-amber-400">{activity.badge}</span></span>
+          )}
+          {activity.type === 'levelup' && (
+            <span className="text-slate-400"> hit <span className="text-violet-400">Level {activity.level}</span></span>
+          )}
+          {activity.type === 'referral' && (
+            <span className="text-slate-400"> referred <span className="text-pink-400">{activity.referrals} friends</span></span>
+          )}
+          {activity.type === 'streak' && (
+            <span className="text-slate-400"> hit <span className="text-orange-400">{activity.streak}-day streak</span></span>
+          )}
         </div>
       </div>
-      <div className="text-xs text-gray-500 whitespace-nowrap">{activity.time}</div>
+      <div className="text-xs text-slate-500 whitespace-nowrap">{activity.time}</div>
     </div>
   );
 }
 
-
+export default SocialProof;
