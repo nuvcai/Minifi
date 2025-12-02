@@ -7,7 +7,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { wealthPillars, wealthEras, investorWisdom, hopeMessages, foPrinciples } from "./wealthWisdom";
+// Wealth wisdom data is available via wealthWisdom.ts
 import { MARKETING_EVENTS } from "./marketingData";
 
 // ============================================================================

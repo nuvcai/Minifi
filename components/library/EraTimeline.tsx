@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button as _Button } from "@/components/ui/button";
 import { ChevronRight, Clock, TrendingUp, Users, Lightbulb } from "lucide-react";
 import { wealthEras, type WealthEra } from "@/components/data/wealthWisdom";
 

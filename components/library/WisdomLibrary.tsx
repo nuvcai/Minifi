@@ -11,12 +11,7 @@ import {
   wealthEras,
   investorWisdom,
   hopeMessages,
-  foPrinciples,
-  type WealthPillar,
-  type WealthEra,
-  type InvestorWisdom,
-  type HopeMessage,
-  type FOPrinciple
+  foPrinciples
 } from "@/components/data/wealthWisdom";
 
 interface WisdomLibraryProps {

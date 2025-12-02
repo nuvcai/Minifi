@@ -28,7 +28,7 @@ export default function HomePage() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const shareUrl = "https://minifi.app";
+  const shareUrl = "https://legacy-guardians.vercel.app";
   const shareText = "🎮 Check out Legacy Guardians - a free game that teaches teens about investing through time-travel adventures! Built with AI for the AWS Hackathon 2025 🚀";
   
   const handleCopyLink = async () => {
