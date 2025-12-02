@@ -68,12 +68,13 @@ export function TimelineSection({
               </div>
             </div>
             <div>
+              <p className="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-1">Chapter 1</p>
               <h2 className="text-2xl font-black text-gray-900 flex items-center gap-2">
-                Financial History
+                Learn from the Crisis
                 <Sparkles className="h-5 w-5 text-amber-500" />
               </h2>
               <p className="text-sm text-gray-500">
-                Travel through time and learn from the past
+                Master history's greatest financial moments
               </p>
             </div>
           </div>
@@ -94,7 +95,7 @@ export function TimelineSection({
         {/* Progress Bar */}
         <div className="mb-4">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-gray-500">Timeline Progress</span>
+            <span className="text-sm text-gray-500">Chapter Progress</span>
             <span className="text-sm font-bold text-indigo-600">{Math.round(progressPercentage)}%</span>
           </div>
           <div className="h-3 rounded-full bg-gray-100 overflow-hidden">
