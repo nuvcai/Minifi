@@ -1,3 +1,12 @@
+/**
+ * ╔══════════════════════════════════════════════════════════════════════════════╗
+ * ║   📚 HISTORICAL MISSIONS - Teaching Wealth Through Financial History         ║
+ * ║   A Family Office Perspective on Generational Wealth Creation                ║
+ * ║   ✨ MiniFi / Legacy Guardians Educational Content ✨                       ║
+ * ║   Copyright (c) 2025 NUVC.AI / Tick.AI. All Rights Reserved.                ║
+ * ╚══════════════════════════════════════════════════════════════════════════════╝
+ */
+
 // Asset Class Categories - aligned with Family Office standards
 export type AssetClass = 
   | "equities"           // Stocks, shares, equity funds
@@ -42,6 +51,11 @@ export interface MissionData {
   options: InvestmentOption[];
   coachAdvice: Record<string, string>;
   outcome: string;
+  // NEW: Generational wealth wisdom fields
+  wealthLesson: string;           // Key wealth-building lesson from this era
+  foWisdom: string;               // Family Office perspective
+  historicalOpportunity: string;  // What opportunity existed in this era
+  hopeMessage: string;            // Inspiring message for young investors
 }
 
 export const missionData: Record<number, MissionData> = {
@@ -136,6 +150,10 @@ export const missionData: Record<number, MissionData> = {
     },
     outcome:
       "Plot twist: In 1991, Japan's central bank raised interest rates and the bubble POPPED! 💥 Stocks and property prices crashed hard, starting the 'Lost Decade' of slow growth.",
+    wealthLesson: "🎓 WEALTH LESSON: When EVERYONE is euphoric and prices seem too good to be true... they usually are! Bubbles happen when people forget that prices should reflect real value. Diversified investors who held bonds and gold preserved their wealth while others lost 60-70%.",
+    foWisdom: "🏛️ FAMILY OFFICE WISDOM: The wealthiest families survived Japan's crash because they NEVER put all their eggs in one basket. While speculators lost everything, diversified portfolios dropped 15-20% max. Capital preservation isn't boring - it's how fortunes survive crises.",
+    historicalOpportunity: "💡 THE OPPORTUNITY: While Japan suffered, wise investors who moved to US markets caught the beginning of America's tech boom. Those who bought Microsoft, Intel, and Walmart in 1990 saw 10-20x returns by 2000. Crisis in one market = opportunity in another!",
+    hopeMessage: "✨ FOR YOU: Every crash in history has been followed by an even bigger boom. Japan's 1990 crash taught a generation about bubble risks - knowledge that protected smart investors in 2000 and 2008. Learning from history is YOUR superpower!"
   },
   1997: {
     context:
@@ -228,6 +246,10 @@ export const missionData: Record<number, MissionData> = {
     },
     outcome:
       "The crisis lasted until 1998 - many Asian currencies lost over 50% of their value and stock markets dropped 60-80%! 😱 Meanwhile, US markets stayed relatively chill and became a safe haven.",
+    wealthLesson: "🎓 WEALTH LESSON: Global diversification protects you from regional disasters! While Asian markets crashed 60-80%, US stocks GAINED 28%. Having investments in multiple regions means one area's crisis doesn't destroy your wealth.",
+    foWisdom: "🏛️ FAMILY OFFICE WISDOM: The smartest move during the Asian Crisis was patience + cash. Those who held cash could buy incredible Asian companies at 70-80% discounts. Samsung, Toyota, and TSMC traded at once-in-a-lifetime prices for those brave enough to buy.",
+    historicalOpportunity: "💡 THE OPPORTUNITY: Investors who bought quality Asian stocks AFTER the crisis (1998-1999) saw massive returns over the next decade. Samsung alone returned 5,000%+. Crisis prices create generational wealth opportunities!",
+    hopeMessage: "✨ FOR YOU: Regional crises are scary but temporary. The Asian economies that crashed in 1997 are now powerhouses - Korea, Thailand, Indonesia. What looked like the end was actually a reset. Your generation's 'crisis' markets could be tomorrow's goldmines!"
   },
   2000: {
     context:
@@ -320,6 +342,10 @@ export const missionData: Record<number, MissionData> = {
     },
     outcome:
       "March 2000 - the bubble BURSTS! 💥 Nasdaq crashes 78% over the next two years. Most .com companies go bankrupt. Pets.com becomes a meme. The party is over.",
+    wealthLesson: "🎓 WEALTH LESSON: Revolutionary technology can be REAL while stock prices are INSANE! The internet DID change everything - but Pets.com at $300M valuation selling dog food online? Come on! Separate good technology from bad investments.",
+    foWisdom: "🏛️ FAMILY OFFICE WISDOM: Amazon, Google, and Apple all survived the crash and became trillion-dollar companies. The difference? Real business models that made actual profits. FOs stayed invested in QUALITY tech while avoiding the 'story stocks' with no real business.",
+    historicalOpportunity: "💡 THE OPPORTUNITY: The dot-com crash was AMAZING for patient investors! Amazon dropped from $113 to $6 but survived. Those who bought at $6 saw 600x returns! The crash separated real businesses from fake ones - then rewarded those who recognized the difference.",
+    hopeMessage: "✨ FOR YOU: This is DIRECTLY relevant to AI today! AI will change everything (like the internet did), but not every AI company is a good investment. Learn to separate hype from substance. The next Amazon is being built right now - can you spot it?"
   },
   2008: {
     context:
@@ -412,6 +438,10 @@ export const missionData: Record<number, MissionData> = {
     },
     outcome:
       "2008-2009: Global stocks dropped 50%+ 📉 But US bonds and gold were the safe havens everyone needed. The government pumped TRILLIONS into the economy, setting up the recovery that followed.",
+    wealthLesson: "🎓 WEALTH LESSON: Market crashes are the ultimate test of your strategy. Those with diversified portfolios (bonds + gold) only dropped 20-30% while all-stock portfolios fell 50%+. More importantly, they had CASH to buy at the bottom!",
+    foWisdom: "🏛️ FAMILY OFFICE WISDOM: 'Be greedy when others are fearful.' Legendary investors like Warren Buffett were BUYING in late 2008 and early 2009. They knew quality companies at 50% off are gifts. FOs kept 10-15% cash specifically for moments like this.",
+    historicalOpportunity: "💡 THE OPPORTUNITY: The S&P 500 bottomed at 666 in March 2009. By 2019, it hit 3,000 - a 4.5x return! Those who invested $10,000 at the bottom had $45,000 ten years later. Crashes create millionaires for those brave enough to buy.",
+    hopeMessage: "✨ FOR YOU: You WILL experience market crashes in your lifetime. They'll feel terrifying - everyone will say it's 'different this time.' It never is. Keep some powder dry, stay calm, and remember: this mission taught you that crashes are opportunities in disguise! 🎯"
   },
   2020: {
     context:
@@ -504,6 +534,10 @@ export const missionData: Record<number, MissionData> = {
     },
     outcome:
       "Plot twist: Tech stocks went absolutely INSANE! 🚀 After the initial crash, the Nasdaq doubled while many traditional companies struggled. The Fed's money printing pushed all asset prices up.",
+    wealthLesson: "🎓 WEALTH LESSON: Crises accelerate existing trends! COVID didn't create e-commerce or remote work - it ACCELERATED them by 10 years. Smart investors asked: 'What was already growing that this crisis will supercharge?' The answer was tech, and it paid massively.",
+    foWisdom: "🏛️ FAMILY OFFICE WISDOM: The fastest recovery from a crash in history happened because FOs recognized that this crisis was DIFFERENT - it would END (vaccines were coming) and would accelerate digital transformation. They bought quality tech aggressively in March-April 2020.",
+    historicalOpportunity: "💡 THE OPPORTUNITY: Those who bought in March 2020 saw the Nasdaq nearly TRIPLE in 18 months. Zoom went from $70 to $560. Tesla went 10x. Understanding that COVID would accelerate digital trends was worth a fortune.",
+    hopeMessage: "✨ FOR YOU: COVID taught your generation something powerful: the world can change FAST, and those who adapt quickly win. You saw businesses pivot, schools go online, and new habits form overnight. This adaptability is YOUR superpower for future opportunities! 🦠➡️🚀"
   },
   2025: {
     context:

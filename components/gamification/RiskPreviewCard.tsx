@@ -28,7 +28,9 @@ import {
   BookOpen,
   Target,
 } from "lucide-react";
+import Image from "next/image";
 import { InvestmentOption } from "@/components/data/missions";
+import { AICoach } from "@/components/data/coaches";
 import { getCourageXpForRisk } from "./effortRewards";
 
 // Learning outcomes based on risk level and asset class
@@ -84,11 +86,50 @@ const encouragementMessages: Record<string, string> = {
   none: "Sometimes the bravest move is doing nothing. Timing is everything! ⏰",
 };
 
+// Coach-specific advice based on their personality and the risk level
+const getCoachAdvice = (coach: AICoach | undefined, riskLevel: string): string => {
+  if (!coach) return "Trust your instincts and learn from every decision!";
+  
+  const coachAdvice: Record<string, Record<string, string>> = {
+    "steady-sam": {
+      extreme: "Whoa there! This is way outside my comfort zone. But hey, if you want to learn about risk the hard way... just remember what I taught you about capital preservation! 🛡️",
+      high: "This is pretty risky for my taste, but I respect the courage! Remember: never invest more than you can afford to learn from. 📚",
+      medium: "Now we're talking! A balanced approach - not too hot, not too cold. I can work with this! 👍",
+      low: "This is more my style! Slow and steady wins the race. You're building a solid foundation here. 🏆",
+      none: "Smart move! Sometimes cash is king. You're preserving your options for when the right opportunity comes. 💎",
+    },
+    "growth-guru": {
+      extreme: "Woah, going all in! I appreciate the ambition, but remember - diversification is key even when being bold! 🎯",
+      high: "Now you're thinking like a growth investor! Just make sure this fits your overall portfolio balance. 📊",
+      medium: "Perfect balance! This is exactly how I'd approach it - growth with guardrails. Smart thinking! ⚖️",
+      low: "Playing it safe - not bad for part of your portfolio! Just don't forget to allocate some for growth too. 🌱",
+      none: "Cash has its place! Great for rebalancing opportunities when markets dip. 💰",
+    },
+    "adventure-alex": {
+      extreme: "YES! Now THIS is what I'm talking about! Fortune favors the bold - let's see what you're made of! 🚀",
+      high: "Good energy! You're embracing the growth mindset. Remember: time in market beats timing the market! ⚡",
+      medium: "A bit conservative for my taste, but hey, gotta start somewhere! Balance is... fine, I guess. 😏",
+      low: "Playing it safe, huh? Okay, but don't forget - nothing ventured, nothing gained! 💭",
+      none: "Cash?! You're killing me here! But okay, even I keep some dry powder for opportunities... 🤷",
+    },
+    "yield-yoda": {
+      extreme: "Hmm, risky this is! But learn you will, profit or not. The force of experience is strong. 🔮",
+      high: "Bold choice, young padawan! Remember: income-generating assets can be found at every risk level. 💫",
+      medium: "Balanced approach, I sense! Many dividend stocks and REITs live here. Wise choice! 🧘",
+      low: "Income seekers love this zone! Bonds and dividend aristocrats await. Strong with this one, you are! 💰",
+      none: "Cash flow important is! Preserve capital now, compound later you will. Patient investors win! ⏳",
+    },
+  };
+  
+  return coachAdvice[coach.id]?.[riskLevel] || coach.investmentPhilosophy;
+};
+
 interface RiskPreviewCardProps {
   option: InvestmentOption;
   onConfirm: () => void;
   onCancel: () => void;
   onCourageXpEarned?: (xp: number, label: string) => void;
+  coach?: AICoach;
 }
 
 export function RiskPreviewCard({
@@ -96,6 +137,7 @@ export function RiskPreviewCard({
   onConfirm,
   onCancel,
   onCourageXpEarned,
+  coach,
 }: RiskPreviewCardProps) {
   const [showFullPreview, setShowFullPreview] = useState(false);
   const [courageLevel, setCourageLevel] = useState(0);
@@ -107,6 +149,7 @@ export function RiskPreviewCard({
   const learnings = learningOutcomes[riskLevel] || learningOutcomes.medium;
   const worstCase = worstCaseScenarios[riskLevel] || worstCaseScenarios.medium;
   const encouragement = encouragementMessages[riskLevel] || encouragementMessages.medium;
+  const coachAdvice = getCoachAdvice(coach, riskLevel);
 
   // Animate courage meter when preview is shown
   useEffect(() => {
@@ -267,16 +310,55 @@ export function RiskPreviewCard({
           </div>
         </div>
 
-        {/* Encouragement Message */}
-        <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4 border border-blue-200">
+        {/* Coach Advice Section */}
+        <div className={`rounded-lg p-4 border ${
+          coach 
+            ? "bg-gradient-to-r from-slate-800 to-slate-900 border-slate-700" 
+            : "bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200"
+        }`}>
           <div className="flex items-start gap-3">
-            <div className="bg-blue-500 rounded-full p-2">
-              <Trophy className="h-4 w-4 text-white" />
-            </div>
-            <div>
-              <p className="font-medium text-blue-800 mb-1">Remember...</p>
-              <p className="text-sm text-blue-700">{encouragement}</p>
-            </div>
+            {coach ? (
+              <>
+                {/* Coach Avatar */}
+                <div className="relative flex-shrink-0">
+                  <div className={`w-12 h-12 rounded-full overflow-hidden border-2 ${
+                    coach.riskTolerance === "very_aggressive" ? "border-purple-400" :
+                    coach.riskTolerance === "aggressive" ? "border-orange-400" :
+                    coach.riskTolerance === "moderate" ? "border-green-400" :
+                    "border-blue-400"
+                  }`}>
+                    <Image
+                      src={coach.avatar}
+                      alt={coach.name}
+                      width={48}
+                      height={48}
+                      className="object-cover w-full h-full"
+                    />
+                  </div>
+                  {/* Online indicator */}
+                  <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-slate-800" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <p className="font-semibold text-slate-100">{coach.name}</p>
+                    <Badge variant="outline" className="text-[10px] bg-slate-700/50 text-slate-300 border-slate-600">
+                      {coach.personality}
+                    </Badge>
+                  </div>
+                  <p className="text-sm text-slate-300 leading-relaxed">{coachAdvice}</p>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="bg-blue-500 rounded-full p-2 flex-shrink-0">
+                  <Trophy className="h-4 w-4 text-white" />
+                </div>
+                <div>
+                  <p className="font-medium text-blue-800 mb-1">Remember...</p>
+                  <p className="text-sm text-blue-700">{encouragement}</p>
+                </div>
+              </>
+            )}
           </div>
         </div>
 

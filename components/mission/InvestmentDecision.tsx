@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { DollarSign, BarChart3, InfoIcon, Clock, TrendingUp, Sparkles } from "lucide-react";
 import { InvestmentOption, AssetClass, TimeHorizon } from "@/components/data/missions";
+import { AICoach } from "@/components/data/coaches";
 import { RiskPreviewCard } from "@/components/gamification/RiskPreviewCard";
 import { CourageXpNotification } from "@/components/gamification/CourageXpNotification";
 import { InlineFloatingXp } from "@/components/gamification/FloatingXp";
@@ -34,6 +35,7 @@ interface InvestmentDecisionProps {
   onConfirm: () => void;
   onBack: () => void;
   onCourageXpEarned?: (xp: number, label: string) => void;
+  selectedCoach?: AICoach;
 }
 
 export function InvestmentDecision({
@@ -43,6 +45,7 @@ export function InvestmentDecision({
   onConfirm,
   onBack,
   onCourageXpEarned,
+  selectedCoach,
 }: InvestmentDecisionProps) {
   const [showRiskPreview, setShowRiskPreview] = useState(false);
   const [courageNotification, setCourageNotification] = useState<{
@@ -127,6 +130,7 @@ export function InvestmentDecision({
           onConfirm={handleRiskPreviewConfirm}
           onCancel={handleRiskPreviewCancel}
           onCourageXpEarned={onCourageXpEarned}
+          coach={selectedCoach}
         />
       </div>
     );

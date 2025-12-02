@@ -123,6 +123,7 @@ export function MissionModal({
               selectedInvestment && onInvestmentConfirm(selectedInvestment)
             }
             onBack={() => onStepChange("intro")}
+            selectedCoach={selectedCoach}
           />
         )}
 
