@@ -366,6 +366,162 @@ CREATE POLICY "Anyone can join waitlist" ON waitlist
   WITH CHECK (true);
 
 -- =============================================================================
+-- TRADING_SESSIONS TABLE - Competition/Trading session data
+-- =============================================================================
+
+CREATE TABLE IF NOT EXISTS trading_sessions (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  user_id UUID REFERENCES user_profiles(id) ON DELETE CASCADE,
+  email TEXT,
+  session_id TEXT,
+  
+  -- Session details
+  competition_type TEXT DEFAULT 'standard',
+  coach_id TEXT,
+  starting_capital DECIMAL(15, 2) DEFAULT 5000.00,
+  
+  -- Final results
+  final_value DECIMAL(15, 2),
+  total_return DECIMAL(10, 4),
+  sharpe_ratio DECIMAL(10, 4),
+  volatility DECIMAL(10, 4),
+  max_drawdown DECIMAL(10, 4),
+  annualized_return DECIMAL(10, 4),
+  
+  -- Portfolio snapshot
+  final_portfolio JSONB DEFAULT '{}',
+  final_cash DECIMAL(15, 2),
+  
+  -- Chart data
+  chart_data JSONB DEFAULT '[]',
+  
+  -- Status
+  status TEXT DEFAULT 'active' CHECK (status IN ('active', 'completed', 'abandoned')),
+  
+  -- Timestamps
+  started_at TIMESTAMPTZ DEFAULT NOW(),
+  ended_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Indexes for trading_sessions
+CREATE INDEX IF NOT EXISTS idx_trading_user ON trading_sessions(user_id);
+CREATE INDEX IF NOT EXISTS idx_trading_email ON trading_sessions(email);
+CREATE INDEX IF NOT EXISTS idx_trading_session ON trading_sessions(session_id);
+CREATE INDEX IF NOT EXISTS idx_trading_status ON trading_sessions(status);
+CREATE INDEX IF NOT EXISTS idx_trading_created ON trading_sessions(created_at DESC);
+
+-- Enable Row Level Security
+ALTER TABLE trading_sessions ENABLE ROW LEVEL SECURITY;
+
+-- Policy: Service role can do everything
+DROP POLICY IF EXISTS "Service role full access" ON trading_sessions;
+CREATE POLICY "Service role full access" ON trading_sessions
+  FOR ALL
+  TO service_role
+  USING (true)
+  WITH CHECK (true);
+
+-- Policy: Anonymous users can manage their sessions
+DROP POLICY IF EXISTS "Anyone can manage their sessions" ON trading_sessions;
+CREATE POLICY "Anyone can manage their sessions" ON trading_sessions
+  FOR ALL
+  TO anon
+  WITH CHECK (true);
+
+-- =============================================================================
+-- TRADING_TRANSACTIONS TABLE - Individual trades within a session
+-- =============================================================================
+
+CREATE TABLE IF NOT EXISTS trading_transactions (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  session_id UUID REFERENCES trading_sessions(id) ON DELETE CASCADE,
+  
+  -- Trade details
+  asset TEXT NOT NULL,
+  action TEXT NOT NULL CHECK (action IN ('buy', 'sell')),
+  shares DECIMAL(15, 8) NOT NULL,
+  price DECIMAL(15, 4) NOT NULL,
+  total_value DECIMAL(15, 2) NOT NULL,
+  
+  -- Asset metadata
+  asset_class TEXT,
+  
+  -- Portfolio state after trade
+  portfolio_value_after DECIMAL(15, 2),
+  cash_after DECIMAL(15, 2),
+  
+  -- Timestamps
+  executed_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Indexes for trading_transactions
+CREATE INDEX IF NOT EXISTS idx_transactions_session ON trading_transactions(session_id);
+CREATE INDEX IF NOT EXISTS idx_transactions_asset ON trading_transactions(asset);
+CREATE INDEX IF NOT EXISTS idx_transactions_executed ON trading_transactions(executed_at DESC);
+
+-- Enable Row Level Security
+ALTER TABLE trading_transactions ENABLE ROW LEVEL SECURITY;
+
+-- Policy: Service role can do everything
+DROP POLICY IF EXISTS "Service role full access" ON trading_transactions;
+CREATE POLICY "Service role full access" ON trading_transactions
+  FOR ALL
+  TO service_role
+  USING (true)
+  WITH CHECK (true);
+
+-- Policy: Anonymous users can insert transactions
+DROP POLICY IF EXISTS "Anyone can log transactions" ON trading_transactions;
+CREATE POLICY "Anyone can log transactions" ON trading_transactions
+  FOR INSERT
+  TO anon
+  WITH CHECK (true);
+
+-- =============================================================================
+-- PORTFOLIO_SNAPSHOTS TABLE - Periodic portfolio value snapshots
+-- =============================================================================
+
+CREATE TABLE IF NOT EXISTS portfolio_snapshots (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  session_id UUID REFERENCES trading_sessions(id) ON DELETE CASCADE,
+  
+  -- Snapshot data
+  total_value DECIMAL(15, 2) NOT NULL,
+  cash_value DECIMAL(15, 2),
+  holdings JSONB DEFAULT '{}',
+  
+  -- Market data at snapshot time
+  prices JSONB DEFAULT '{}',
+  
+  -- Timestamps
+  snapshot_time TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Indexes for portfolio_snapshots
+CREATE INDEX IF NOT EXISTS idx_snapshots_session ON portfolio_snapshots(session_id);
+CREATE INDEX IF NOT EXISTS idx_snapshots_time ON portfolio_snapshots(snapshot_time DESC);
+
+-- Enable Row Level Security
+ALTER TABLE portfolio_snapshots ENABLE ROW LEVEL SECURITY;
+
+-- Policy: Service role can do everything
+DROP POLICY IF EXISTS "Service role full access" ON portfolio_snapshots;
+CREATE POLICY "Service role full access" ON portfolio_snapshots
+  FOR ALL
+  TO service_role
+  USING (true)
+  WITH CHECK (true);
+
+-- Policy: Anonymous users can insert snapshots
+DROP POLICY IF EXISTS "Anyone can save snapshots" ON portfolio_snapshots;
+CREATE POLICY "Anyone can save snapshots" ON portfolio_snapshots
+  FOR INSERT
+  TO anon
+  WITH CHECK (true);
+
+-- =============================================================================
 -- VIEWS - Useful aggregate views
 -- =============================================================================
 
@@ -486,6 +642,14 @@ GRANT ALL ON streak_claims TO service_role;
 GRANT SELECT, INSERT ON user_profiles TO anon;
 GRANT SELECT, INSERT, UPDATE ON daily_streaks TO anon;
 GRANT SELECT, INSERT ON streak_claims TO anon;
+
+-- Trading tables
+GRANT ALL ON trading_sessions TO service_role;
+GRANT ALL ON trading_transactions TO service_role;
+GRANT ALL ON portfolio_snapshots TO service_role;
+GRANT SELECT, INSERT, UPDATE ON trading_sessions TO anon;
+GRANT SELECT, INSERT ON trading_transactions TO anon;
+GRANT SELECT, INSERT ON portfolio_snapshots TO anon;
 
 -- Grant view permissions
 GRANT SELECT ON lead_stats TO service_role;
