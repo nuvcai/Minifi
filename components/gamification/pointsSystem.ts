@@ -76,12 +76,12 @@ export interface PointsBalance {
 
 export interface PointsTransaction {
   id: string;
-  type: "earn" | "redeem" | "expire" | "bonus";
+  type: "earn" | "redeem" | "expire" | "bonus" | "stake_reward" | "referral";
   amount: number;
   description: string;
-  source: string;
+  source?: string; // Optional for backwards compatibility
   timestamp: Date;
-  balance: number;
+  balance?: number; // Optional for backwards compatibility
 }
 
 export interface RewardItem {
