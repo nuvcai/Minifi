@@ -552,11 +552,73 @@ export default function TradingDashboard({
   };
 
   const handleEndCompetition = () => {
+    // Calculate additional performance metrics using performanceData
+    const portfolioHistory = performanceData.length > 0 
+      ? performanceData.map(p => ({ time: p.time, value: p.total }))
+      : [{ time: 0, value: startingCapital }];
+    
+    // Calculate volatility (standard deviation of hourly returns)
+    const hourlyReturns: number[] = [];
+    for (let i = 1; i < portfolioHistory.length; i++) {
+      const prevValue = portfolioHistory[i - 1].value;
+      const currValue = portfolioHistory[i].value;
+      if (prevValue > 0) {
+        hourlyReturns.push((currValue - prevValue) / prevValue);
+      }
+    }
+    
+    const avgReturn = hourlyReturns.length > 0 
+      ? hourlyReturns.reduce((a, b) => a + b, 0) / hourlyReturns.length 
+      : 0;
+    
+    const variance = hourlyReturns.length > 0
+      ? hourlyReturns.reduce((sum, r) => sum + Math.pow(r - avgReturn, 2), 0) / hourlyReturns.length
+      : 0;
+    
+    // Annualize: ~252 trading days * 6.5 hours per day
+    const volatility = Math.sqrt(variance) * Math.sqrt(252 * 6.5) * 100;
+    
+    // Calculate max drawdown
+    let maxDrawdown = 0;
+    let peak = portfolioHistory[0]?.value || startingCapital;
+    
+    for (const point of portfolioHistory) {
+      if (point.value > peak) {
+        peak = point.value;
+      }
+      const drawdown = (peak - point.value) / peak;
+      if (drawdown > maxDrawdown) {
+        maxDrawdown = drawdown;
+      }
+    }
+    
+    // Calculate Sharpe ratio (assuming risk-free rate of 4%)
+    const riskFreeRate = 0.04;
+    const annualizedReturn = dailyReturn; // Already in percentage
+    const sharpeRatio = volatility > 0 
+      ? (annualizedReturn / 100 - riskFreeRate) / (volatility / 100) 
+      : 0;
+    
+    // Generate chart data for results page
+    const chartData = portfolioHistory.map((point, index) => {
+      const date = new Date();
+      date.setHours(date.getHours() - (portfolioHistory.length - 1 - index));
+      return {
+        date: date.toISOString().split('T')[0] + ' ' + date.toTimeString().slice(0, 5),
+        value: point.value,
+      };
+    });
+    
     onEndCompetition({
       finalValue: totalValue,
       totalReturn: dailyReturn,
       portfolio,
       cash,
+      volatility: Math.abs(volatility).toFixed(1),
+      sharpeRatio: sharpeRatio.toFixed(2),
+      maxDrawdown: (maxDrawdown * 100).toFixed(1),
+      annualizedReturn: annualizedReturn.toFixed(1),
+      chartData,
     });
   };
 

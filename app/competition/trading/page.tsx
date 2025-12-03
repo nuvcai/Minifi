@@ -44,6 +44,25 @@ function TradingContent() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleEndCompetition = (results: any) => {
     if (results && typeof results.finalValue === "number" && typeof results.totalReturn === "number") {
+      // Store full results in sessionStorage for the results page
+      const fullResults = {
+        finalValue: results.finalValue,
+        totalReturn: results.totalReturn,
+        portfolio: results.portfolio || {},
+        cash: results.cash || 0,
+        chartData: results.chartData || null,
+        sharpeRatio: results.sharpeRatio || null,
+        volatility: results.volatility || null,
+        maxDrawdown: results.maxDrawdown || null,
+      };
+      
+      try {
+        sessionStorage.setItem('competitionResults', JSON.stringify(fullResults));
+      } catch (e) {
+        console.warn('Could not store results in sessionStorage:', e);
+      }
+      
+      // Navigate with basic params as fallback
       const finalValue = results.finalValue;
       const totalReturn = results.totalReturn;
       router.push(`/competition/results?finalValue=${finalValue}&totalReturn=${totalReturn}`);
