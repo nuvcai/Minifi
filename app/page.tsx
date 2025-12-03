@@ -12,7 +12,8 @@ import Image from "next/image";
 import { 
   Play, ChevronRight, ArrowRight, BookOpen, Target, 
   Shield, Sparkles, Users, Clock, Award,
-  GraduationCap, Lightbulb, Building2, History
+  GraduationCap, Lightbulb, Building2, History,
+  Menu, X, Trophy, HelpCircle
 } from "lucide-react";
 import { aiCoaches } from "@/components/data/coaches";
 import { wealthEras, foPrinciples, investorWisdom } from "@/components/data/wealthWisdom";
@@ -23,6 +24,7 @@ export default function HomePage() {
   const [activeEraIndex, setActiveEraIndex] = useState(0);
   const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set());
   const sectionRefs = useRef<{ [key: string]: HTMLElement | null }>({});
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   // Typewriter state for coach text
   const [displayedText, setDisplayedText] = useState("");
@@ -157,19 +159,19 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#050507] overflow-hidden">
-      {/* Animated background */}
-      <div className="fixed inset-0 pointer-events-none">
+    <div className="min-h-screen w-full bg-[#050507] overflow-x-hidden">
+      {/* Animated background - Full viewport coverage */}
+      <div className="fixed inset-0 w-screen h-screen pointer-events-none overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/20 via-transparent to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 h-[500px] bg-gradient-to-t from-violet-950/30 to-transparent" />
-        {/* Floating orbs */}
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-violet-500/10 rounded-full blur-3xl animate-pulse delay-1000" />
+        {/* Floating orbs - Responsive sizing */}
+        <div className="absolute top-1/4 left-4 sm:left-1/4 w-64 sm:w-96 h-64 sm:h-96 bg-indigo-500/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/4 right-4 sm:right-1/4 w-56 sm:w-80 h-56 sm:h-80 bg-violet-500/10 rounded-full blur-3xl animate-pulse delay-1000" />
       </div>
       
-      <div className="relative">
+      <div className="relative w-full">
         {/* Navigation */}
-        <nav className={`container mx-auto px-6 py-6 transition-all duration-1000 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
+        <nav className={`w-full max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 transition-all duration-1000 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Image
@@ -177,15 +179,16 @@ export default function HomePage() {
                 alt="Mini.Fi"
                 width={120}
                 height={40}
-                className="h-10 w-auto"
+                className="h-8 sm:h-10 w-auto"
               />
             </div>
             
-            <div className="flex items-center gap-6">
-              <Link href="/library" className="text-sm text-white/70 hover:text-white font-medium transition-colors hidden sm:block">
+            {/* Desktop Navigation */}
+            <div className="hidden sm:flex items-center gap-6">
+              <Link href="/library" className="text-sm text-white/70 hover:text-white font-medium transition-colors">
                 Learn
               </Link>
-              <Link href="/support" className="text-sm text-white/70 hover:text-white font-medium transition-colors hidden sm:block">
+              <Link href="/support" className="text-sm text-white/70 hover:text-white font-medium transition-colors">
                 Support
               </Link>
               <Link 
@@ -196,11 +199,80 @@ export default function HomePage() {
                 <ChevronRight className="inline-block h-4 w-4 ml-1 group-hover:translate-x-0.5 transition-transform" />
               </Link>
             </div>
+            
+            {/* Mobile Navigation */}
+            <div className="flex sm:hidden items-center gap-3">
+              <Link 
+                href="/timeline"
+                className="text-xs px-4 py-2 rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white font-semibold"
+              >
+                Play Free
+              </Link>
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="p-2 rounded-xl bg-white/10 text-white touch-manipulation"
+                aria-label="Toggle menu"
+              >
+                {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              </button>
+            </div>
           </div>
+          
+          {/* Mobile Menu Dropdown */}
+          {mobileMenuOpen && (
+            <div className="sm:hidden mt-4 p-4 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 animate-in slide-in-from-top-2 duration-200">
+              <div className="space-y-1">
+                <Link 
+                  href="/timeline" 
+                  className="flex items-center gap-3 p-3 rounded-xl text-white hover:bg-white/10 transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <Play className="h-5 w-5 text-indigo-400" />
+                  <div>
+                    <p className="font-medium">Play Now</p>
+                    <p className="text-xs text-white/60">Start your journey</p>
+                  </div>
+                </Link>
+                <Link 
+                  href="/library" 
+                  className="flex items-center gap-3 p-3 rounded-xl text-white hover:bg-white/10 transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <BookOpen className="h-5 w-5 text-amber-400" />
+                  <div>
+                    <p className="font-medium">Wisdom Library</p>
+                    <p className="text-xs text-white/60">Learn from the greats</p>
+                  </div>
+                </Link>
+                <Link 
+                  href="/competition" 
+                  className="flex items-center gap-3 p-3 rounded-xl text-white hover:bg-white/10 transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <Trophy className="h-5 w-5 text-yellow-400" />
+                  <div>
+                    <p className="font-medium">Competition</p>
+                    <p className="text-xs text-white/60">Challenge yourself</p>
+                  </div>
+                </Link>
+                <Link 
+                  href="/support" 
+                  className="flex items-center gap-3 p-3 rounded-xl text-white hover:bg-white/10 transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <HelpCircle className="h-5 w-5 text-emerald-400" />
+                  <div>
+                    <p className="font-medium">Help & Support</p>
+                    <p className="text-xs text-white/60">Get assistance</p>
+                  </div>
+                </Link>
+              </div>
+            </div>
+          )}
         </nav>
 
         {/* Hero Section - Mission First */}
-        <main className="container mx-auto px-6">
+        <main className="w-full max-w-7xl mx-auto px-4 sm:px-6">
           <div className={`max-w-5xl mx-auto pt-16 pb-20 text-center transition-all duration-1000 delay-100 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             
             {/* Mission Statement - HERO FOCUS */}
@@ -215,41 +287,41 @@ export default function HomePage() {
             </div>
 
             {/* The Big Mission Quote */}
-            <div className="relative mb-16">
+            <div className="relative mb-10 sm:mb-16">
               <div className="absolute -inset-4 bg-gradient-to-r from-indigo-500/5 via-violet-500/5 to-purple-500/5 rounded-3xl blur-xl" />
               <blockquote className="relative">
-                <p className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight tracking-tight">
+                <p className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight tracking-tight">
                   <span className="text-white/90">"</span>
                   <span className="bg-gradient-to-r from-amber-300 via-orange-300 to-red-300 bg-clip-text text-transparent">70%</span>
                   <span className="text-white/80"> of Australian teens have </span>
                   <span className="text-white/90">no financial education.</span>
                 </p>
-                <p className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mt-4 tracking-tight">
-              <span className="bg-gradient-to-r from-indigo-400 via-violet-400 to-purple-400 bg-clip-text text-transparent">
+                <p className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mt-3 sm:mt-4 tracking-tight">
+                  <span className="bg-gradient-to-r from-indigo-400 via-violet-400 to-purple-400 bg-clip-text text-transparent">
                     We're changing that.
-              </span>
+                  </span>
                   <span className="text-white/90">"</span>
                 </p>
               </blockquote>
             </div>
 
             {/* Tagline */}
-            <p className="text-lg sm:text-xl text-white/70 max-w-2xl mx-auto mb-10 leading-relaxed">
+            <p className="text-base sm:text-lg md:text-xl text-white/70 max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed px-2">
               Not just another finance app. Mini.Fi brings <span className="text-white font-medium">250 years of wealth wisdom</span> from 
               history's greatest investors and <span className="text-white font-medium">Family Office strategies</span> — 
               all through an immersive game experience.
             </p>
 
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20">
-              <Link href="/timeline">
-                <button className="group flex items-center gap-3 px-8 py-4 rounded-2xl bg-gradient-to-r from-indigo-500 via-violet-500 to-purple-500 text-white font-semibold text-lg shadow-2xl shadow-violet-500/20 hover:shadow-violet-500/40 hover:scale-[1.02] transition-all duration-300">
+            {/* CTA Buttons - Mobile optimized */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-12 sm:mb-20 px-4 sm:px-0">
+              <Link href="/timeline" className="w-full sm:w-auto">
+                <button className="group w-full sm:w-auto flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-8 py-4 rounded-2xl bg-gradient-to-r from-indigo-500 via-violet-500 to-purple-500 text-white font-semibold text-base sm:text-lg shadow-2xl shadow-violet-500/20 hover:shadow-violet-500/40 hover:scale-[1.02] transition-all duration-300 touch-manipulation active:scale-[0.98]">
                   <Play className="h-5 w-5" />
                   Play Free Now
                   <ChevronRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </button>
               </Link>
-              <div className="flex items-center gap-2 text-white/60 text-sm">
+              <div className="flex items-center gap-2 text-white/60 text-xs sm:text-sm">
                 <Shield className="h-4 w-4 text-emerald-400" />
                 No sign-up required • 100% free
               </div>
@@ -663,8 +735,8 @@ export default function HomePage() {
         </main>
 
         {/* Footer */}
-        <footer className="border-t border-white/10 bg-black/40">
-          <div className="container mx-auto px-6 py-12">
+        <footer className="w-full border-t border-white/10 bg-black/40">
+          <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-12">
             <div className="grid md:grid-cols-4 gap-8 mb-8">
               <div>
                 <div className="flex items-center gap-3 mb-4">
