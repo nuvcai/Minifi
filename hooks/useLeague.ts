@@ -11,7 +11,6 @@
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { api } from '@/lib/api';
 import { LEAGUES, type League } from '@/components/gamification/LeagueSystem';
 
 // Re-export League type from LeagueSystem for consumers

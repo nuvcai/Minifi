@@ -661,7 +661,7 @@ function pickRandom<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-function pickRandomN<T>(arr: T[], n: number): T[] {
+function _pickRandomN<T>(arr: T[], n: number): T[] {
   const shuffled = [...arr].sort(() => 0.5 - Math.random());
   return shuffled.slice(0, n);
 }

@@ -28,7 +28,7 @@ import {
   Lock,
   Star,
 } from "lucide-react";
-import { EffortBadge, effortBadges, LearningMilestone, learningMilestones } from "./effortRewards";
+import { EffortBadge, effortBadges, learningMilestones } from "./effortRewards";
 
 interface BadgeDisplayProps {
   earnedBadgeIds: string[];
@@ -65,7 +65,7 @@ export function BadgeDisplay({
   earnedMilestoneIds,
   stats,
   compact = false,
-  onBadgeClick,
+  onBadgeClick: _onBadgeClick,
 }: BadgeDisplayProps) {
   const [selectedBadge, setSelectedBadge] = useState<EffortBadge | null>(null);
   const [showAllBadges, setShowAllBadges] = useState(false);

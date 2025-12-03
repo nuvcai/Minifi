@@ -19,7 +19,6 @@ import { Input } from "@/components/ui/input";
 import {
   Gift,
   Search,
-  Filter,
   Star,
   Sparkles,
   Check,
@@ -29,10 +28,8 @@ import {
   Film,
   Heart,
   Coins,
-  ChevronRight,
   Clock,
   Lock,
-  ExternalLink,
 } from "lucide-react";
 import { FlybuysPoints, PartnerReward, RewardCategory, MembershipTier } from "./stakingTypes";
 import { partnerRewards, membershipTiers, getTierByPoints, getNextTier } from "./stakingData";
@@ -73,7 +70,7 @@ export function FlybuysRewards({
   const [selectedCategory, setSelectedCategory] = useState<RewardCategory | "all">("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedReward, setSelectedReward] = useState<PartnerReward | null>(null);
-  const [showConfirm, setShowConfirm] = useState(false);
+  const [_showConfirm, setShowConfirm] = useState(false);
   const [redeemSuccess, setRedeemSuccess] = useState(false);
 
   const currentTier = getTierByPoints(points.lifetimeEarned);

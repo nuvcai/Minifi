@@ -184,11 +184,12 @@ export function ShareResultCard({
         shareOpened = true;
         break;
         
-      case "email":
+      case "email": {
         const subject = `I just completed a mission in Mini.Fi! 🎮`;
         window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(shareText + "\n\n" + shareUrl)}`;
         shareOpened = true;
         break;
+      }
         
       case "copy_link":
         try {

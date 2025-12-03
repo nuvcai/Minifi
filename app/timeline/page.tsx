@@ -9,7 +9,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { BookOpen, Trophy, Star, Zap, Target, ChevronRight } from "lucide-react";
+import { BookOpen, Trophy, Zap, ChevronRight } from "lucide-react";
 
 // Components
 import { GameHeader } from "@/components/game/GameHeader";
@@ -18,7 +18,6 @@ import { TimelineSection } from "@/components/game/TimelineSection";
 import { EventDetailModal } from "@/components/modals/EventDetailModal";
 import { MissionModal } from "@/components/modals/MissionModal";
 import { SummaryModal } from "@/components/modals/SummaryModal";
-import { RewardsModal } from "@/components/modals/RewardsModal";
 import { LevelUpCelebration, BadgeDisplay, MilestoneAchievement, SavingsVault, InvestorJourney, RewardsStore } from "@/components/gamification";
 import { DailyStreak } from "@/components/gamification/DailyStreak";
 import { DailyWisdom } from "@/components/library/DailyWisdom";
@@ -64,7 +63,6 @@ export default function TimelinePage() {
   const [completedMissions, setCompletedMissions] = useState<string[]>([]);
   const [competitionUnlocked, setCompetitionUnlocked] = useState(false);
   const [showRewardsStore, setShowRewardsStore] = useState(false);
-  const [redeemedRewards, setRedeemedRewards] = useState<string[]>([]);
   const [showLevelUp, setShowLevelUp] = useState(false);
   const [levelUpInfo, setLevelUpInfo] = useState({ newLevel: 1, previousLevel: 0 });
   const [missionStep, setMissionStep] = useState<"intro" | "decision" | "thesis" | "result" | "whatif" | "quiz">("intro");
@@ -78,14 +76,12 @@ export default function TimelinePage() {
   const [completedRandomCount, setCompletedRandomCount] = useState(0);
   
   // Flybuys-style points system
-  const {
-    balance: pointsBalance,
-    tierInfo,
-    earnFromXP,
-    redeemReward,
-    canAfford,
-    meetsTier,
-    getPointsValue,
+  const { 
+    balance: pointsBalance, 
+    earnFromXP, 
+    redeemReward, 
+    canAfford, 
+    meetsTier 
   } = usePoints();
   
   // Effort rewards tracking
@@ -93,13 +89,10 @@ export default function TimelinePage() {
     stats: effortStats,
     earnedRewards,
     pendingNotifications,
-    totalEffortXp,
     recordInvestment,
-    recordRiskPreviewViewed,
     recordCoachAdviceViewed,
     recordMissionCompleted,
     clearPendingNotification,
-    getLossEncouragement,
   } = useEffortRewards();
   
   // Milestone notification state
@@ -143,7 +136,7 @@ export default function TimelinePage() {
               loadedFromDb = true;
             }
           }
-        } catch (e) {
+        } catch {
           console.log("Falling back to localStorage for game progress");
         }
       }
@@ -227,7 +220,7 @@ export default function TimelinePage() {
             },
           }),
         });
-      } catch (e) {
+      } catch {
         console.log("Failed to sync progress to database");
       }
     }
@@ -383,17 +376,6 @@ export default function TimelinePage() {
 
   const startCompetition = () => {
     window.location.href = "/competition";
-  };
-
-  const handleLegacyRedeemReward = (reward: { id: string; cost: number }) => {
-    if (playerXP >= reward.cost && !redeemedRewards.includes(reward.id)) {
-      const newXP = playerXP - reward.cost;
-      setPlayerXP(newXP);
-      setTotalScore(newXP); // Keep score in sync with XP
-      setRedeemedRewards((prev) => [...prev, reward.id]);
-      // Save progress after redeeming
-      saveProgress(newXP, playerLevel, completedMissions);
-    }
   };
 
   const handleXpEarned = (amount: number, source?: string) => {
@@ -759,12 +741,13 @@ export default function TimelinePage() {
         onRestart={() => window.location.reload()}
       />
 
-      <RewardsModal
+      <RewardsStore
         open={showRewardsStore}
         onOpenChange={setShowRewardsStore}
-        playerXP={playerXP}
-        redeemedRewards={redeemedRewards}
-        onRedeemReward={handleLegacyRedeemReward}
+        balance={pointsBalance}
+        onRedeem={redeemReward}
+        canAfford={canAfford}
+        meetsTier={meetsTier}
       />
 
       <LevelUpCelebration

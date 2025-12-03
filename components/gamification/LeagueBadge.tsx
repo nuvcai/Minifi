@@ -35,16 +35,7 @@ import {
 // TYPES
 // =============================================================================
 
-interface League {
-  id: string;
-  name: string;
-  tier: number;
-  emoji: string;
-  min_xp: number;
-  promotion_slots: number;
-  relegation_slots: number;
-  cohort_size: number;
-}
+import { type League } from './LeagueSystem';
 
 interface LeagueBadgeProps {
   league: League | null;
@@ -248,9 +239,9 @@ function LeaguePopoverContent({
         </div>
         <p className="text-[10px] text-white/50 mt-1">
           {zone === 'promotion' 
-            ? `Top ${league.promotion_slots} get promoted!`
+            ? `Top ${league.promotionSlots} get promoted!`
             : zone === 'danger'
-              ? `Bottom ${league.relegation_slots} get relegated!`
+              ? `Bottom ${league.relegationSlots} get relegated!`
               : 'Keep earning XP to climb!'
           }
         </p>

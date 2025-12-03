@@ -18,7 +18,7 @@ import {
   TrendingUp,
   Clock,
   Dice6,
-  Infinity,
+  Infinity as InfinityIcon,
   RefreshCw,
 } from "lucide-react";
 import { FinancialEvent } from "@/components/data/events";
@@ -326,7 +326,7 @@ export function TimelineSection({
                   <div className="flex items-center gap-2 mb-1">
                     <h3 className="text-lg font-bold text-gray-900">Random Scenarios</h3>
                     <Badge className="bg-violet-100 text-violet-700 border-violet-200 text-xs">
-                      <Infinity className="h-3 w-3 mr-1" />
+                      <InfinityIcon className="h-3 w-3 mr-1" />
                       Infinite
                     </Badge>
                   </div>

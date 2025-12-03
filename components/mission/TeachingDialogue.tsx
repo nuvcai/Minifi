@@ -1065,7 +1065,7 @@ export function TeachingDialogue({
     // Remove common title prefixes and clean up the text
     return text
       .replace(/^(Key Recommendations?|Next Steps?|My Key Recommendations?|🎓 My Key Recommendations?|🚀 Next Steps?):\s*/i, "")
-      .replace(/^[•\-\*]\s*/, "") // Remove bullet points
+      .replace(/^[•\-*]\s*/, "") // Remove bullet points
       .trim();
   };
 
@@ -1097,7 +1097,7 @@ export function TeachingDialogue({
         return `Sharpe ratio is ${actualSharpe.toFixed(2)}, measuring risk-adjusted returns. ${actualSharpe > 1 ? 
           "Excellent risk-adjusted performance!" : actualSharpe > 0 ? "Reasonable risk-return balance." : "This suggests the return may not have justified the risk taken."} ${cleanAdviceText(aiCoachAdvice.next_steps?.[0]) || "Focus on risk-adjusted returns for better investment decisions."}`;
         
-      case "portfolio_chart":
+      case "portfolio_chart": {
         let chartExplanation = "";
         if (currentMessage.id === "portfolio_performance") {
           chartExplanation = `This chart shows how your $100,000 investment in ${selectedOption.name} performed over time, ending at $${Math.round(actualFinalValue).toLocaleString()}. `;
@@ -1112,6 +1112,7 @@ export function TeachingDialogue({
           `While the outcome was negative, understanding these patterns helps you make more informed decisions in similar future scenarios.`;
         
         return chartExplanation + ` ${cleanAdviceText(aiCoachAdvice.recommendations?.[0]) || "Track your performance by year to spot trends and patterns."}`;
+      }
         
       default:
         return aiCoachAdvice.advice || "Let me know if you have any questions about your investment performance!";
