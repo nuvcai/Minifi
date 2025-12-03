@@ -764,7 +764,7 @@ export default function TimelinePage() {
         onOpenChange={setShowRewardsStore}
         playerXP={playerXP}
         redeemedRewards={redeemedRewards}
-        onRedeemReward={redeemReward}
+        onRedeemReward={handleLegacyRedeemReward}
       />
 
       <LevelUpCelebration

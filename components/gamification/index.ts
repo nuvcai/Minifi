@@ -35,6 +35,12 @@ export {
   type LeagueReward,
 } from "./LeagueSystem";
 
+// League Badge for headers/profiles
+export { LeagueBadge, MiniLeagueBadge } from "./LeagueBadge";
+
+// Season End Celebration Modal
+export { SeasonEndCelebration, type SeasonEndResult } from "./SeasonEndCelebration";
+
 // Investor Journey - Narrative Badge Progression
 export { InvestorJourney, journeyStages, type JourneyStage } from "./InvestorJourney";
 
@@ -49,8 +55,21 @@ export { SavingsVault } from "./SavingsVault";
 export { RewardsStore } from "./RewardsStore";
 export * from "./pointsSystem";
 
-// Staking Types & Data
-export * from "./stakingTypes";
+// Staking Types & Data (excluding PointsTransaction which is already exported from pointsSystem)
+export {
+  type StakingPool,
+  type UserStake,
+  type StakingStats,
+  type MembershipTier,
+  type PartnerReward,
+  type BoostOffer,
+  type NFTReward,
+  type StakingTier,
+  type TierBenefits,
+  type FlybuysPoints,
+  type RewardCategory,
+  type ActiveBoost,
+} from "./stakingTypes";
 export {
   stakingPools,
   membershipTiers,

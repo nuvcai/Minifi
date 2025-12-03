@@ -20,6 +20,8 @@ import {
   Check,
 } from "lucide-react";
 import { levelTitles } from "@/components/gamification/LevelUpCelebration";
+import { LeagueBadge, SeasonEndCelebration, type SeasonEndResult } from "@/components/gamification";
+import { useLeague } from "@/hooks/useLeague";
 import {
   Dialog,
   DialogContent,
@@ -50,6 +52,20 @@ export function GameHeader({
   const [animatedScore, setAnimatedScore] = useState(0);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  
+  // League system hook
+  const { 
+    league, 
+    userRank, 
+    zone, 
+    timeRemaining, 
+    xpToNextRank, 
+    xpLead,
+    standings,
+    seasonEndResult,
+    showSeasonEnd,
+    dismissSeasonEnd,
+  } = useLeague();
   
   // Auth state
   const [userEmail, setUserEmail] = useState<string | null>(null);
@@ -251,6 +267,20 @@ export function GameHeader({
                 </p>
               </div>
             </div>
+            
+            {/* League Badge */}
+            {league && (
+              <LeagueBadge
+                league={league}
+                rank={userRank}
+                zone={zone}
+                weeklyXp={standings?.current_user?.weekly_xp || 0}
+                timeRemaining={timeRemaining}
+                xpToNextRank={xpToNextRank}
+                xpLead={xpLead}
+                compact={true}
+              />
+            )}
           </div>
           
           {/* Mobile Stats & Menu */}
@@ -448,6 +478,16 @@ export function GameHeader({
           </div>
         </DialogContent>
       </Dialog>
+      
+      {/* Season End Celebration Modal */}
+      <SeasonEndCelebration
+        open={showSeasonEnd}
+        onClose={dismissSeasonEnd}
+        result={seasonEndResult}
+        onContinue={() => {
+          dismissSeasonEnd();
+        }}
+      />
     </header>
   );
 }

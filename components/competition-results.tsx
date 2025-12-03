@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -13,12 +13,17 @@ import {
   TrendingDown,
   DollarSign,
   Users,
-  Calendar,
   BarChart3,
-  Star,
-  Crown,
   Target,
+  Crown,
+  Flame,
+  Clock,
+  ChevronUp,
+  Shield,
+  AlertTriangle,
+  Sparkles,
 } from "lucide-react";
+import { LeagueSystem } from "@/components/gamification";
 
 interface CompetitionResultsProps {
   finalValue: number;
@@ -26,109 +31,39 @@ interface CompetitionResultsProps {
   onBackToHome: () => void;
 }
 
-// Mock leaderboard data
-const weeklyLeaderboard = [
-  {
-    rank: 1,
-    name: "Investment Master Wang",
-    return: 15.8,
-    profit: 158.0,
-    avatar: "👑",
-  },
-  { rank: 2, name: "Stock God Lee", return: 12.3, profit: 123.0, avatar: "🏆" },
-  { rank: 3, name: "Fund Queen", return: 9.7, profit: 97.0, avatar: "💎" },
-  { rank: 4, name: "You", return: 8.5, profit: 85.0, avatar: "🎯" },
-  { rank: 5, name: "Crypto Newbie", return: 6.2, profit: 62.0, avatar: "🚀" },
-  { rank: 6, name: "Value Investor", return: 4.8, profit: 48.0, avatar: "📈" },
-  {
-    rank: 7,
-    name: "Technical Analyst",
-    return: 3.1,
-    profit: 31.0,
-    avatar: "📊",
-  },
-  {
-    rank: 8,
-    name: "Long-term Holder",
-    return: 1.9,
-    profit: 19.0,
-    avatar: "⏰",
-  },
-];
-
-const monthlyLeaderboard = [
-  {
-    rank: 1,
-    name: "Monthly Champion",
-    return: 28.5,
-    profit: 285.0,
-    avatar: "👑",
-  },
-  {
-    rank: 2,
-    name: "Steady Investor",
-    return: 22.1,
-    profit: 221.0,
-    avatar: "🏆",
-  },
-  {
-    rank: 3,
-    name: "Tech Stock King",
-    return: 18.9,
-    profit: 189.0,
-    avatar: "💎",
-  },
-  { rank: 4, name: "ETF Expert", return: 15.2, profit: 152.0, avatar: "📈" },
-  { rank: 5, name: "You", return: 12.8, profit: 128.0, avatar: "🎯" },
-  { rank: 6, name: "Crypto Master", return: 10.5, profit: 105.0, avatar: "🚀" },
-  {
-    rank: 7,
-    name: "Diversified Investor",
-    return: 8.7,
-    profit: 87.0,
-    avatar: "📊",
-  },
-  { rank: 8, name: "New Investor", return: 6.3, profit: 63.0, avatar: "⭐" },
-];
-
-const allTimeLeaderboard = [
-  {
-    rank: 1,
-    name: "Legendary Investor",
-    return: 45.2,
-    profit: 452.0,
-    avatar: "👑",
-  },
-  { rank: 2, name: "Stock Veteran", return: 38.7, profit: 387.0, avatar: "🏆" },
-  {
-    rank: 3,
-    name: "Investment Professor",
-    return: 32.4,
-    profit: 324.0,
-    avatar: "💎",
-  },
-  { rank: 4, name: "Fund Manager", return: 28.9, profit: 289.0, avatar: "📈" },
-  { rank: 5, name: "Quant Trader", return: 25.1, profit: 251.0, avatar: "🤖" },
-  { rank: 6, name: "Value Finder", return: 21.8, profit: 218.0, avatar: "🔍" },
-  { rank: 7, name: "You", return: 18.5, profit: 185.0, avatar: "🎯" },
-  {
-    rank: 8,
-    name: "Trend Follower",
-    return: 15.3,
-    profit: 153.0,
-    avatar: "📊",
-  },
-];
-
 export default function CompetitionResults({
   finalValue,
   totalReturn,
   onBackToHome,
 }: CompetitionResultsProps) {
-  const [activeTab, setActiveTab] = useState("weekly");
-
-  const userRank = 4; // Mock user rank
+  const [activeTab, setActiveTab] = useState("league");
+  const [userLeague, setUserLeague] = useState("gold");
+  const [userRank, setUserRank] = useState(4);
+  
   const profit = finalValue - 1000;
+
+  // Calculate user rank based on return
+  useEffect(() => {
+    if (totalReturn >= 15) {
+      setUserRank(1);
+      setUserLeague("diamond");
+    } else if (totalReturn >= 12) {
+      setUserRank(2);
+      setUserLeague("platinum");
+    } else if (totalReturn >= 9) {
+      setUserRank(3);
+      setUserLeague("gold");
+    } else if (totalReturn >= 6) {
+      setUserRank(4);
+      setUserLeague("gold");
+    } else if (totalReturn >= 3) {
+      setUserRank(7);
+      setUserLeague("silver");
+    } else {
+      setUserRank(10);
+      setUserLeague("bronze");
+    }
+  }, [totalReturn]);
 
   const getRankIcon = (rank: number) => {
     switch (rank) {
@@ -153,18 +88,14 @@ export default function CompetitionResults({
     }
   };
 
-  const getCurrentLeaderboard = () => {
-    switch (activeTab) {
-      case "weekly":
-        return weeklyLeaderboard;
-      case "monthly":
-        return monthlyLeaderboard;
-      case "all":
-        return allTimeLeaderboard;
-      default:
-        return weeklyLeaderboard;
-    }
+  // Get zone based on rank
+  const getZone = () => {
+    if (userRank <= 10) return "promotion";
+    if (userRank > 25) return "danger";
+    return "safe";
   };
+
+  const zone = getZone();
 
   return (
     <div className="relative">
@@ -247,7 +178,7 @@ export default function CompetitionResults({
                     {getRankIcon(userRank)}
                   </div>
                   <p className="text-xs sm:text-sm text-muted-foreground mb-1">
-                    Ranking
+                    League Rank
                   </p>
                   <Badge
                     className={`text-sm sm:text-lg px-2 sm:px-3 py-1 ${getRankBadge(
@@ -258,109 +189,109 @@ export default function CompetitionResults({
                   </Badge>
                 </div>
               </div>
+              
+              {/* Zone Status */}
+              <div className="mt-4 flex justify-center">
+                <div className={`
+                  flex items-center gap-2 px-4 py-2 rounded-full
+                  ${zone === 'promotion' ? 'bg-emerald-500/20 border border-emerald-500/30' : ''}
+                  ${zone === 'safe' ? 'bg-blue-500/20 border border-blue-500/30' : ''}
+                  ${zone === 'danger' ? 'bg-red-500/20 border border-red-500/30' : ''}
+                `}>
+                  {zone === 'promotion' && <ChevronUp className="h-4 w-4 text-emerald-400" />}
+                  {zone === 'safe' && <Shield className="h-4 w-4 text-blue-400" />}
+                  {zone === 'danger' && <AlertTriangle className="h-4 w-4 text-red-400" />}
+                  <span className={`text-sm font-medium
+                    ${zone === 'promotion' ? 'text-emerald-400' : ''}
+                    ${zone === 'safe' ? 'text-blue-400' : ''}
+                    ${zone === 'danger' ? 'text-red-400' : ''}
+                  `}>
+                    {zone === 'promotion' && '🚀 Promotion Zone - Great job!'}
+                    {zone === 'safe' && '🛡️ Safe Zone'}
+                    {zone === 'danger' && '⚠️ Danger Zone'}
+                  </span>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Leaderboards */}
+        {/* Leaderboards - Now with KEEP-Style Leagues */}
         <div className="max-w-4xl mx-auto mb-8">
-          <Card className="bg-card border-border shadow-lg">
+          <Card className="bg-card border-border shadow-lg overflow-hidden">
             <CardHeader className="pb-3 sm:pb-6">
               <CardTitle className="text-lg sm:text-2xl font-serif text-foreground flex items-center gap-1 sm:gap-2">
                 <Users className="h-4 w-4 sm:h-6 sm:w-6 text-primary" />
-                Leaderboard
+                League Standings
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-3 sm:p-6">
+            <CardContent className="p-0">
               <Tabs
                 value={activeTab}
                 onValueChange={setActiveTab}
                 className="w-full"
               >
-                <TabsList className="grid w-full grid-cols-3 mb-4 sm:mb-6">
+                <TabsList className="grid w-full grid-cols-2 rounded-none border-b border-border">
                   <TabsTrigger
-                    value="weekly"
-                    className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm"
+                    value="league"
+                    className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm rounded-none data-[state=active]:bg-primary/10"
                   >
-                    <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
-                    Weekly
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="monthly"
-                    className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm"
-                  >
-                    <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
-                    Monthly
+                    <Crown className="h-3 w-3 sm:h-4 sm:w-4" />
+                    Your League
                   </TabsTrigger>
                   <TabsTrigger
                     value="all"
-                    className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm"
+                    className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm rounded-none data-[state=active]:bg-primary/10"
                   >
-                    <Star className="h-3 w-3 sm:h-4 sm:w-4" />
-                    All Time
+                    <Sparkles className="h-3 w-3 sm:h-4 sm:w-4" />
+                    All Leagues
                   </TabsTrigger>
                 </TabsList>
 
-                <TabsContent
-                  value={activeTab}
-                  className="space-y-2 sm:space-y-3"
-                >
-                  {getCurrentLeaderboard().map((player, index) => (
-                    <div
-                      key={index}
-                      className={`flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 rounded-lg transition-all hover:shadow-md ${
-                        player.name === "You"
-                          ? "bg-gradient-to-r from-primary/10 to-secondary/10 border-2 border-primary/30"
-                          : "bg-muted/50 hover:bg-muted"
-                      }`}
-                    >
-                      <div className="flex items-center gap-2 sm:gap-4 mb-2 sm:mb-0">
-                        <div className="flex items-center gap-1 sm:gap-2">
-                          {getRankIcon(player.rank)}
-                          <Badge
-                            className={`${getRankBadge(
-                              player.rank
-                            )} min-w-[40px] sm:min-w-[60px] justify-center text-xs sm:text-sm`}
-                          >
-                            #{player.rank}
-                          </Badge>
-                        </div>
-                        <div className="flex items-center gap-2 sm:gap-3">
-                          <span className="text-lg sm:text-2xl">
-                            {player.avatar}
-                          </span>
-                          <div>
-                            <p
-                              className={`font-semibold text-sm sm:text-base ${
-                                player.name === "You"
-                                  ? "text-primary"
-                                  : "text-foreground"
-                              }`}
-                            >
-                              {player.name}
-                            </p>
-                            <p className="text-xs sm:text-sm text-muted-foreground">
-                              P&L: {player.profit >= 0 ? "+" : ""}$
-                              {player.profit.toFixed(2)}
-                            </p>
+                <TabsContent value="league" className="mt-0">
+                  <LeagueSystem 
+                    currentLeagueId={userLeague}
+                    currentUserRank={userRank}
+                    onEarnXp={onBackToHome}
+                  />
+                </TabsContent>
+
+                <TabsContent value="all" className="mt-0 p-4">
+                  <div className="space-y-3">
+                    {[
+                      { id: 'diamond', name: 'Diamond League', emoji: '👑', color: 'from-cyan-500/30 to-blue-500/30', border: 'border-cyan-400/50' },
+                      { id: 'platinum', name: 'Platinum League', emoji: '💎', color: 'from-violet-500/30 to-purple-500/30', border: 'border-violet-400/50' },
+                      { id: 'gold', name: 'Gold League', emoji: '🥇', color: 'from-yellow-500/30 to-amber-500/30', border: 'border-yellow-400/50' },
+                      { id: 'silver', name: 'Silver League', emoji: '🥈', color: 'from-slate-400/30 to-gray-500/30', border: 'border-slate-400/50' },
+                      { id: 'bronze', name: 'Bronze League', emoji: '🥉', color: 'from-amber-700/30 to-orange-600/30', border: 'border-amber-600/50' },
+                    ].map((league) => (
+                      <div
+                        key={league.id}
+                        className={`
+                          p-4 rounded-xl border transition-all
+                          bg-gradient-to-r ${league.color} ${league.border}
+                          ${league.id === userLeague ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' : 'opacity-70'}
+                        `}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <span className="text-3xl">{league.emoji}</span>
+                            <div>
+                              <h4 className="font-bold text-foreground">{league.name}</h4>
+                              <p className="text-xs text-muted-foreground">
+                                {league.id === userLeague ? 'You are here!' : 'Unlock by earning more XP'}
+                              </p>
+                            </div>
                           </div>
+                          {league.id === userLeague && (
+                            <Badge className="bg-primary text-primary-foreground">
+                              Current
+                            </Badge>
+                          )}
                         </div>
                       </div>
-                      <div className="text-left sm:text-right">
-                        <p
-                          className={`text-base sm:text-lg font-bold ${
-                            player.return >= 0 ? "text-chart-1" : "text-chart-2"
-                          }`}
-                        >
-                          {player.return >= 0 ? "+" : ""}
-                          {player.return.toFixed(1)}%
-                        </p>
-                        <p className="text-xs sm:text-sm text-muted-foreground">
-                          Return Rate
-                        </p>
-                      </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </TabsContent>
               </Tabs>
             </CardContent>
@@ -374,7 +305,8 @@ export default function CompetitionResults({
             size="lg"
             className="bg-gradient-to-r from-primary to-secondary text-white hover:from-primary/90 hover:to-secondary/90 px-6 sm:px-8 py-2 sm:py-3 text-base sm:text-lg font-semibold shadow-lg"
           >
-            Back to Home
+            <Flame className="h-5 w-5 mr-2" />
+            Continue Journey
           </Button>
         </div>
       </div>

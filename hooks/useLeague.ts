@@ -12,28 +12,19 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { api } from '@/lib/api';
+import { LEAGUES, type League } from '@/components/gamification/LeagueSystem';
+
+// Re-export League type from LeagueSystem for consumers
+export type { League } from '@/components/gamification/LeagueSystem';
+
+// Helper to get League UI data by ID
+function getLeagueById(leagueId: string): League {
+  return LEAGUES.find(l => l.id === leagueId) || LEAGUES[0];
+}
 
 // =============================================================================
 // TYPES
 // =============================================================================
-
-export interface League {
-  id: string;
-  name: string;
-  tier: number;
-  emoji: string;
-  min_xp: number;
-  promotion_slots: number;
-  relegation_slots: number;
-  cohort_size: number;
-  weekly_rewards: Array<{
-    rank?: number;
-    rank_range?: [number, number];
-    xp_bonus: number;
-    badge?: string;
-    special?: string;
-  }>;
-}
 
 export interface LeaguePlayer {
   id: string;
@@ -119,91 +110,48 @@ export interface UseLeagueReturn {
 }
 
 // =============================================================================
-// LEAGUE DEFINITIONS (Client-side fallback)
+// LEAGUE DEFINITIONS - Using LEAGUES from LeagueSystem
 // =============================================================================
 
-const DEFAULT_LEAGUES: League[] = [
-  {
-    id: 'bronze',
-    name: 'Bronze League',
-    tier: 1,
-    emoji: '🥉',
-    min_xp: 0,
-    promotion_slots: 10,
-    relegation_slots: 0,
-    cohort_size: 30,
-    weekly_rewards: [
+// Use LEAGUES directly from LeagueSystem for UI consistency
+const DEFAULT_LEAGUES = LEAGUES;
+
+// Helper to get rewards for a league
+function getLeagueRewards(leagueId: string): Array<{ rank?: number; rank_range?: [number, number]; xp_bonus: number; badge?: string; special?: string }> {
+  const rewardsMap: Record<string, Array<{ rank?: number; rank_range?: [number, number]; xp_bonus: number; badge?: string; special?: string }>> = {
+    bronze: [
       { rank: 1, xp_bonus: 100, badge: 'bronze_champion' },
       { rank: 2, xp_bonus: 75 },
       { rank: 3, xp_bonus: 50 },
       { rank_range: [4, 10], xp_bonus: 25 },
     ],
-  },
-  {
-    id: 'silver',
-    name: 'Silver League',
-    tier: 2,
-    emoji: '🥈',
-    min_xp: 500,
-    promotion_slots: 10,
-    relegation_slots: 5,
-    cohort_size: 30,
-    weekly_rewards: [
+    silver: [
       { rank: 1, xp_bonus: 200, badge: 'silver_champion' },
       { rank: 2, xp_bonus: 150 },
       { rank: 3, xp_bonus: 100 },
       { rank_range: [4, 10], xp_bonus: 50 },
     ],
-  },
-  {
-    id: 'gold',
-    name: 'Gold League',
-    tier: 3,
-    emoji: '🥇',
-    min_xp: 1500,
-    promotion_slots: 10,
-    relegation_slots: 5,
-    cohort_size: 30,
-    weekly_rewards: [
+    gold: [
       { rank: 1, xp_bonus: 400, badge: 'gold_champion' },
       { rank: 2, xp_bonus: 300 },
       { rank: 3, xp_bonus: 200 },
       { rank_range: [4, 10], xp_bonus: 100 },
     ],
-  },
-  {
-    id: 'platinum',
-    name: 'Platinum League',
-    tier: 4,
-    emoji: '💎',
-    min_xp: 3500,
-    promotion_slots: 8,
-    relegation_slots: 5,
-    cohort_size: 30,
-    weekly_rewards: [
+    platinum: [
       { rank: 1, xp_bonus: 750, badge: 'platinum_champion', special: 'exclusive_avatar' },
       { rank: 2, xp_bonus: 500 },
       { rank: 3, xp_bonus: 350 },
       { rank_range: [4, 8], xp_bonus: 200 },
     ],
-  },
-  {
-    id: 'diamond',
-    name: 'Diamond League',
-    tier: 5,
-    emoji: '👑',
-    min_xp: 7500,
-    promotion_slots: 3,
-    relegation_slots: 10,
-    cohort_size: 30,
-    weekly_rewards: [
+    diamond: [
       { rank: 1, xp_bonus: 1500, badge: 'diamond_champion', special: 'hall_of_fame' },
       { rank: 2, xp_bonus: 1000, badge: 'diamond_elite' },
       { rank: 3, xp_bonus: 750, badge: 'diamond_star' },
       { rank_range: [4, 10], xp_bonus: 400 },
     ],
-  },
-];
+  };
+  return rewardsMap[leagueId] || rewardsMap.bronze;
+}
 
 // =============================================================================
 // LOCAL STORAGE KEYS
@@ -254,7 +202,7 @@ function setWeeklyXp(xp: number): void {
 
 function getLeagueByXp(totalXp: number): League {
   for (let i = DEFAULT_LEAGUES.length - 1; i >= 0; i--) {
-    if (totalXp >= DEFAULT_LEAGUES[i].min_xp) {
+    if (totalXp >= DEFAULT_LEAGUES[i].minXpToEnter) {
       return DEFAULT_LEAGUES[i];
     }
   }
@@ -389,9 +337,9 @@ export function useLeague(): UseLeagueReturn {
     let userRank = 8; // Default
     
     const players: LeaguePlayer[] = [];
-    for (let i = 0; i < league.cohort_size; i++) {
+    for (let i = 0; i < league.cohortSize; i++) {
       const isUser = i === userRank - 1;
-      const baseXp = league.min_xp + (league.cohort_size - i) * 50 + Math.floor(Math.random() * 200);
+      const baseXp = league.minXpToEnter + (league.cohortSize - i) * 50 + Math.floor(Math.random() * 200);
       
       players.push({
         id: isUser ? 'current_user' : `player_${i}`,
@@ -416,9 +364,9 @@ export function useLeague(): UseLeagueReturn {
     
     // Determine zone
     let zone: 'promotion' | 'safe' | 'danger' = 'safe';
-    if (userRank <= league.promotion_slots) {
+    if (userRank <= league.promotionSlots) {
       zone = 'promotion';
-    } else if (league.relegation_slots > 0 && userRank > league.cohort_size - league.relegation_slots) {
+    } else if (league.relegationSlots > 0 && userRank > league.cohortSize - league.relegationSlots) {
       zone = 'danger';
     }
     
@@ -454,8 +402,8 @@ export function useLeague(): UseLeagueReturn {
       user_rank: userRank,
       zone,
       targets,
-      promotion_threshold: league.promotion_slots,
-      relegation_threshold: league.relegation_slots > 0 ? league.cohort_size - league.relegation_slots : null,
+      promotion_threshold: league.promotionSlots,
+      relegation_threshold: league.relegationSlots > 0 ? league.cohortSize - league.relegationSlots : null,
     };
   };
 
@@ -464,8 +412,8 @@ export function useLeague(): UseLeagueReturn {
     if (!standings || !league) return;
     
     const finalRank = standings.user_rank;
-    const promoted = finalRank <= league.promotion_slots;
-    const relegated = league.relegation_slots > 0 && finalRank > league.cohort_size - league.relegation_slots;
+    const promoted = finalRank <= league.promotionSlots;
+    const relegated = league.relegationSlots > 0 && finalRank > league.cohortSize - league.relegationSlots;
     
     // Determine new league
     let newLeague = league;
@@ -480,7 +428,7 @@ export function useLeague(): UseLeagueReturn {
     const badges: string[] = [];
     let special: string | undefined;
     
-    for (const reward of league.weekly_rewards) {
+    for (const reward of getLeagueRewards(league.id)) {
       if (reward.rank === finalRank) {
         xpBonus = reward.xp_bonus;
         if (reward.badge) badges.push(reward.badge);

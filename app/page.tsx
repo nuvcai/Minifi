@@ -646,6 +646,82 @@ export default function HomePage() {
             </div>
           </section>
 
+          {/* League Competition Preview */}
+          <section 
+            id="leagues"
+            ref={(el) => { sectionRefs.current['leagues'] = el; }}
+            className={`max-w-6xl mx-auto py-24 transition-all duration-1000 ${visibleSections.has('leagues') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}
+          >
+            <div className="text-center mb-12">
+              <span className="inline-block px-4 py-2 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-sm font-medium mb-6">
+                <Trophy className="inline-block h-4 w-4 mr-2" />
+                Weekly Leagues
+              </span>
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 tracking-tight">
+                Compete. Climb. Conquer.
+              </h2>
+              <p className="text-lg text-white/70 max-w-2xl mx-auto">
+                Join weekly league competitions and climb through 5 tiers from Bronze to Diamond.
+                Earn XP, get promoted, and prove you're the best!
+              </p>
+            </div>
+
+            {/* League Tiers Preview */}
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-12">
+              {[
+                { id: 'bronze', name: 'Bronze', emoji: '🥉', color: 'from-amber-700/30 to-orange-600/30', border: 'border-amber-600/50' },
+                { id: 'silver', name: 'Silver', emoji: '🥈', color: 'from-slate-400/30 to-gray-500/30', border: 'border-slate-400/50' },
+                { id: 'gold', name: 'Gold', emoji: '🥇', color: 'from-yellow-500/30 to-amber-500/30', border: 'border-yellow-400/50' },
+                { id: 'platinum', name: 'Platinum', emoji: '💎', color: 'from-violet-500/30 to-purple-500/30', border: 'border-violet-400/50' },
+                { id: 'diamond', name: 'Diamond', emoji: '👑', color: 'from-cyan-500/30 to-blue-500/30', border: 'border-cyan-400/50' },
+              ].map((league, index) => (
+                <div
+                  key={league.id}
+                  className={`p-4 rounded-2xl bg-gradient-to-br ${league.color} border ${league.border} text-center transform hover:scale-105 transition-all duration-300`}
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
+                  <span className="text-4xl mb-2 block">{league.emoji}</span>
+                  <h4 className="font-bold text-white">{league.name}</h4>
+                </div>
+              ))}
+            </div>
+
+            {/* How It Works */}
+            <div className="grid md:grid-cols-3 gap-6 mb-12">
+              <div className="p-6 rounded-2xl bg-white/[0.03] border border-white/10">
+                <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center mb-4">
+                  <span className="text-2xl">📈</span>
+                </div>
+                <h4 className="font-bold text-white mb-2">Earn XP</h4>
+                <p className="text-white/70 text-sm">Complete missions, maintain streaks, and learn from history to earn XP points.</p>
+              </div>
+              <div className="p-6 rounded-2xl bg-white/[0.03] border border-white/10">
+                <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center mb-4">
+                  <span className="text-2xl">🏆</span>
+                </div>
+                <h4 className="font-bold text-white mb-2">Compete Weekly</h4>
+                <p className="text-white/70 text-sm">Face off against 30 players in your league. Top 10 get promoted each week!</p>
+              </div>
+              <div className="p-6 rounded-2xl bg-white/[0.03] border border-white/10">
+                <div className="w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center mb-4">
+                  <span className="text-2xl">👑</span>
+                </div>
+                <h4 className="font-bold text-white mb-2">Reach Diamond</h4>
+                <p className="text-white/70 text-sm">Climb to the top and join the elite Diamond League for exclusive rewards!</p>
+              </div>
+            </div>
+
+            <div className="text-center">
+              <Link href="/competition">
+                <button className="group inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold text-lg shadow-xl shadow-amber-500/25 hover:shadow-amber-500/40 hover:scale-[1.02] transition-all duration-300">
+                  <Trophy className="h-5 w-5" />
+                  Join the Competition
+                  <ChevronRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                </button>
+              </Link>
+            </div>
+          </section>
+
           {/* Final CTA */}
           <section 
             id="cta"

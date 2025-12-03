@@ -34,6 +34,14 @@ import {
 } from 'lucide-react';
 import { LEAGUES, type League } from './LeagueSystem';
 
+// Minimal league interface for season end result (compatible with both UI and API types)
+interface MinimalLeague {
+  id: string;
+  name: string;
+  tier: number;
+  emoji: string;
+}
+
 // =============================================================================
 // CONFETTI COMPONENT
 // =============================================================================
@@ -104,8 +112,8 @@ function Confetti({ count = 50 }: { count?: number }) {
 // =============================================================================
 
 export interface SeasonEndResult {
-  previousLeague: League;
-  newLeague: League;
+  previousLeague: MinimalLeague;
+  newLeague: MinimalLeague;
   finalRank: number;
   promoted: boolean;
   relegated: boolean;

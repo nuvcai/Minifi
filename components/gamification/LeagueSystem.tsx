@@ -720,7 +720,7 @@ export function LeagueSystem({
                       : `bg-gradient-to-r ${league.bgGradient} ${league.borderColor} hover:scale-[1.02]`
                   }
                 `}
-                style={{ ringColor: isCurrentLeague ? league.color : 'transparent' }}
+                style={{ boxShadow: isCurrentLeague ? `0 0 0 2px ${league.color}` : 'none' }}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">

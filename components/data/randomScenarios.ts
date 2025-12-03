@@ -733,9 +733,11 @@ export function generateRandomScenario(): { event: FinancialEvent; missionData: 
   const template = pickRandom(scenarioTemplates);
   const isGoodOutcome = Math.random() > 0.4; // 60% chance of good outcome
   
-  // Get the principle data for richer educational content
-  const primaryPrinciple = corePrinciples[template.primaryPrinciple];
-  const secondaryPrinciple = corePrinciples[template.secondaryPrinciple];
+  // Get the principle data for richer educational content (with safe defaults)
+  const primaryPrincipleKey = template.primaryPrinciple ?? "emotionalIntelligence";
+  const secondaryPrincipleKey = template.secondaryPrinciple ?? "learningThroughCrisis";
+  const primaryPrinciple = corePrinciples[primaryPrincipleKey];
+  const secondaryPrinciple = corePrinciples[secondaryPrincipleKey];
   
   // Generate variables for template filling
   const vars = {
@@ -756,9 +758,11 @@ export function generateRandomScenario(): { event: FinancialEvent; missionData: 
   const currentYear = new Date().getFullYear();
   const scenarioYear = currentYear + Math.floor(Math.random() * 3); // Current to 2 years ahead
   
-  // Build a description that highlights the educational focus
+  // Build a description that highlights the educational focus (with safe defaults)
   const principleEmoji = primaryPrinciple.emoji;
-  const scenarioDescription = `${principleEmoji} ${template.emotionalChallenge.split(' - ')[0]} Challenge`;
+  const emotionalChallenge = template.emotionalChallenge ?? "Investment Challenge";
+  const challengePart = emotionalChallenge.includes(' - ') ? emotionalChallenge.split(' - ')[0] : emotionalChallenge;
+  const scenarioDescription = `${principleEmoji} ${challengePart}`;
   
   const event: FinancialEvent = {
     year: scenarioYear,
@@ -783,11 +787,13 @@ export function generateRandomScenario(): { event: FinancialEvent; missionData: 
   // Build principle-based educational messages
   const wealthLesson = `🎓 WEALTH LESSON: ${pickRandom(template.lessonsTemplates)}`;
   
-  // Use generational wisdom from the template
-  const foWisdom = `🏛️ FAMILY OFFICE WISDOM: ${pickRandom(template.generationalWisdom)}`;
+  // Use generational wisdom from the template (with safe default)
+  const wisdomList = template.generationalWisdom ?? ["Diversification and patience are the cornerstones of generational wealth."];
+  const foWisdom = `🏛️ FAMILY OFFICE WISDOM: ${pickRandom(wisdomList)}`;
   
-  // Build conviction test as opportunity
-  const historicalOpportunity = `💎 THE TEST: ${template.convictionTest}\n\n${secondaryPrinciple.emoji} ${secondaryPrinciple.name}: ${pickRandom(secondaryPrinciple.keyLessons)}`;
+  // Build conviction test as opportunity (with safe default)
+  const convictionTest = template.convictionTest ?? "Can you make decisions based on research rather than emotion?";
+  const historicalOpportunity = `💎 THE TEST: ${convictionTest}\n\n${secondaryPrinciple.emoji} ${secondaryPrinciple.name}: ${pickRandom(secondaryPrinciple.keyLessons)}`;
   
   // Build hope message incorporating the principles
   const hopeMessage = `✨ MASTERING ${primaryPrinciple.name.toUpperCase()}: ${primaryPrinciple.description}\n\n🔑 Key Insight: ${pickRandom(primaryPrinciple.keyLessons)}\n\n💪 Remember: Every scenario you complete builds your emotional intelligence and investment judgment. This practice will serve you for life!`;

@@ -288,11 +288,16 @@ export function InvestorJourney({
 }: InvestorJourneyProps) {
   const [selectedStage, setSelectedStage] = useState<JourneyStage | null>(null);
   
-  // Use external claimed stages if provided, otherwise manage internally
-  const claimedStagesSet = useMemo(() => 
-    new Set(externalClaimedStages || []),
-    [externalClaimedStages]
-  );
+  // Internal state for when external state is not provided
+  const [internalClaimedStages, setInternalClaimedStages] = useState<Set<string>>(new Set());
+  
+  // Use external claimed stages if provided, otherwise use internal state
+  const claimedStagesSet = useMemo(() => {
+    if (externalClaimedStages !== undefined) {
+      return new Set(externalClaimedStages);
+    }
+    return internalClaimedStages;
+  }, [externalClaimedStages, internalClaimedStages]);
   
   // Find current stage
   const currentStageIndex = useMemo(() => {
@@ -308,7 +313,15 @@ export function InvestorJourney({
   const nextStage = journeyStages[currentStageIndex + 1];
   
   const handleClaimReward = (stage: JourneyStage) => {
-    setClaimedStages(prev => new Set([...prev, stage.id]));
+    // If external state management is provided, use it
+    if (onClaimStage) {
+      onClaimStage(stage.id);
+    } else {
+      // Otherwise, manage internally
+      setInternalClaimedStages(prev => new Set([...prev, stage.id]));
+    }
+    
+    // Always call reward claim handler for XP
     if (onStageRewardClaim) {
       onStageRewardClaim(stage);
     }
@@ -370,7 +383,7 @@ export function InvestorJourney({
         <StageDetailModal
           stage={selectedStage}
           isCompleted={selectedStage ? isStageCompleted(selectedStage, stats) : false}
-          isClaimed={selectedStage ? claimedStages.has(selectedStage.id) : false}
+          isClaimed={selectedStage ? claimedStagesSet.has(selectedStage.id) : false}
           progress={selectedStage ? getStageProgress(selectedStage, stats) : 0}
           stats={stats}
           onClose={() => setSelectedStage(null)}
@@ -401,7 +414,7 @@ export function InvestorJourney({
           const isCurrent = index === currentStageIndex;
           const isLocked = index > currentStageIndex + 1;
           const progress = getStageProgress(stage, stats);
-          const claimed = claimedStages.has(stage.id);
+          const claimed = claimedStagesSet.has(stage.id);
           
           return (
             <div 
@@ -479,7 +492,7 @@ export function InvestorJourney({
       <StageDetailModal
         stage={selectedStage}
         isCompleted={selectedStage ? isStageCompleted(selectedStage, stats) : false}
-        isClaimed={selectedStage ? claimedStages.has(selectedStage.id) : false}
+        isClaimed={selectedStage ? claimedStagesSet.has(selectedStage.id) : false}
         progress={selectedStage ? getStageProgress(selectedStage, stats) : 0}
         stats={stats}
         onClose={() => setSelectedStage(null)}
