@@ -1,58 +1,250 @@
-NUVC.AI PROPRIETARY LICENSE
-============================
+NUVC.AI COMMERCIAL PROPRIETARY LICENSE
+======================================
 
-MiniFi™ - MVP Version for AWS AI Hackathon 2025
-Copyright (c) 2025 NUVC.AI / Tick.AI. All Rights Reserved.
+MiniFi™ - Financial Education Platform
+Version 1.2 | Effective Date: December 2025
 
-✨ VIBE-CODED BY TICK.AI ✨
+Copyright (c) 2024-2025 NUVC.AI Pty Ltd and Tick.AI. All Rights Reserved.
 
-NOTICE: This software and associated documentation files (the "Software") 
-are the proprietary and confidential property of NUVC.AI and Tick.AI.
+================================================================================
+                         IMPORTANT LEGAL NOTICE
+================================================================================
 
-VERSION: MVP (Minimum Viable Product) - Hackathon Edition
-PURPOSE: AWS AI Hackathon 2025 (Global Vibe) Submission
-TRACK: AI in Education & Learning
+This software, MiniFi™, including but not limited to all source code, object 
+code, documentation, graphics, user interfaces, algorithms, methodologies, 
+databases, and associated materials (collectively, the "Software"), is the 
+exclusive proprietary property of NUVC.AI Pty Ltd ("NUVC.AI") and Tick.AI, 
+protected by Australian and international copyright, trademark, patent, and 
+trade secret laws.
 
-RESTRICTIONS:
--------------
-1. NO COMMERCIAL USE: This Software may NOT be used for commercial purposes 
-   without explicit written permission from NUVC.AI.
+================================================================================
+                           GRANT OF LICENSE
+================================================================================
 
-2. NO REDISTRIBUTION: You may NOT distribute, sublicense, sell, or transfer 
-   copies of this Software to any third party.
+NO LICENSE IS GRANTED. Access to this repository does not constitute a license 
+to use, copy, modify, distribute, or create derivative works of the Software.
 
-3. NO MODIFICATION FOR COMMERCIAL USE: You may NOT modify, adapt, or create 
-   derivative works based on this Software for commercial purposes.
+Any use of this Software requires a separate, written commercial license 
+agreement with NUVC.AI.
 
-4. NO REVERSE ENGINEERING: You may NOT reverse engineer, decompile, or 
-   disassemble any part of this Software.
+================================================================================
+                           RESTRICTIONS
+================================================================================
 
-5. ATTRIBUTION REQUIRED: Any permitted use must include clear attribution 
-   to NUVC.AI and Tick.AI.
+WITHOUT A VALID COMMERCIAL LICENSE, YOU MAY NOT:
 
-PERMITTED USE:
---------------
-- Educational and personal non-commercial use
-- Hackathon demonstration and judging purposes
-- Code review and evaluation by authorized parties
+1. USE
+   - Use the Software for any purpose, commercial or non-commercial
+   - Execute, run, or operate the Software in any environment
+   - Access the Software's functionality through any interface
 
-INTELLECTUAL PROPERTY:
-----------------------
-MiniFi™, the AI coaching system, Family Office Investment Methodology™, 
-and all associated algorithms, designs, and documentation are the 
-exclusive intellectual property of NUVC.AI and Tick.AI.
+2. COPY OR REPRODUCE
+   - Copy, clone, fork, or reproduce the Software in whole or in part
+   - Store copies of the Software on any device or storage medium
+   - Create backup copies except as explicitly permitted by law
 
-WARRANTY DISCLAIMER:
---------------------
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-IMPLIED. IN NO EVENT SHALL NUVC.AI OR TICK.AI BE LIABLE FOR ANY CLAIM, 
-DAMAGES OR OTHER LIABILITY ARISING FROM THE USE OF THE SOFTWARE.
+3. MODIFY OR ADAPT
+   - Modify, alter, translate, or adapt the Software
+   - Create derivative works based on the Software
+   - Merge the Software with other software or materials
 
-CONTACT:
---------
-For licensing inquiries: legal@nuvc.ai
+4. DISTRIBUTE OR TRANSFER
+   - Distribute, publish, sublicense, sell, rent, lease, or lend the Software
+   - Transfer the Software to any third party
+   - Make the Software available on any network or public repository
+   - Share access credentials or API keys associated with the Software
 
----
-✨ Vibe-coded with love by Tick.AI ✨
-🚀 Powered by Amazon Q Developer & Kiro CLI
-🏆 AWS AI Hackathon 2025 - Global Vibe
+5. REVERSE ENGINEER
+   - Reverse engineer, decompile, disassemble, or decode the Software
+   - Attempt to derive source code from compiled code
+   - Analyze the Software to extract algorithms, data structures, or ideas
+
+6. REMOVE NOTICES
+   - Remove, alter, or obscure any copyright, trademark, or other proprietary 
+     notices contained in the Software
+
+================================================================================
+                     INTELLECTUAL PROPERTY RIGHTS
+================================================================================
+
+NUVC.AI and Tick.AI retain all right, title, and interest in and to:
+
+TRADEMARKS:
+- MiniFi™
+- "Family Office Investment Methodology™"
+- "Learn to Invest Like the 1%™"
+- NUVC.AI logo and branding
+- Tick.AI logo and branding
+
+TRADE SECRETS:
+- AI coaching algorithms and prompts
+- Gamification mechanics and formulas
+- Investment simulation engine
+- Risk profiling methodologies
+- Points and rewards calculations
+
+PATENTS (PENDING):
+- AI-powered financial education system
+- Crisis-based learning methodology
+- Conviction investing gamification framework
+
+COPYRIGHTS:
+- All source code, including frontend and backend
+- User interface designs and layouts
+- Educational content and mission scenarios
+- Documentation and training materials
+- Audio, visual, and multimedia assets
+
+================================================================================
+                      DATA PROTECTION & PRIVACY
+================================================================================
+
+The Software processes user data in compliance with:
+- Australian Privacy Act 1988
+- General Data Protection Regulation (GDPR)
+- California Consumer Privacy Act (CCPA)
+
+Users of the Software must comply with all applicable data protection laws and 
+maintain appropriate safeguards for any personal data processed through the 
+Software.
+
+================================================================================
+                         WARRANTY DISCLAIMER
+================================================================================
+
+THE SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT.
+
+NUVC.AI AND TICK.AI DO NOT WARRANT THAT:
+- The Software will meet your requirements
+- The Software will be uninterrupted, timely, secure, or error-free
+- The results obtained from the Software will be accurate or reliable
+- Any errors in the Software will be corrected
+
+================================================================================
+                      LIMITATION OF LIABILITY
+================================================================================
+
+IN NO EVENT SHALL NUVC.AI, TICK.AI, OR THEIR AFFILIATES, DIRECTORS, OFFICERS, 
+EMPLOYEES, AGENTS, OR LICENSORS BE LIABLE FOR:
+
+- Any indirect, incidental, special, consequential, or punitive damages
+- Loss of profits, data, use, goodwill, or other intangible losses
+- Damages exceeding AUD $100 or the amount paid for a license (if any)
+
+This limitation applies regardless of the theory of liability (contract, tort, 
+strict liability, or otherwise), even if advised of the possibility of such 
+damages.
+
+================================================================================
+                      INDEMNIFICATION
+================================================================================
+
+You agree to indemnify, defend, and hold harmless NUVC.AI, Tick.AI, and their 
+affiliates from any claims, damages, losses, liabilities, costs, and expenses 
+(including reasonable attorneys' fees) arising from:
+
+- Your unauthorized use of the Software
+- Your violation of this License
+- Your violation of any third-party rights
+- Any misrepresentation by you
+
+================================================================================
+                         ENFORCEMENT
+================================================================================
+
+NUVC.AI reserves the right to:
+
+1. Monitor usage of the Software to detect unauthorized use
+2. Take legal action against any unauthorized use
+3. Seek injunctive relief to prevent ongoing violations
+4. Recover all damages, costs, and attorneys' fees
+
+Unauthorized use of the Software may result in:
+- Civil liability for damages (minimum AUD $50,000 per violation)
+- Criminal prosecution under applicable copyright laws
+- Permanent injunction against further use
+
+================================================================================
+                      GOVERNING LAW
+================================================================================
+
+This License shall be governed by and construed in accordance with the laws of 
+the State of Victoria, Australia, without regard to its conflict of law 
+provisions.
+
+Any disputes arising from this License shall be subject to the exclusive 
+jurisdiction of the courts of Victoria, Australia.
+
+================================================================================
+                    COMMERCIAL LICENSING
+================================================================================
+
+For commercial use, licensing inquiries, partnerships, or investment 
+opportunities, please contact:
+
+  NUVC.AI Pty Ltd
+  Email: legal@nuvc.ai
+  Business: hello@nuvc.ai
+  Website: https://nuvc.ai
+
+LICENSING OPTIONS:
+
+1. STARTUP LICENSE
+   - For startups with < $1M annual revenue
+   - Limited features, single deployment
+   
+2. ENTERPRISE LICENSE  
+   - Unlimited users, full features
+   - White-label options available
+   - Dedicated support
+
+3. EDUCATIONAL INSTITUTION LICENSE
+   - Special pricing for schools and universities
+   - Classroom management features
+   - Bulk student access
+
+4. PARTNERSHIP / WHITE-LABEL
+   - Co-branded solutions
+   - API access
+   - Custom integrations
+
+================================================================================
+                         EXPORT CONTROL
+================================================================================
+
+The Software may be subject to Australian export control laws and regulations. 
+You may not export, re-export, or transfer the Software in violation of any 
+applicable export laws.
+
+================================================================================
+                          SEVERABILITY
+================================================================================
+
+If any provision of this License is held to be invalid or unenforceable, that 
+provision shall be enforced to the maximum extent permissible, and the remaining 
+provisions shall remain in full force and effect.
+
+================================================================================
+                        ENTIRE AGREEMENT
+================================================================================
+
+This License constitutes the entire agreement between you and NUVC.AI regarding 
+the Software and supersedes all prior or contemporaneous understandings.
+
+================================================================================
+
+By accessing this repository or any portion of the Software, you acknowledge 
+that you have read, understood, and agree to be bound by this License.
+
+================================================================================
+
+MiniFi™ — Empowering the Next Generation of Investors
+Built with conviction by NUVC.AI and Tick.AI
+
+"Financial literacy shouldn't be a privilege. It's a right."
+
+================================================================================
+                    © 2024-2025 NUVC.AI Pty Ltd. All Rights Reserved.
+================================================================================
