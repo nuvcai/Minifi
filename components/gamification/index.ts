@@ -26,6 +26,43 @@ export { BadgeDisplay } from "./BadgeDisplay";
 // Milestone Achievement Modal
 export { MilestoneAchievement } from "./MilestoneAchievement";
 
+// KEEP-Style League Division System
+export { 
+  LeagueSystem, 
+  LEAGUES,
+  type League,
+  type LeaguePlayer,
+  type LeagueReward,
+} from "./LeagueSystem";
+
+// Investor Journey - Narrative Badge Progression
+export { InvestorJourney, journeyStages, type JourneyStage } from "./InvestorJourney";
+
+// Staking & Flybuys Components
+export { StakingCard } from "./StakingCard";
+export { FlybuysRewards } from "./FlybuysRewards";
+
+// Internal Savings System
+export { SavingsVault } from "./SavingsVault";
+
+// Staking Types & Data
+export * from "./stakingTypes";
+export {
+  stakingPools,
+  membershipTiers,
+  partnerRewards,
+  boostOffers,
+  nftRewards,
+  getPoolById,
+  getTierByPoints,
+  getNextTier,
+  calculateDailyYield,
+  calculateTotalYield,
+  getRewardsByCategory,
+  getFeaturedRewards,
+  getRewardsForTier,
+} from "./stakingData";
+
 // Effort Rewards Data & Utilities
 export {
   courageRewards,
