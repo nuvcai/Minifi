@@ -226,7 +226,9 @@ interface InvestorJourneyProps {
     coachesUsed: number;
     quizScore?: number;
   };
+  claimedStages?: string[];
   onStageRewardClaim?: (stage: JourneyStage) => void;
+  onClaimStage?: (stageId: string) => void;
   compact?: boolean;
 }
 
@@ -279,11 +281,18 @@ const getStageProgress = (stage: JourneyStage, stats: InvestorJourneyProps['stat
 
 export function InvestorJourney({
   stats,
+  claimedStages: externalClaimedStages,
   onStageRewardClaim,
+  onClaimStage,
   compact = false,
 }: InvestorJourneyProps) {
   const [selectedStage, setSelectedStage] = useState<JourneyStage | null>(null);
-  const [claimedStages, setClaimedStages] = useState<Set<string>>(new Set());
+  
+  // Use external claimed stages if provided, otherwise manage internally
+  const claimedStagesSet = useMemo(() => 
+    new Set(externalClaimedStages || []),
+    [externalClaimedStages]
+  );
   
   // Find current stage
   const currentStageIndex = useMemo(() => {
