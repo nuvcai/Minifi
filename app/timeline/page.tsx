@@ -19,7 +19,7 @@ import { EventDetailModal } from "@/components/modals/EventDetailModal";
 import { MissionModal } from "@/components/modals/MissionModal";
 import { SummaryModal } from "@/components/modals/SummaryModal";
 import { RewardsModal } from "@/components/modals/RewardsModal";
-import { LevelUpCelebration, BadgeDisplay, MilestoneAchievement } from "@/components/gamification";
+import { LevelUpCelebration, BadgeDisplay, MilestoneAchievement, SavingsVault, InvestorJourney } from "@/components/gamification";
 import { DailyStreak } from "@/components/gamification/DailyStreak";
 import { DailyWisdom } from "@/components/library/DailyWisdom";
 
@@ -29,7 +29,8 @@ import { useEffortRewards } from "@/hooks/useEffortRewards";
 // Data
 import { financialEvents, FinancialEvent } from "@/components/data/events";
 import { aiCoaches } from "@/components/data/coaches";
-import { missionData } from "@/components/data/missions";
+import { missionData, MissionData } from "@/components/data/missions";
+import { generateRandomScenario } from "@/components/data/randomScenarios";
 
 // Local storage keys
 const GAME_PROGRESS_KEY = "minifi_game_progress";
@@ -65,11 +66,15 @@ export default function TimelinePage() {
   const [redeemedRewards, setRedeemedRewards] = useState<string[]>([]);
   const [showLevelUp, setShowLevelUp] = useState(false);
   const [levelUpInfo, setLevelUpInfo] = useState({ newLevel: 1, previousLevel: 0 });
-  const [missionStep, setMissionStep] = useState<"intro" | "decision" | "result">("intro");
+  const [missionStep, setMissionStep] = useState<"intro" | "decision" | "thesis" | "result" | "whatif" | "quiz">("intro");
   const [selectedInvestment, setSelectedInvestment] = useState<string | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [missionResult, setMissionResult] = useState<any>(null);
   const [streakDays, setStreakDays] = useState(0);
+  
+  // Random scenario state for post-completion gameplay
+  const [randomScenarios, setRandomScenarios] = useState<{ event: FinancialEvent; missionData: MissionData }[]>([]);
+  const [completedRandomCount, setCompletedRandomCount] = useState(0);
   
   // Effort rewards tracking
   const {
@@ -322,10 +327,26 @@ export default function TimelinePage() {
       // Record mission completion for effort rewards
       recordMissionCompleted();
 
-      const eventIndex = financialEvents.findIndex((e) => e.year === missionEvent.year);
-      if (eventIndex !== -1) {
-        financialEvents[eventIndex].completed = true;
-        updateUnlockStatus();
+      // Check if this is a random scenario
+      const isRandomScenario = randomScenarios.some(s => s.event.title === missionEvent.title);
+      
+      if (isRandomScenario) {
+        // Mark the random scenario as completed
+        setRandomScenarios(prev => 
+          prev.map(s => 
+            s.event.title === missionEvent.title 
+              ? { ...s, event: { ...s.event, completed: true } }
+              : s
+          )
+        );
+        setCompletedRandomCount(prev => prev + 1);
+      } else {
+        // Handle predefined missions
+        const eventIndex = financialEvents.findIndex((e) => e.year === missionEvent.year);
+        if (eventIndex !== -1) {
+          financialEvents[eventIndex].completed = true;
+          updateUnlockStatus();
+        }
       }
 
       const newLevel = Math.floor(newXP / 1000) + 1;
@@ -363,7 +384,7 @@ export default function TimelinePage() {
     }
   };
 
-  const handleXpEarned = (amount: number) => {
+  const handleXpEarned = (amount: number, source?: string) => {
     const newXP = playerXP + amount;
     setPlayerXP(newXP);
     setTotalScore(newXP);
@@ -394,6 +415,34 @@ export default function TimelinePage() {
     saveProgress(newXP, Math.max(newLevel, playerLevel), completedMissions);
   };
   
+  // Savings vault handlers
+  const handleSavingsDeposit = (amount: number) => {
+    // Deduct from available XP (XP moves to savings)
+    const newXP = playerXP - amount;
+    setPlayerXP(newXP);
+    setTotalScore(newXP);
+    saveProgress(newXP, playerLevel, completedMissions);
+  };
+  
+  const handleSavingsWithdraw = (amount: number) => {
+    // Add back to available XP
+    const newXP = playerXP + amount;
+    setPlayerXP(newXP);
+    setTotalScore(newXP);
+    
+    const newLevel = Math.floor(newXP / 1000) + 1;
+    if (newLevel > playerLevel) {
+      setPlayerLevel(newLevel);
+    }
+    
+    saveProgress(newXP, Math.max(newLevel, playerLevel), completedMissions);
+  };
+  
+  const handleSavingsInterest = (amount: number) => {
+    // Interest is "free" XP earned from saving
+    handleXpEarned(amount, "savings_interest");
+  };
+  
   // Handle milestone XP claim
   const handleMilestoneXpClaim = (xp: number) => {
     handleXpEarned(xp);
@@ -410,23 +459,50 @@ export default function TimelinePage() {
     setMissionResult(null);
   };
 
-  const currentMission = missionEvent
-    ? missionData[missionEvent.year as keyof typeof missionData]
-    : null;
+  // Get mission data - check random scenarios first, then predefined
+  const getCurrentMissionData = (): MissionData | null => {
+    if (!missionEvent) return null;
+    
+    // Check if this is a random scenario
+    const randomScenario = randomScenarios.find(s => s.event.title === missionEvent.title);
+    if (randomScenario) {
+      return randomScenario.missionData;
+    }
+    
+    // Fall back to predefined mission data
+    return missionData[missionEvent.year as keyof typeof missionData] || null;
+  };
+  
+  const currentMission = getCurrentMissionData();
+  
+  // Generate a new random scenario
+  const generateNewScenario = () => {
+    const newScenario = generateRandomScenario();
+    setRandomScenarios(prev => [...prev, newScenario]);
+    return newScenario;
+  };
+  
+  // Start a random scenario directly
+  const startRandomMission = () => {
+    const scenario = generateNewScenario();
+    setMissionEvent(scenario.event);
+    setGameStarted(true);
+    setMissionStep("intro");
+  };
 
   const completedCount = financialEvents.filter((e) => e.completed).length;
   const availableCount = financialEvents.filter((e) => e.unlocked && !e.completed).length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-indigo-50 via-white to-violet-50">
-      {/* Fun background blobs */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-20 right-20 w-64 h-64 bg-indigo-200/30 rounded-full blur-3xl" />
-        <div className="absolute bottom-40 left-10 w-80 h-80 bg-violet-200/30 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 right-1/3 w-48 h-48 bg-purple-200/20 rounded-full blur-3xl" />
+    <div className="min-h-screen w-full bg-gradient-to-b from-indigo-50 via-white to-violet-50 overflow-x-hidden">
+      {/* Fun background blobs - Full viewport coverage */}
+      <div className="fixed inset-0 w-screen h-screen pointer-events-none overflow-hidden">
+        <div className="absolute top-20 right-4 sm:right-20 w-48 sm:w-64 h-48 sm:h-64 bg-indigo-200/30 rounded-full blur-3xl" />
+        <div className="absolute bottom-40 left-0 sm:left-10 w-64 sm:w-80 h-64 sm:h-80 bg-violet-200/30 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 right-1/4 sm:right-1/3 w-40 sm:w-48 h-40 sm:h-48 bg-purple-200/20 rounded-full blur-3xl" />
       </div>
       
-      <div className="relative">
+      <div className="relative w-full">
         <GameHeader
           playerLevel={playerLevel}
           playerXP={playerXP}
@@ -434,7 +510,7 @@ export default function TimelinePage() {
           onRewardsClick={() => setShowRewardsStore(true)}
         />
 
-        <div className="container mx-auto px-4 sm:px-6 py-8">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-8">
           <div className="grid lg:grid-cols-4 gap-6 lg:gap-8">
             
             {/* Sidebar - All Features */}
@@ -450,6 +526,15 @@ export default function TimelinePage() {
               {/* Daily Streak */}
               <DailyStreak onBonusClaimed={handleStreakBonus} />
               
+              {/* Savings Vault - Teach saving habits */}
+              <SavingsVault
+                availableXP={playerXP}
+                streakDays={streakDays}
+                onDeposit={handleSavingsDeposit}
+                onWithdraw={handleSavingsWithdraw}
+                onInterestEarned={handleSavingsInterest}
+              />
+              
               {/* Effort Badges */}
               <BadgeDisplay
                 earnedBadgeIds={earnedRewards.filter(r => r.type === "badge").map(r => r.data.id)}
@@ -463,6 +548,20 @@ export default function TimelinePage() {
                   investmentsAfterLoss: effortStats.investmentsAfterLoss,
                   investmentsMade: effortStats.investmentsMade,
                 }}
+                compact={true}
+              />
+
+              {/* Investor Journey - Narrative Progression */}
+              <InvestorJourney
+                stats={{
+                  missionsCompleted: completedMissions.length,
+                  totalXp: playerXP,
+                  badgesEarned: earnedRewards.filter(r => r.type === "badge").length,
+                  assetClassesExplored: effortStats.differentAssetClassesTried.size,
+                  coachesUsed: effortStats.coachesUsed.size,
+                  quizScore: 0, // TODO: Track quiz scores
+                }}
+                onStageRewardClaim={(stage) => handleXpEarned(stage.rewards.xpBonus, `${stage.title} reward`)}
                 compact={true}
               />
 
@@ -558,14 +657,17 @@ export default function TimelinePage() {
                 competitionUnlocked={competitionUnlocked}
                 onEventClick={handleEventClick}
                 onStartCompetition={startCompetition}
+                randomScenarios={randomScenarios}
+                completedRandomCount={completedRandomCount}
+                onGenerateRandomScenario={startRandomMission}
               />
             </div>
           </div>
         </div>
 
         {/* Footer */}
-        <footer className="mt-12 border-t border-gray-100 bg-white/50 backdrop-blur">
-          <div className="container mx-auto px-6 py-8">
+        <footer className="mt-12 w-full border-t border-gray-100 bg-white/50 backdrop-blur">
+          <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-8">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 <Image
@@ -661,6 +763,7 @@ export default function TimelinePage() {
         }}
         onXpClaimed={handleMilestoneXpClaim}
       />
+      
     </div>
   );
 }

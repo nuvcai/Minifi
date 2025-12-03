@@ -17,6 +17,9 @@ import {
   Star,
   TrendingUp,
   Clock,
+  Dice6,
+  Infinity,
+  RefreshCw,
 } from "lucide-react";
 import { FinancialEvent } from "@/components/data/events";
 import { EventCard } from "./EventCard";
@@ -29,13 +32,20 @@ interface TimelineSectionProps {
   competitionUnlocked: boolean;
   onEventClick: (event: FinancialEvent) => void;
   onStartCompetition: () => void;
+  // Random scenario props
+  randomScenarios?: { event: FinancialEvent; missionData: unknown }[];
+  completedRandomCount?: number;
+  onGenerateRandomScenario?: () => void;
 }
 
 export function TimelineSection({ 
   events, 
   competitionUnlocked, 
   onEventClick, 
-  onStartCompetition 
+  onStartCompetition,
+  randomScenarios = [],
+  completedRandomCount = 0,
+  onGenerateRandomScenario,
 }: TimelineSectionProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [filter, setFilter] = useState<"all" | "available" | "completed">("all");
@@ -280,26 +290,137 @@ export function TimelineSection({
           </div>
         )}
         
-        {/* All completed celebration */}
+        {/* All completed celebration + Random Scenarios */}
         {completedCount === events.length && (
-          <div className="mt-6 p-6 rounded-2xl bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 border-2 border-amber-200 text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 mb-4 shadow-xl shadow-amber-200/50 animate-heartbeat">
-              <Trophy className="h-8 w-8 text-white" />
+          <div className="mt-6 space-y-4">
+            {/* Celebration Banner */}
+            <div className="p-6 rounded-2xl bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 border-2 border-amber-200 text-center">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 mb-4 shadow-xl shadow-amber-200/50 animate-heartbeat">
+                <Trophy className="h-8 w-8 text-white" />
+              </div>
+              <h3 className="text-xl font-black text-gray-900 mb-2">
+                🎉 All Challenges Complete!
+              </h3>
+              <p className="text-gray-600 mb-4">
+                You've mastered the entire timeline. Keep practicing or enter competition!
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Button 
+                  size="lg"
+                  className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold shadow-lg"
+                  onClick={onStartCompetition}
+                >
+                  <Star className="h-5 w-5 mr-2" />
+                  Enter Competition Mode
+                </Button>
+              </div>
             </div>
-            <h3 className="text-xl font-black text-gray-900 mb-2">
-              🎉 All Challenges Complete!
-            </h3>
-            <p className="text-gray-600 mb-4">
-              You've mastered the entire timeline. Ready for the real competition?
-            </p>
-            <Button 
-              size="lg"
-              className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold shadow-lg"
-              onClick={onStartCompetition}
-            >
-              <Star className="h-5 w-5 mr-2" />
-              Enter Competition Mode
-            </Button>
+            
+            {/* Random Scenario Generator */}
+            <div className="p-6 rounded-2xl bg-gradient-to-br from-violet-50 via-purple-50 to-fuchsia-50 border-2 border-violet-200">
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0 w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg shadow-violet-200/50">
+                  <Dice6 className="h-7 w-7 text-white" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="text-lg font-bold text-gray-900">Random Scenarios</h3>
+                    <Badge className="bg-violet-100 text-violet-700 border-violet-200 text-xs">
+                      <Infinity className="h-3 w-3 mr-1" />
+                      Infinite
+                    </Badge>
+                  </div>
+                  <p className="text-gray-600 text-sm mb-4">
+                    Generate unique market scenarios to keep practicing! Each scenario is randomly created with different events, options, and outcomes.
+                  </p>
+                  
+                  {/* Stats */}
+                  <div className="flex items-center gap-4 mb-4 text-sm">
+                    <div className="flex items-center gap-1.5 text-violet-600">
+                      <RefreshCw className="h-4 w-4" />
+                      <span className="font-semibold">{randomScenarios.length}</span>
+                      <span className="text-gray-500">generated</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-emerald-600">
+                      <Trophy className="h-4 w-4" />
+                      <span className="font-semibold">{completedRandomCount}</span>
+                      <span className="text-gray-500">completed</span>
+                    </div>
+                  </div>
+                  
+                  {/* Generate Button */}
+                  {onGenerateRandomScenario && (
+                    <Button 
+                      size="lg"
+                      className="bg-gradient-to-r from-violet-500 via-purple-500 to-fuchsia-500 hover:from-violet-600 hover:via-purple-600 hover:to-fuchsia-600 text-white font-bold shadow-lg shadow-violet-200/50 group w-full sm:w-auto"
+                      onClick={onGenerateRandomScenario}
+                    >
+                      <Dice6 className="h-5 w-5 mr-2 group-hover:animate-spin" style={{ animationDuration: '1s' }} />
+                      Generate New Scenario
+                      <Sparkles className="h-5 w-5 ml-2 text-yellow-300" />
+                    </Button>
+                  )}
+                </div>
+              </div>
+              
+              {/* Recent Random Scenarios */}
+              {randomScenarios.length > 0 && (
+                <div className="mt-6 pt-4 border-t border-violet-200">
+                  <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                    <Clock className="h-4 w-4" />
+                    Recent Random Scenarios
+                  </h4>
+                  <div className="grid gap-3">
+                    {randomScenarios.slice(-3).reverse().map((scenario, idx) => (
+                      <button
+                        key={scenario.event.title}
+                        onClick={() => onEventClick(scenario.event)}
+                        disabled={scenario.event.completed}
+                        className={`w-full p-4 rounded-xl border-2 text-left transition-all ${
+                          scenario.event.completed
+                            ? 'bg-gray-50 border-gray-200 opacity-60'
+                            : 'bg-white border-violet-200 hover:border-violet-400 hover:shadow-md cursor-pointer'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                              scenario.event.completed
+                                ? 'bg-gray-100 text-gray-400'
+                                : 'bg-gradient-to-br from-violet-100 to-purple-100 text-violet-600'
+                            }`}>
+                              {scenario.event.completed ? (
+                                <Star className="h-5 w-5 fill-current" />
+                              ) : (
+                                <Dice6 className="h-5 w-5" />
+                              )}
+                            </div>
+                            <div>
+                              <p className={`font-semibold ${scenario.event.completed ? 'text-gray-400' : 'text-gray-900'}`}>
+                                {scenario.event.title}
+                              </p>
+                              <p className="text-xs text-gray-500">{scenario.event.description}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge className={`text-xs ${
+                              scenario.event.completed 
+                                ? 'bg-gray-100 text-gray-500' 
+                                : 'bg-violet-100 text-violet-700'
+                            }`}>
+                              {scenario.event.reward} XP
+                            </Badge>
+                            {!scenario.event.completed && (
+                              <Play className="h-4 w-4 text-violet-500" />
+                            )}
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>
