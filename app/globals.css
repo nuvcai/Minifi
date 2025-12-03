@@ -980,3 +980,84 @@
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(180deg, #4f46e5, #7c3aed);
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Mobile Full-Width Layout - Edge-to-Edge Design
+   Ensures headers and backgrounds span full device width on mobile
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Full viewport width utility */
+.full-viewport-width {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+}
+
+/* Mobile page wrapper - ensures full width backgrounds */
+.mobile-page-wrapper {
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Mobile header - full width background with contained content */
+.mobile-header-full {
+  width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+/* Override container padding on mobile for tighter edge spacing */
+@media (max-width: 640px) {
+  /* Reduce horizontal padding on very small screens */
+  .mobile-tight-padding {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  /* Full bleed sections on mobile */
+  .mobile-full-bleed {
+    margin-left: -1rem;
+    margin-right: -1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    width: calc(100% + 2rem);
+  }
+  
+  /* Ensure fixed backgrounds cover full viewport */
+  .mobile-bg-full {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    overflow: hidden;
+  }
+}
+
+/* Prevent horizontal scroll from fixed elements */
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+}
+
+/* Ensure root container is full width */
+#__next,
+main {
+  width: 100%;
+  max-width: 100vw;
+}
+
+/* Fix for iOS Safari viewport issues */
+@supports (-webkit-touch-callout: none) {
+  .min-h-screen {
+    min-height: -webkit-fill-available;
+  }
+}
