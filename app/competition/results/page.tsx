@@ -71,16 +71,23 @@ function ResultsContent() {
       if (health.status === 'healthy' || health.status === 'degraded') {
         setBackendStatus('connected');
         
-        // Try to get investment metrics for a sample ticker
+        // Try to get real investment metrics for comparison
         try {
           const endDate = new Date().toISOString().split('T')[0];
-          const startDate = new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+          const startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
           
-          const metrics = await api.getInvestmentMetrics('SPY', startDate, endDate, 10000);
+          // Get S&P 500 benchmark for comparison
+          const metrics = await api.getInvestmentMetrics('SPY', startDate, endDate, resultsData?.finalValue || 5000);
           setBackendMetrics(metrics);
+          
+          console.log('📊 Real market metrics loaded:', {
+            ticker: metrics.ticker,
+            dataPoints: metrics.data_points,
+            return: metrics.total_return,
+          });
         } catch (metricsError) {
           console.warn('Could not fetch detailed metrics:', metricsError);
-          // Backend is connected but metrics failed - that's okay
+          // Backend is connected but metrics failed - use simulated data
         }
       } else {
         setBackendStatus('error');
