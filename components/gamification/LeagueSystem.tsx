@@ -14,23 +14,23 @@
 import React, { useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import {
-  Crown,
   Flame,
   Shield,
   Zap,
   TrendingUp,
   TrendingDown,
   Clock,
-  Users,
   ChevronUp,
-  ChevronDown,
   Sparkles,
   Target,
   AlertTriangle,
   Trophy,
+  Crown,
+  Medal,
+  Award,
   Star,
+  Gem,
 } from 'lucide-react';
 
 // =============================================================================
@@ -345,7 +345,7 @@ interface PlayerRowProps {
 
 function PlayerRow({ player, rank, league, showZone = false }: PlayerRowProps) {
   const zone = getZone(rank, league);
-  const isTopThree = rank <= 3;
+  const _isTopThree = rank <= 3;
   
   const rankEmoji = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : null;
   
@@ -541,7 +541,7 @@ export function LeagueSystem({
   const currentPlayer = players.find(p => p.isCurrentUser);
   const zone = getZone(currentUserRank, currentLeague);
   
-  const LeagueIcon = currentLeague.icon;
+  const _LeagueIcon = currentLeague.icon;
   
   return (
     <div className={`rounded-2xl overflow-hidden border ${currentLeague.borderColor} bg-gradient-to-br ${currentLeague.bgGradient} shadow-2xl ${currentLeague.glowColor}`}>
