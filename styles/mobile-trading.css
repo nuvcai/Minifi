@@ -444,3 +444,141 @@
 .pull-refresh-indicator.active {
   top: 10px;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Mobile Bottom Navigation Support
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Content padding for bottom nav */
+.has-mobile-nav {
+  padding-bottom: calc(5rem + env(safe-area-inset-bottom));
+}
+
+@media (min-width: 768px) {
+  .has-mobile-nav {
+    padding-bottom: 0;
+  }
+}
+
+/* Bottom nav active item animation */
+@keyframes nav-item-bounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.nav-item-active {
+  animation: nav-item-bounce 0.3s ease-out;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Dialog/Modal Mobile Enhancements
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Slide-in animation for mobile sheet dialogs */
+@keyframes slide-in-from-bottom {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-out-to-bottom {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
+/* Mobile dialog sheet handle for drag gestures */
+.dialog-handle {
+  width: 40px;
+  height: 5px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+  margin: 8px auto 16px;
+  cursor: grab;
+}
+
+.dialog-handle:active {
+  cursor: grabbing;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Enhanced Touch Targets for Trading
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Trading action buttons - extra large touch area */
+@media (max-width: 640px) {
+  .trading-btn {
+    min-height: 48px;
+    min-width: 48px;
+    padding: 0.75rem;
+  }
+  
+  .trading-input {
+    min-height: 48px;
+    font-size: 18px; /* Larger for easy reading */
+    text-align: center;
+  }
+}
+
+/* Card press feedback for trading cards */
+.trading-card {
+  transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .trading-card:active {
+    transform: scale(0.98);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Scroll Improvements
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Prevent rubber-banding on iOS for fixed elements */
+.prevent-bounce {
+  overscroll-behavior: none;
+}
+
+/* Smooth momentum scrolling */
+.momentum-scroll {
+  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
+}
+
+/* Scrollable container with fade indicators */
+.scroll-fade-container {
+  position: relative;
+}
+
+.scroll-fade-container::before,
+.scroll-fade-container::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 20px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.scroll-fade-container::before {
+  top: 0;
+  background: linear-gradient(to bottom, white, transparent);
+}
+
+.scroll-fade-container::after {
+  bottom: 0;
+  background: linear-gradient(to top, white, transparent);
+}

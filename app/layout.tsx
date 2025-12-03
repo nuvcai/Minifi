@@ -4,9 +4,10 @@
  */
 
 import type React from "react";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Outfit, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
+import { MobileBottomNav, MobileNavSpacer } from "@/components/shared/MobileBottomNav";
 
 // Outfit - Modern geometric sans for headings
 const outfit = Outfit({
@@ -24,6 +25,14 @@ const plusJakarta = Plus_Jakarta_Sans({
   weight: ["400", "500", "600", "700"],
 });
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
+};
+
 export const metadata: Metadata = {
   title: "Mini.Fi - Learn to Invest Through Play",
   description: "A free game that teaches teens about investing through time-travel adventures. Built by NUVC.AI for the AWS AI Hackathon 2025.",
@@ -34,6 +43,11 @@ export const metadata: Metadata = {
   authors: [{ name: "NUVC.AI", url: "https://nuvc.ai" }],
   creator: "NUVC.AI",
   keywords: ["financial literacy", "investment education", "game", "teens", "AI"],
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Mini.Fi",
+  },
 };
 
 export default function RootLayout({
@@ -51,6 +65,9 @@ export default function RootLayout({
         suppressHydrationWarning={true}
       >
         {children}
+        {/* Mobile bottom navigation - hidden on desktop */}
+        <MobileBottomNav />
+        <MobileNavSpacer />
       </body>
     </html>
   );
