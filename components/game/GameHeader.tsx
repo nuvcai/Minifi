@@ -146,12 +146,12 @@ export function GameHeader({
   }, []);
 
   return (
-    <header className={`sticky top-0 z-50 transition-all duration-300 ${
+    <header className={`sticky top-0 z-50 w-full transition-all duration-300 ${
       isScrolled 
         ? 'bg-white/95 backdrop-blur-xl shadow-lg shadow-indigo-100/50 border-b border-indigo-100'
         : 'bg-white/80 backdrop-blur-xl border-b border-gray-100'
     }`}>
-      <div className="container mx-auto px-4 sm:px-6 py-3">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-3">
         <div className="flex items-center justify-between">
           
           {/* Logo */}
