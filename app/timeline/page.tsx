@@ -87,7 +87,6 @@ export default function TimelinePage() {
     meetsTier,
     getPointsValue,
   } = usePoints();
-  const [showRewardsStore, setShowRewardsStore] = useState(false);
   
   // Effort rewards tracking
   const {
@@ -386,7 +385,7 @@ export default function TimelinePage() {
     window.location.href = "/competition";
   };
 
-  const redeemReward = (reward: { id: string; cost: number }) => {
+  const handleLegacyRedeemReward = (reward: { id: string; cost: number }) => {
     if (playerXP >= reward.cost && !redeemedRewards.includes(reward.id)) {
       const newXP = playerXP - reward.cost;
       setPlayerXP(newXP);
