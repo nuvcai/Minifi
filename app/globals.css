@@ -127,3 +127,330 @@
     @apply bg-background text-foreground font-sans;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MOBILE-FIRST UX OPTIMIZATIONS
+   Larger touch targets, better readability, improved accessibility
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Base mobile improvements */
+@media (max-width: 768px) {
+  /* Increase base font size for readability */
+  html {
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
+  }
+  
+  body {
+    line-height: 1.6;
+  }
+  
+  /* Better heading sizes on mobile */
+  h1 { font-size: 1.75rem; line-height: 1.2; }
+  h2 { font-size: 1.5rem; line-height: 1.25; }
+  h3 { font-size: 1.25rem; line-height: 1.3; }
+  h4 { font-size: 1.125rem; line-height: 1.35; }
+  
+  /* Ensure minimum touch target size (44px Apple HIG) */
+  button, 
+  [role="button"],
+  a,
+  input,
+  select,
+  textarea {
+    min-height: 44px;
+  }
+  
+  /* Better button padding */
+  button:not(.icon-btn),
+  [role="button"]:not(.icon-btn) {
+    padding: 12px 16px;
+    font-size: 0.9375rem;
+  }
+}
+
+/* Mobile button enhancements */
+.mobile-btn {
+  @apply min-h-[48px] px-5 py-3 text-base font-semibold rounded-xl;
+  @apply active:scale-[0.97] transition-transform;
+  touch-action: manipulation;
+}
+
+.mobile-btn-lg {
+  @apply min-h-[56px] px-6 py-4 text-lg font-bold rounded-2xl;
+}
+
+.mobile-btn-icon {
+  @apply min-w-[48px] min-h-[48px] p-3 rounded-xl;
+  @apply flex items-center justify-center;
+}
+
+/* Mobile card optimizations */
+.mobile-card {
+  @apply p-4 rounded-2xl;
+  @apply active:scale-[0.99] transition-transform duration-150;
+  touch-action: manipulation;
+}
+
+.mobile-card-compact {
+  @apply p-3 rounded-xl;
+}
+
+/* Mobile text visibility */
+.mobile-text-primary {
+  @apply text-base leading-relaxed text-gray-900;
+}
+
+.mobile-text-secondary {
+  @apply text-sm leading-relaxed text-gray-600;
+}
+
+.mobile-text-caption {
+  @apply text-xs leading-normal text-gray-500;
+}
+
+/* Better contrast for mobile viewing */
+.mobile-high-contrast {
+  @apply text-gray-900 font-medium;
+}
+
+/* Mobile-friendly badges */
+.mobile-badge {
+  @apply px-3 py-1.5 text-xs font-semibold rounded-lg;
+  @apply min-h-[28px] flex items-center gap-1.5;
+}
+
+/* Mobile spacing utilities */
+.mobile-spacing {
+  @apply space-y-4;
+}
+
+.mobile-gap {
+  @apply gap-3;
+}
+
+/* Improved touch feedback */
+@media (hover: none) and (pointer: coarse) {
+  /* Enhanced active states for touch */
+  .touch-active:active {
+    transform: scale(0.97);
+    opacity: 0.9;
+  }
+  
+  /* Better card press feedback */
+  .touch-card:active {
+    transform: scale(0.98);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+  
+  /* Disable hover effects that look bad on touch */
+  .hover\:scale-105:active {
+    transform: scale(1.02);
+  }
+}
+
+/* Mobile-specific component overrides */
+@media (max-width: 640px) {
+  /* Larger touch targets for small screens */
+  .sm-touch-target {
+    min-height: 48px;
+    min-width: 48px;
+  }
+  
+  /* Stack buttons on mobile */
+  .mobile-btn-stack {
+    @apply flex flex-col gap-3;
+  }
+  
+  .mobile-btn-stack button {
+    @apply w-full;
+  }
+  
+  /* Horizontal scroll containers */
+  .mobile-scroll-x {
+    @apply flex overflow-x-auto gap-3 pb-2 -mx-4 px-4;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .mobile-scroll-x > * {
+    scroll-snap-align: start;
+    flex-shrink: 0;
+  }
+  
+  /* Full-width modals */
+  .mobile-modal {
+    @apply w-full max-w-full mx-0 rounded-t-3xl rounded-b-none;
+    @apply fixed bottom-0 left-0 right-0;
+    max-height: 90vh;
+  }
+  
+  /* Better input fields */
+  input, textarea, select {
+    font-size: 16px !important; /* Prevent iOS zoom */
+    @apply rounded-xl;
+  }
+  
+  /* Reduced padding in cards for more content */
+  .card-compact {
+    @apply p-3;
+  }
+  
+  /* Better list spacing */
+  .mobile-list > * + * {
+    @apply mt-3;
+  }
+}
+
+/* Mobile navigation bottom bar */
+.mobile-nav-bar {
+  @apply fixed bottom-0 left-0 right-0 z-50;
+  @apply bg-white/95 backdrop-blur-lg;
+  @apply border-t border-gray-200;
+  @apply flex items-center justify-around;
+  @apply px-2 py-2;
+  padding-bottom: max(env(safe-area-inset-bottom), 8px);
+}
+
+.mobile-nav-item {
+  @apply flex flex-col items-center justify-center;
+  @apply min-w-[64px] min-h-[48px];
+  @apply text-gray-500 transition-colors;
+  @apply active:text-primary active:scale-95;
+}
+
+.mobile-nav-item.active {
+  @apply text-primary;
+}
+
+.mobile-nav-item span {
+  @apply text-[10px] font-medium mt-0.5;
+}
+
+/* Safe area padding for notched devices */
+.safe-area-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.safe-area-x {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+/* Mobile chart optimizations */
+.mobile-chart {
+  @apply min-h-[280px];
+  touch-action: pan-y;
+}
+
+.mobile-chart-legend {
+  @apply text-xs leading-tight;
+}
+
+/* Swipe gesture indicators */
+.swipe-indicator {
+  @apply w-10 h-1 rounded-full bg-gray-300 mx-auto mb-3;
+}
+
+/* Pull to refresh area */
+.ptr-area {
+  @apply h-16 flex items-center justify-center;
+  @apply text-gray-400 text-sm;
+}
+
+/* Mobile-friendly tooltips (show on tap) */
+@media (hover: none) {
+  [data-tooltip]:active::after {
+    content: attr(data-tooltip);
+    @apply absolute bottom-full left-1/2 -translate-x-1/2 mb-2;
+    @apply px-3 py-2 rounded-lg bg-gray-900 text-white text-xs;
+    @apply whitespace-nowrap z-50;
+  }
+}
+
+/* Game-specific mobile improvements */
+@media (max-width: 640px) {
+  /* XP badge - more prominent on mobile */
+  .xp-badge-mobile {
+    @apply px-3 py-1.5 text-sm font-bold;
+    @apply bg-gradient-to-r from-amber-100 to-yellow-100;
+    @apply text-amber-700 rounded-full;
+    @apply shadow-sm;
+  }
+  
+  /* Mission cards - taller hit area */
+  .mission-card-mobile {
+    @apply min-h-[120px] p-4;
+  }
+  
+  /* Coach avatar - larger on mobile */
+  .coach-avatar-mobile {
+    @apply w-14 h-14;
+  }
+  
+  /* Difficulty stars - larger tap target */
+  .difficulty-stars-mobile {
+    @apply gap-1.5;
+  }
+  
+  .difficulty-stars-mobile svg {
+    @apply w-4 h-4;
+  }
+  
+  /* Investment option cards - better layout */
+  .investment-card-mobile {
+    @apply p-4 min-h-[140px];
+  }
+  
+  /* Chart points - larger for touch */
+  .chart-point-mobile {
+    @apply w-14 h-14 text-base;
+  }
+}
+
+/* Responsive text truncation */
+.mobile-truncate-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.mobile-truncate-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Mobile loading states */
+.mobile-skeleton {
+  @apply animate-pulse bg-gray-200 rounded-lg;
+}
+
+.mobile-spinner {
+  @apply w-6 h-6 border-2 border-gray-300 border-t-primary rounded-full;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Improve focus states for accessibility */
+@media (max-width: 768px) {
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-primary;
+  }
+  
+  /* Remove focus ring on touch devices unless using keyboard */
+  @media (hover: none) {
+    :focus:not(:focus-visible) {
+      outline: none;
+    }
+  }
+}

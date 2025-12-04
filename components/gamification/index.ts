@@ -7,6 +7,7 @@
 // Loss Aversion Components
 export { RiskPreviewCard } from "./RiskPreviewCard";
 export { CourageXpNotification, MiniCourageXp } from "./CourageXpNotification";
+export { RiskRewardChart } from "./RiskRewardChart";
 
 // Quick Win Components
 export { LevelUpCelebration, levelTitles } from "./LevelUpCelebration";
