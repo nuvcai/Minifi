@@ -9,7 +9,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { BookOpen, Trophy, Star, Zap, Target, ChevronRight } from "lucide-react";
+import { BookOpen, Trophy, Star, ChevronRight, Gift } from "lucide-react";
 
 // Components
 import { GameHeader } from "@/components/game/GameHeader";
@@ -21,7 +21,6 @@ import { SummaryModal } from "@/components/modals/SummaryModal";
 import { RewardsModal } from "@/components/modals/RewardsModal";
 import { LevelUpCelebration, BadgeDisplay, MilestoneAchievement } from "@/components/gamification";
 import { DailyStreak } from "@/components/gamification/DailyStreak";
-import { DailyWisdom } from "@/components/library/DailyWisdom";
 
 // Hooks
 import { useEffortRewards } from "@/hooks/useEffortRewards";
@@ -430,7 +429,7 @@ export default function TimelinePage() {
         <GameHeader
           playerLevel={playerLevel}
           playerXP={playerXP}
-          totalScore={totalScore}
+          streakDays={streakDays}
           onRewardsClick={() => setShowRewardsStore(true)}
         />
 
@@ -498,40 +497,6 @@ export default function TimelinePage() {
                 </div>
               </div>
 
-              {/* Upcoming Features Teaser */}
-              <div className="p-5 rounded-2xl bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200 shadow-lg shadow-purple-100">
-                <h3 className="text-sm font-semibold text-purple-700 mb-3 flex items-center gap-2">
-                  <Zap className="h-4 w-4" />
-                  Coming Soon 🚀
-                </h3>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 p-2 bg-white/60 rounded-lg border border-purple-100">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-400 to-blue-500 flex items-center justify-center text-white text-sm">📈</div>
-                    <div className="flex-1">
-                      <p className="text-xs font-semibold text-gray-800">Asset Mastery</p>
-                      <p className="text-[10px] text-gray-500">Track your skills</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 p-2 bg-white/60 rounded-lg border border-purple-100">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white text-sm">🏆</div>
-                    <div className="flex-1">
-                      <p className="text-xs font-semibold text-gray-800">Certifications</p>
-                      <p className="text-[10px] text-gray-500">Earn badges</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 p-2 bg-white/60 rounded-lg border border-purple-100">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white text-sm">👥</div>
-                    <div className="flex-1">
-                      <p className="text-xs font-semibold text-gray-800">Multiplayer</p>
-                      <p className="text-[10px] text-gray-500">Challenge friends</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Daily Wisdom - Compact */}
-              <DailyWisdom compact showControls={false} />
-
               {/* Wisdom Library Link */}
               <Link href="/library">
                 <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 shadow-lg shadow-amber-100 hover:shadow-xl hover:shadow-amber-200 hover:-translate-y-1 transition-all cursor-pointer">
@@ -562,6 +527,55 @@ export default function TimelinePage() {
             </div>
           </div>
         </div>
+        
+        {/* Mobile Bottom Bar - Quick Access to Key Features */}
+        <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-gray-200 shadow-lg z-40 safe-area-bottom">
+          <div className="flex items-center justify-around py-2 px-4">
+            {/* Coach */}
+            <button 
+              onClick={() => {/* Could open coach modal */}}
+              className="flex flex-col items-center gap-1 p-2 rounded-xl hover:bg-gray-100 transition-colors"
+            >
+              <img 
+                src={selectedCoach.avatar} 
+                alt={selectedCoach.name}
+                className="w-8 h-8 rounded-full border-2 border-indigo-200"
+              />
+              <span className="text-[10px] text-gray-600 font-medium">Coach</span>
+            </button>
+            
+            {/* Progress */}
+            <div className="flex flex-col items-center gap-1 p-2">
+              <div className="flex items-center gap-1 px-3 py-1 rounded-full bg-indigo-100">
+                <span className="text-sm font-bold text-indigo-600">{completedCount}/{financialEvents.length}</span>
+              </div>
+              <span className="text-[10px] text-gray-600 font-medium">Missions</span>
+            </div>
+            
+            {/* Streak */}
+            <button className="flex flex-col items-center gap-1 p-2 rounded-xl hover:bg-gray-100 transition-colors">
+              <div className={`flex items-center gap-1 px-3 py-1 rounded-full ${streakDays > 0 ? 'bg-orange-100' : 'bg-gray-100'}`}>
+                <span className="text-sm">🔥</span>
+                <span className={`text-sm font-bold ${streakDays > 0 ? 'text-orange-600' : 'text-gray-400'}`}>{streakDays}</span>
+              </div>
+              <span className="text-[10px] text-gray-600 font-medium">Streak</span>
+            </button>
+            
+            {/* Rewards */}
+            <button 
+              onClick={() => setShowRewardsStore(true)}
+              className="flex flex-col items-center gap-1 p-2 rounded-xl hover:bg-gray-100 transition-colors"
+            >
+              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-amber-100">
+                <Gift className="h-4 w-4 text-amber-600" />
+              </div>
+              <span className="text-[10px] text-gray-600 font-medium">Rewards</span>
+            </button>
+          </div>
+        </div>
+        
+        {/* Spacer for mobile bottom bar */}
+        <div className="lg:hidden h-20" />
 
         {/* Footer */}
         <footer className="mt-12 border-t border-gray-100 bg-white/50 backdrop-blur">

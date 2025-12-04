@@ -31,14 +31,15 @@ import { Button } from "@/components/ui/button";
 interface GameHeaderProps {
   playerLevel: number;
   playerXP: number;
-  totalScore: number;
+  totalScore?: number; // Deprecated - kept for compatibility
+  streakDays?: number;
   onRewardsClick?: () => void;
 }
 
 export function GameHeader({
   playerLevel,
   playerXP,
-  totalScore,
+  streakDays = 0,
   onRewardsClick,
 }: GameHeaderProps) {
   const xpToNextLevel = 1000;
@@ -47,7 +48,6 @@ export function GameHeader({
   const levelInfo = levelTitles[playerLevel] || levelTitles[1];
   
   const [animatedXP, setAnimatedXP] = useState(0);
-  const [animatedScore, setAnimatedScore] = useState(0);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   
@@ -113,28 +113,25 @@ export function GameHeader({
     setShowMobileMenu(false);
   };
 
-  // Animate numbers on mount and when they change
+  // Animate XP on mount and when it changes
   useEffect(() => {
-    const duration = 1000;
-    const steps = 30;
+    const duration = 800;
+    const steps = 20;
     const xpStep = (playerXP - animatedXP) / steps;
-    const scoreStep = (totalScore - animatedScore) / steps;
     
     let currentStep = 0;
     const interval = setInterval(() => {
       currentStep++;
       if (currentStep >= steps) {
         setAnimatedXP(playerXP);
-        setAnimatedScore(totalScore);
         clearInterval(interval);
       } else {
         setAnimatedXP(prev => Math.round(prev + xpStep));
-        setAnimatedScore(prev => Math.round(prev + scoreStep));
       }
     }, duration / steps);
     
     return () => clearInterval(interval);
-  }, [playerXP, totalScore]);
+  }, [playerXP]);
 
   // Handle scroll
   useEffect(() => {
@@ -203,16 +200,15 @@ export function GameHeader({
               </button>
             )}
             
-            {/* Level & XP Display */}
+            {/* Level & XP Display - Single unified element */}
             <div className="flex items-center gap-3 px-4 py-2 rounded-2xl bg-gradient-to-r from-slate-50 to-indigo-50 shadow-lg shadow-indigo-100/50 border border-indigo-100">
-              {/* Animated Level Badge */}
+              {/* Level Badge */}
               <div className="relative group cursor-pointer">
                 <div className={`absolute inset-0 bg-gradient-to-br ${levelInfo.color} rounded-xl blur opacity-50 group-hover:opacity-75 transition-opacity`} />
                 <div className={`relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br ${levelInfo.color} shadow-lg`}>
                   <span className="text-sm font-black text-white">{playerLevel}</span>
                 </div>
-                {/* Tooltip */}
-                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
                   {levelInfo.title}
                 </div>
               </div>
@@ -226,47 +222,46 @@ export function GameHeader({
                   </span>
                   <span className="text-xs text-gray-500 font-medium">XP</span>
                 </div>
-                {/* Animated Progress bar */}
                 <div className="relative w-24 h-2 mt-1 bg-gray-200 rounded-full overflow-hidden">
                   <div
                     className="absolute inset-y-0 left-0 bg-gradient-to-r from-indigo-500 via-violet-500 to-purple-500 rounded-full transition-all duration-500"
                     style={{ width: `${xpProgress}%` }}
-                  >
-                    {/* Shimmer effect */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer" />
-                  </div>
+                  />
                 </div>
               </div>
             </div>
             
-            {/* Score Display */}
-            <div className="flex items-center gap-3 px-4 py-2 rounded-2xl bg-gradient-to-r from-violet-50 to-purple-50 shadow-lg shadow-violet-100/50 border border-violet-100">
-              <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 shadow-lg">
-                <Trophy className="h-5 w-5 text-white" />
+            {/* Streak indicator (if active) */}
+            {streakDays > 0 && (
+              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200">
+                <span className="text-lg">🔥</span>
+                <span className="text-sm font-bold text-orange-600">{streakDays}</span>
               </div>
-              <div>
-                <p className="text-[10px] text-gray-500 uppercase tracking-wider font-medium">Score</p>
-                <p className="text-base font-black text-violet-600">
-                  {animatedScore.toLocaleString()}
-                </p>
-              </div>
-            </div>
+            )}
           </div>
           
           {/* Mobile Stats & Menu */}
           <div className="flex md:hidden items-center gap-2">
-            {/* Compact Level Badge */}
-            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-xl bg-gradient-to-r from-slate-50 to-indigo-50 border border-indigo-100`}>
-              <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${levelInfo.color} flex items-center justify-center shadow`}>
-                <span className="text-xs font-black text-white">{playerLevel}</span>
+            {/* Streak indicator (mobile) */}
+            {streakDays > 0 && (
+              <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-orange-50 border border-orange-200">
+                <span className="text-sm">🔥</span>
+                <span className="text-xs font-bold text-orange-600">{streakDays}</span>
+              </div>
+            )}
+            
+            {/* Compact Level + XP Badge */}
+            <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-slate-50 to-indigo-50 border border-indigo-100">
+              <div className={`w-7 h-7 rounded-lg bg-gradient-to-br ${levelInfo.color} flex items-center justify-center shadow`}>
+                <span className="text-[10px] font-black text-white">{playerLevel}</span>
               </div>
               <div className="flex items-center gap-1">
                 <Star className="h-3 w-3 text-amber-500" />
-                <span className="text-xs font-bold text-gray-900">{(playerXP / 1000).toFixed(1)}k</span>
+                <span className="text-xs font-bold text-gray-900">{playerXP >= 1000 ? `${(playerXP / 1000).toFixed(1)}k` : playerXP}</span>
               </div>
             </div>
             
-            {/* Mobile Menu Button */}
+            {/* Menu Button */}
             <button
               onClick={() => setShowMobileMenu(!showMobileMenu)}
               className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors"
@@ -280,43 +275,30 @@ export function GameHeader({
           </div>
         </div>
         
-        {/* Mobile Dropdown Menu */}
+        {/* Mobile Dropdown Menu - Simplified */}
         {showMobileMenu && (
           <div className="md:hidden mt-3 p-4 rounded-2xl bg-white border border-gray-200 shadow-xl animate-in slide-in-from-top-2 duration-200">
-            {/* Stats Grid */}
-            <div className="grid grid-cols-2 gap-3 mb-4">
-              <div className="p-3 rounded-xl bg-gradient-to-br from-indigo-50 to-violet-50 border border-indigo-100">
-                <div className="flex items-center gap-2 mb-1">
-                  <Star className="h-4 w-4 text-amber-500" />
-                  <span className="text-xs text-gray-500">XP</span>
-                </div>
-                <p className="text-lg font-black text-gray-900">{playerXP.toLocaleString()}</p>
-                <div className="w-full h-1.5 mt-1 bg-gray-200 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full"
-                    style={{ width: `${xpProgress}%` }}
-                  />
-                </div>
-              </div>
-              
-              <div className="p-3 rounded-xl bg-gradient-to-br from-violet-50 to-purple-50 border border-violet-100">
-                <div className="flex items-center gap-2 mb-1">
-                  <Trophy className="h-4 w-4 text-violet-500" />
-                  <span className="text-xs text-gray-500">Score</span>
-                </div>
-                <p className="text-lg font-black text-violet-600">{totalScore.toLocaleString()}</p>
-              </div>
-            </div>
-            
-            {/* Level Info */}
-            <div className="p-3 rounded-xl bg-gradient-to-r from-slate-50 to-gray-50 border border-gray-200 mb-4">
-              <div className="flex items-center gap-3">
-                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${levelInfo.color} flex items-center justify-center shadow-lg`}>
+            {/* Level + XP Combined */}
+            <div className="p-4 rounded-xl bg-gradient-to-r from-slate-50 to-indigo-50 border border-indigo-100 mb-4">
+              <div className="flex items-center gap-4">
+                <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${levelInfo.color} flex items-center justify-center shadow-lg`}>
                   {levelInfo.icon}
                 </div>
-                <div>
-                  <p className="text-xs text-gray-500">Current Level</p>
-                  <p className="font-bold text-gray-900">Level {playerLevel} - {levelInfo.title}</p>
+                <div className="flex-1">
+                  <p className="font-bold text-gray-900">Level {playerLevel}</p>
+                  <p className="text-sm text-gray-500">{levelInfo.title}</p>
+                  <div className="flex items-center gap-2 mt-2">
+                    <Star className="h-4 w-4 text-amber-500" />
+                    <span className="text-lg font-black text-gray-900">{playerXP.toLocaleString()}</span>
+                    <span className="text-xs text-gray-500">XP</span>
+                  </div>
+                  <div className="w-full h-2 mt-1 bg-gray-200 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full transition-all"
+                      style={{ width: `${xpProgress}%` }}
+                    />
+                  </div>
+                  <p className="text-[10px] text-gray-400 mt-1">{xpInLevel} / {xpToNextLevel} to next level</p>
                 </div>
               </div>
             </div>
