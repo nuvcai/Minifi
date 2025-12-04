@@ -457,16 +457,14 @@ export function TeachingDialogue({
   const [metricExplanation, setMetricExplanation] = useState<string>("");
   // Track hover state for metric highlighting
   const [hoveredMetric, setHoveredMetric] = useState<string | null>(null);
-  // Track XP earned this session
-  const [sessionXp, setSessionXp] = useState<number>(0);
   // Track XP animation
   const [showXpAnimation, setShowXpAnimation] = useState<boolean>(false);
+  const [xpAnimationAmount, setXpAnimationAmount] = useState<number>(0);
   // Track coach typing effect
   const [coachTypingText, setCoachTypingText] = useState<string>("");
   const [isCoachTyping, setIsCoachTyping] = useState<boolean>(false);
-  // Track viewed buttons to prevent duplicate XP - separate shared and step-specific
-  const [viewedSharedButtons, setViewedSharedButtons] = useState<Set<string>>(new Set());
-  const [viewedStepButtons, setViewedStepButtons] = useState<Set<string>>(new Set());
+  // Track which steps have earned XP (simpler: one XP reward per step)
+  const [stepsEarnedXP, setStepsEarnedXP] = useState<Set<string>>(new Set());
 
   // Generate cache key for this mission - use useMemo to prevent recreation
   const cacheKey = React.useMemo(
@@ -914,35 +912,22 @@ export function TeachingDialogue({
     setSelectedMetric(isAlreadySelected ? null : metricKey);
     
     if (!isAlreadySelected) {
-      // Determine if this is a shared button (first 4) or step-specific button (5th)
-      const isSharedButton = ["final_value", "total_return", "volatility", "sharpe_ratio"].includes(metricKey);
-      const isStepSpecificButton = metricKey === "portfolio_chart";
+      // Simplified XP: +10 XP for first interaction on this step
+      const stepKey = currentMessage.id;
+      const isFirstInteractionOnStep = !stepsEarnedXP.has(stepKey);
       
-      // Generate step-specific key for step buttons
-      const stepSpecificKey = isStepSpecificButton ? `${metricKey}_${currentMessage.id}` : metricKey;
-      
-      // Check if first view based on button type
-      const isFirstView = isSharedButton 
-        ? !viewedSharedButtons.has(metricKey)
-        : !viewedStepButtons.has(stepSpecificKey);
-      
-      if (isFirstView) {
-        setSessionXp(prev => prev + 5);
+      if (isFirstInteractionOnStep) {
+        const xpReward = 10; // Clean 10 XP per step engagement
+        setXpAnimationAmount(xpReward);
         setShowXpAnimation(true);
+        setStepsEarnedXP(prev => new Set([...prev, stepKey]));
         
-        // Update appropriate viewed set
-        if (isSharedButton) {
-          setViewedSharedButtons(prev => new Set([...prev, metricKey]));
-        } else {
-          setViewedStepButtons(prev => new Set([...prev, stepSpecificKey]));
-        }
-        
-        // Call XP callback if provided
+        // Call XP callback
         if (onXpEarned) {
-          onXpEarned(5);
+          onXpEarned(xpReward);
         }
         
-        // Reset XP animation after delay
+        // Reset animation
         setTimeout(() => setShowXpAnimation(false), 1500);
       }
       
@@ -1221,7 +1206,7 @@ export function TeachingDialogue({
               {showXpAnimation && (
                 <div className="absolute -top-2 right-0 z-10">
                   <div className="text-yellow-600 font-bold text-lg animate-bounce-slide-up">
-                    +5 XP
+                    +{xpAnimationAmount} XP
                   </div>
                   {/* Sparkle effects */}
                   <div className="absolute -inset-4 pointer-events-none">
@@ -1237,7 +1222,7 @@ export function TeachingDialogue({
               {/* Metric buttons - first row (4 buttons) - Cloud bubble style */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 mb-2">
                 {currentMessage.metricButtons.slice(0, 4).map((button) => {
-                  const isViewed = viewedSharedButtons.has(button.key);
+                  const stepHasXP = stepsEarnedXP.has(currentMessage.id);
                   return (
                     <button
                       key={button.key}
@@ -1246,8 +1231,6 @@ export function TeachingDialogue({
                       } ${
                         selectedMetric === button.key
                           ? "bg-gradient-to-r from-indigo-400 to-purple-500 text-white border-indigo-500 shadow-lg"
-                          : isViewed
-                          ? "bg-gradient-to-r from-green-50 to-emerald-50 text-emerald-700 border-emerald-200 hover:from-green-100 hover:to-emerald-100"
                           : "bg-gradient-to-r from-sky-50 to-blue-50 text-blue-700 border-blue-200 hover:from-sky-100 hover:to-blue-100"
                       } ${isCoachTyping ? "opacity-50 cursor-not-allowed" : ""}`}
                       onClick={() => !isCoachTyping && handleMetricClick(button.key, button.targetMetric)}
@@ -1259,8 +1242,6 @@ export function TeachingDialogue({
                       <div className={`absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 rotate-45 ${
                         selectedMetric === button.key
                           ? "bg-gradient-to-r from-indigo-400 to-purple-500 border-r border-b border-indigo-500"
-                          : isViewed
-                          ? "bg-gradient-to-r from-green-50 to-emerald-50 border-r border-b border-emerald-200"
                           : "bg-gradient-to-r from-sky-50 to-blue-50 border-r border-b border-blue-200"
                       }`}></div>
                       
@@ -1269,13 +1250,10 @@ export function TeachingDialogue({
                           className: `h-3 w-3 ${
                             selectedMetric === button.key
                               ? "text-white"
-                              : isViewed
-                              ? "text-emerald-600"
                               : "text-blue-600"
                           }`,
                         })}
                         <span className="text-xs font-medium">{button.label}</span>
-                        {isViewed && <span className="text-xs">✓</span>}
                       </div>
                     </button>
                   );
@@ -1287,8 +1265,6 @@ export function TeachingDialogue({
                 <div className="flex justify-center">
                   {(() => {
                     const extraMetricButton = currentMessage.metricButtons[4];
-                    const stepSpecificKey = `${extraMetricButton.key}_${currentMessage.id}`;
-                    const isViewed = viewedStepButtons.has(stepSpecificKey);
                     return (
                       <button
                         key={extraMetricButton.key}
@@ -1297,8 +1273,6 @@ export function TeachingDialogue({
                         } ${
                           selectedMetric === extraMetricButton.key
                             ? "bg-gradient-to-r from-purple-400 to-pink-500 text-white border-purple-500 shadow-lg"
-                            : isViewed
-                            ? "bg-gradient-to-r from-green-50 to-emerald-50 text-emerald-700 border-emerald-200 hover:from-green-100 hover:to-emerald-100"
                             : "bg-gradient-to-r from-purple-50 to-pink-50 text-purple-700 border-purple-200 hover:from-purple-100 hover:to-pink-100"
                         } ${isCoachTyping ? "opacity-50 cursor-not-allowed" : ""}`}
                         onClick={() => !isCoachTyping && handleMetricClick(extraMetricButton.key, extraMetricButton.targetMetric)}
@@ -1310,8 +1284,6 @@ export function TeachingDialogue({
                         <div className={`absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 rotate-45 ${
                           selectedMetric === extraMetricButton.key
                             ? "bg-gradient-to-r from-purple-400 to-pink-500 border-r border-b border-purple-500"
-                            : isViewed
-                            ? "bg-gradient-to-r from-green-50 to-emerald-50 border-r border-b border-emerald-200"
                             : "bg-gradient-to-r from-purple-50 to-pink-50 border-r border-b border-purple-200"
                         }`}></div>
                         
@@ -1320,8 +1292,6 @@ export function TeachingDialogue({
                             className: `h-3 w-3 ${
                               selectedMetric === extraMetricButton.key
                                 ? "text-white"
-                                : isViewed
-                                ? "text-emerald-600"
                                 : "text-purple-600"
                             }`,
                           })}
@@ -1330,7 +1300,6 @@ export function TeachingDialogue({
                             {currentMessage.id === "annual_returns" && "Annual Returns Chart"}
                             {currentMessage.id === "risk_analysis" && "Risk Analysis Chart"}
                           </span>
-                          {isViewed && <span className="text-xs">✓</span>}
                         </div>
                       </button>
                     );

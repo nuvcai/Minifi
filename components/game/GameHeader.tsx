@@ -1,93 +1,97 @@
 import React from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { Gift } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { Gift, Zap } from "lucide-react";
 
 interface GameHeaderProps {
   playerLevel: number;
-  playerXP: number;
-  totalScore: number;
+  playerXP: number; // Spendable XP
+  lifetimeXP: number; // Total earned (for leveling)
   onRewardsClick?: () => void;
 }
+
+// Level XP thresholds for smoother progression
+const XP_THRESHOLDS = [0, 250, 600, 1000, 1500, 2000, 2600, 3300, 4100, 5000];
 
 export function GameHeader({
   playerLevel,
   playerXP,
-  totalScore,
+  lifetimeXP,
   onRewardsClick,
 }: GameHeaderProps) {
-  const xpToNextLevel = 1000;
-  const xpProgress = ((playerXP % xpToNextLevel) / xpToNextLevel) * 100;
+  // Calculate progress to next level based on lifetime XP
+  const currentThreshold = XP_THRESHOLDS[playerLevel - 1] || 0;
+  const nextThreshold = XP_THRESHOLDS[playerLevel] || XP_THRESHOLDS[XP_THRESHOLDS.length - 1];
+  const xpInCurrentLevel = lifetimeXP - currentThreshold;
+  const xpNeededForLevel = nextThreshold - currentThreshold;
+  const xpProgress = Math.min((xpInCurrentLevel / xpNeededForLevel) * 100, 100);
 
   return (
     <header className="border-b bg-card shadow-sm">
-      <div className="container mx-auto sm:px-4 py-4">
-        <div className="flex flex-col items-center gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="text-center sm:text-left">
-            <h1 className="text-2xl sm:text-3xl font-serif font-black text-primary flex items-center justify-center sm:justify-start gap-2">
-              <Image
-                src="/favicon.png"
-                alt="NUVC Icon"
-                width={48}
-                height={48}
-                className="object-contain w-8 h-8 sm:w-12 sm:h-12"
-              />
-              Legacy Guardians
-            </h1>
-            <p className="text-xs sm:text-sm text-muted-foreground">
-              Time-Warp Wealth Adventure
-            </p>
+      <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4">
+        {/* Mobile: Compact single-row layout */}
+        <div className="flex items-center justify-between gap-2">
+          {/* Logo - smaller on mobile */}
+          <div className="flex items-center gap-2 shrink-0">
+            <Image
+              src="/favicon.png"
+              alt="NUVC Icon"
+              width={32}
+              height={32}
+              className="object-contain w-7 h-7 sm:w-10 sm:h-10"
+            />
+            <div className="hidden sm:block">
+              <h1 className="text-xl sm:text-2xl font-serif font-black text-primary leading-tight">
+                Legacy Guardians
+              </h1>
+              <p className="text-xs text-muted-foreground">
+                Time-Warp Wealth Adventure
+              </p>
+            </div>
           </div>
-          <div className="flex justify-center items-center gap-3 sm:gap-6 mt-2 sm:mt-0">
-            {/* Rewards Button */}
+
+          {/* Mobile: XP + Level combined compact display */}
+          <div className="flex items-center gap-2 sm:gap-4 flex-1 justify-end">
+            {/* XP Progress - Combined Level + XP for mobile */}
+            <div className="flex items-center gap-2 bg-gradient-to-r from-green-50 to-emerald-50 px-2 py-1.5 sm:px-4 sm:py-2 rounded-lg border border-green-200">
+              <div className="flex items-center gap-1">
+                <Zap className="h-4 w-4 text-green-600" />
+                <span className="text-sm sm:text-base font-bold text-green-700">
+                  {playerXP}
+                </span>
+                <span className="hidden sm:inline text-xs text-green-600">XP</span>
+              </div>
+              {/* Mini level badge */}
+              <div className="bg-green-600 text-white text-xs font-bold px-1.5 py-0.5 rounded">
+                L{playerLevel}
+              </div>
+            </div>
+
+            {/* Rewards Button - Icon only on mobile */}
             {onRewardsClick && (
               <Button
                 variant="outline"
                 size="sm"
                 onClick={onRewardsClick}
-                className="flex items-center gap-2 bg-gradient-to-r from-yellow-50 to-orange-50 border-yellow-200 hover:from-yellow-100 hover:to-orange-100"
+                className="flex items-center gap-1.5 bg-gradient-to-r from-yellow-50 to-orange-50 border-yellow-200 hover:from-yellow-100 hover:to-orange-100 px-2 sm:px-3"
               >
                 <Gift className="h-4 w-4 text-yellow-600" />
-                <span className="text-yellow-700 font-medium hidden sm:inline">
+                <span className="text-yellow-700 font-medium hidden sm:inline text-sm">
                   Rewards
                 </span>
               </Button>
             )}
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="text-center px-3 py-2 sm:px-4 sm:py-3 bg-muted rounded-lg min-w-[84px] sm:min-w-[100px] cursor-help">
-                    <p className="text-xs text-muted-foreground">Level</p>
-                    <p className="text-lg sm:text-xl font-bold text-primary">
-                      {playerLevel}
-                    </p>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>
-                    Experience: {playerXP}/{xpToNextLevel} XP
-                  </p>
-                  <div className="w-32 bg-gray-200 rounded-full h-2 mt-1">
-                    <div
-                      className="bg-primary h-2 rounded-full transition-all"
-                      style={{ width: `${xpProgress}%` }}
-                    />
-                  </div>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <div className="text-center px-3 py-2 sm:px-4 sm:py-3 bg-muted rounded-lg min-w-[84px] sm:min-w-[100px]">
-              <p className="text-xs text-muted-foreground">Total Score</p>
-              <p className="text-lg sm:text-xl font-bold text-primary">
-                {totalScore}
-              </p>
-            </div>
+          </div>
+        </div>
+
+        {/* XP Progress bar - shown on mobile for visual feedback */}
+        <div className="mt-2 sm:hidden">
+          <div className="flex items-center gap-2">
+            <Progress value={xpProgress} className="h-1.5 flex-1" />
+            <span className="text-[10px] text-muted-foreground whitespace-nowrap">
+              {xpInCurrentLevel}/{xpNeededForLevel} to L{playerLevel + 1}
+            </span>
           </div>
         </div>
       </div>

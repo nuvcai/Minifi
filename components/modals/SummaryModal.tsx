@@ -32,8 +32,8 @@ interface LearningStats {
 
 interface SummaryModalProps {
   open: boolean;
-  playerXP: number;
-  totalScore: number;
+  playerXP: number; // Spendable XP
+  lifetimeXP: number; // Total earned
   events: FinancialEvent[];
   onClose: () => void;
   onRestart: () => void;
@@ -42,7 +42,7 @@ interface SummaryModalProps {
 export function SummaryModal({
   open,
   playerXP,
-  totalScore,
+  lifetimeXP,
   events,
   onClose,
   onRestart,
@@ -50,8 +50,8 @@ export function SummaryModal({
   const calculateLearningStats = (): LearningStats => {
     const totalMissions = events.length;
     const completedCount = events.filter((e) => e.completed).length;
-    const totalXPEarned = playerXP;
-    const averageScore = completedCount > 0 ? Math.round(totalScore / completedCount) : 0;
+    const totalXPEarned = lifetimeXP;
+    const averageScore = completedCount > 0 ? Math.round(lifetimeXP / completedCount) : 0;
 
     return {
       totalMissions,
@@ -78,7 +78,7 @@ export function SummaryModal({
       );
     }
 
-    if (playerXP >= 1000) {
+    if (lifetimeXP >= 1000) {
       insights.push(
         "🏆 Financial Knowledge Master: You have mastered rich financial history knowledge!"
       );

@@ -11,6 +11,9 @@ import { EventDetailModal } from "@/components/modals/EventDetailModal";
 import { MissionModal } from "@/components/modals/MissionModal";
 import { SummaryModal } from "@/components/modals/SummaryModal";
 import { RewardsModal } from "@/components/modals/RewardsModal";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Users } from "lucide-react";
 
 // Import data
 import { financialEvents, FinancialEvent } from "@/components/data/events";
@@ -26,8 +29,8 @@ export default function TimelinePage() {
   const [selectedCoach, setSelectedCoach] = useState(aiCoaches[0]);
   const [gameStarted, setGameStarted] = useState(false);
   const [playerLevel, setPlayerLevel] = useState(1);
-  const [playerXP, setPlayerXP] = useState(0);
-  const [totalScore, setTotalScore] = useState(0);
+  const [playerXP, setPlayerXP] = useState(0); // Spendable XP (can redeem rewards)
+  const [lifetimeXP, setLifetimeXP] = useState(0); // Total earned (for leveling, never decreases)
   const [showSummary, setShowSummary] = useState(false);
   const [summaryDismissed, setSummaryDismissed] = useState(false);
   const summaryTimerRef = useRef<number | null>(null);
@@ -147,13 +150,20 @@ export default function TimelinePage() {
 
   const completeMission = () => {
     if (missionEvent && missionResult) {
-      // Only give the exact base mission reward - no performance bonus
-      // Button interaction XP is already being added in real-time via handleXpEarned
-      const missionReward = missionEvent.reward; // Use exact reward value: 100, 150, 200
+      // Base mission reward
+      const baseReward = missionEvent.reward;
+      
+      // Performance bonus: +50% XP for profitable investments!
+      const performanceBonus = missionResult.performance === "profit" 
+        ? Math.round(baseReward * 0.5) 
+        : 0;
+      
+      // Total XP earned this mission
+      const totalMissionXP = baseReward + performanceBonus;
 
-      // Update player progress with just the mission base reward
-      setPlayerXP((prev) => prev + missionReward);
-      setTotalScore((prev) => prev + missionReward);
+      // Update XP - both spendable and lifetime
+      setPlayerXP((prev) => prev + totalMissionXP);
+      setLifetimeXP((prev) => prev + totalMissionXP);
       setCompletedMissions((prev) => [...prev, missionEvent.title]);
 
       // Update event completion status
@@ -162,21 +172,23 @@ export default function TimelinePage() {
       );
       if (eventIndex !== -1) {
         financialEvents[eventIndex].completed = true;
-        // Update unlock status for other events
         updateUnlockStatus();
       }
 
-      // Level up logic
-      const newLevel = Math.floor((playerXP + missionReward) / 1000) + 1;
+      // Level up based on LIFETIME XP (not affected by spending)
+      // Smoother progression: 250, 600, 1000, 1500, 2000...
+      const xpThresholds = [0, 250, 600, 1000, 1500, 2000, 2600, 3300, 4100, 5000];
+      const newLifetimeXP = lifetimeXP + totalMissionXP;
+      const newLevel = xpThresholds.findIndex((threshold, i) => 
+        newLifetimeXP < (xpThresholds[i + 1] || Infinity)
+      ) + 1;
+      
       if (newLevel > playerLevel) {
         setPlayerLevel(newLevel);
       }
 
-      // Check if competition is unlocked (when specific event completed)
-      if (
-        missionEvent.year === 2025 &&
-        missionEvent.title === "Current Challenges"
-      ) {
+      // Unlock competition after completing final mission
+      if (missionEvent.year === 2025 && missionEvent.title === "Current Challenges") {
         setCompetitionUnlocked(true);
       }
 
@@ -191,17 +203,16 @@ export default function TimelinePage() {
 
   const redeemReward = (reward: any) => {
     if (playerXP >= reward.cost && !redeemedRewards.includes(reward.id)) {
-      setPlayerXP((prev) => prev - reward.cost);
+      setPlayerXP((prev) => prev - reward.cost); // Only deduct from spendable XP
       setRedeemedRewards((prev) => [...prev, reward.id]);
-      // In a real app, this would trigger the actual reward delivery
-      // The email and voucher code are now handled in the RedeemConfirmModal
+      // Lifetime XP stays the same - level is preserved!
     }
   };
 
-  // Real-time XP callback for button interactions
+  // Real-time XP callback for learning interactions (+10 XP per step completed)
   const handleXpEarned = (amount: number) => {
     setPlayerXP((prev) => prev + amount);
-    setTotalScore((prev) => prev + amount);
+    setLifetimeXP((prev) => prev + amount);
   };
 
   const closeMissionModal = () => {
@@ -216,19 +227,21 @@ export default function TimelinePage() {
     ? missionData[missionEvent.year as keyof typeof missionData]
     : null;
 
+  const [showCoachSheet, setShowCoachSheet] = useState(false);
+
   return (
     <div className="min-h-screen bg-background">
       <GameHeader
         playerLevel={playerLevel}
         playerXP={playerXP}
-        totalScore={totalScore}
+        lifetimeXP={lifetimeXP}
         onRewardsClick={() => setShowRewardsStore(true)}
       />
 
-      <div className="container mx-auto sm:px-4 py-8">
-        <div className="grid lg:grid-cols-4 gap-8">
-          {/* Sidebar */}
-          <div className="lg:col-span-1">
+      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
+        <div className="grid lg:grid-cols-4 gap-4 sm:gap-8">
+          {/* Sidebar - Hidden on mobile, shown on large screens */}
+          <div className="hidden lg:block lg:col-span-1">
             <CoachSidebar
               coaches={aiCoaches}
               selectedCoach={selectedCoach}
@@ -244,8 +257,74 @@ export default function TimelinePage() {
             />
           </div>
 
-          {/* Main Timeline */}
+          {/* Main Timeline - Full width on mobile */}
           <div className="lg:col-span-3">
+            {/* Mobile: Quick coach indicator */}
+            <div className="lg:hidden mb-4 flex items-center justify-between bg-card rounded-lg p-3 border shadow-sm">
+              <div className="flex items-center gap-3">
+                <img
+                  src={selectedCoach.avatar}
+                  alt={selectedCoach.name}
+                  className="w-10 h-10 rounded-full border-2 border-primary"
+                />
+                <div>
+                  <p className="font-medium text-sm">{selectedCoach.name}</p>
+                  <p className="text-xs text-muted-foreground">Your Coach</p>
+                </div>
+              </div>
+              <Sheet open={showCoachSheet} onOpenChange={setShowCoachSheet}>
+                <SheetTrigger asChild>
+                  <Button variant="outline" size="sm" className="gap-1.5">
+                    <Users className="h-4 w-4" />
+                    <span className="hidden xs:inline">Change</span>
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="bottom" className="h-[70vh] rounded-t-2xl">
+                  <div className="pt-4 pb-8 overflow-y-auto h-full">
+                    <h3 className="font-serif font-bold text-lg mb-4 px-1">Choose Your Coach</h3>
+                    <div className="space-y-3">
+                      {aiCoaches.map((coach) => (
+                        <div
+                          key={coach.id}
+                          className={`p-4 rounded-xl border-2 cursor-pointer transition-all active:scale-[0.98] ${
+                            selectedCoach.id === coach.id
+                              ? "border-primary bg-primary/10 shadow-md"
+                              : "border-border hover:border-primary/50 hover:bg-primary/5"
+                          }`}
+                          onClick={() => {
+                            setSelectedCoach(coach);
+                            setShowCoachSheet(false);
+                          }}
+                        >
+                          <div className="flex items-center gap-4">
+                            <img
+                              src={coach.avatar}
+                              alt={coach.name}
+                              className="w-14 h-14 rounded-full"
+                            />
+                            <div className="flex-1">
+                              <p className="font-semibold">{coach.name}</p>
+                              <p className="text-sm text-primary font-medium">
+                                {coach.personality}
+                              </p>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                {coach.description}
+                              </p>
+                            </div>
+                            {selectedCoach.id === coach.id && (
+                              <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
+                                <span className="text-white text-sm">✓</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </div>
+
             <TimelineSection
               events={financialEvents}
               competitionUnlocked={competitionUnlocked}
@@ -288,7 +367,7 @@ export default function TimelinePage() {
       <SummaryModal
         open={showSummary}
         playerXP={playerXP}
-        totalScore={totalScore}
+        lifetimeXP={lifetimeXP}
         events={financialEvents}
         onClose={() => {
           setShowSummary(false);
