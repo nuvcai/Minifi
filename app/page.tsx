@@ -175,7 +175,7 @@ export default function HomePage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Image
-                src="/minifi-header-logo.png"
+                src="/minifi-logo.svg"
                 alt="Mini.Fi"
                 width={120}
                 height={40}
@@ -817,7 +817,7 @@ export default function HomePage() {
               <div>
                 <div className="flex items-center gap-3 mb-4">
                   <Image
-                    src="/favicon.png"
+                    src="/favicon.svg"
                     alt="Mini.Fi"
                     width={32}
                     height={32}

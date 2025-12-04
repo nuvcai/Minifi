@@ -37,12 +37,13 @@ export const metadata: Metadata = {
   title: "Mini.Fi - Learn to Invest Through Play",
   description: "A free game that teaches teens about investing through time-travel adventures. Built by NUVC.AI for the AWS AI Hackathon 2025.",
   icons: {
-    icon: '/favicon.png',
-    apple: '/favicon.png',
+    icon: '/favicon.svg',
+    apple: '/favicon.svg',
   },
   authors: [{ name: "NUVC.AI", url: "https://nuvc.ai" }],
   creator: "NUVC.AI",
   keywords: ["financial literacy", "investment education", "game", "teens", "AI"],
+  themeColor: "#8B7CF6",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -61,7 +62,7 @@ export default function RootLayout({
       className={`${outfit.variable} ${plusJakarta.variable} antialiased`}
     >
       <body 
-        className="font-sans min-h-screen bg-[#0a0a0f] text-white" 
+        className="font-sans min-h-screen bg-background text-foreground" 
         suppressHydrationWarning={true}
       >
         {children}

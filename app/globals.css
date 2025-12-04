@@ -4,58 +4,64 @@
 
 :root {
   /* ═══════════════════════════════════════════════════════════════════════════
-     Mini.Fi Brand Colors - Light, Fun, Teen-Friendly Theme
-     Primary: Indigo #6366f1 | Secondary: Violet #8b5cf6 | Accent: Purple #a855f7
-     Clean, bright, and inviting
+     Mini.Fi Visual Identity - Brand Colors
+     Primary: Purple #8B7CF6 | Secondary: Dark #1A1A2E | Accent: Light Purple
+     Modern, trustworthy, financial education focused
      ═══════════════════════════════════════════════════════════════════════════ */
+  
+  /* Brand Purple - #8B7CF6 = HSL(249, 86%, 73%) */
+  --minifi-purple: 249 86% 73%;
+  --minifi-purple-dark: 249 86% 60%;
+  --minifi-purple-light: 249 86% 85%;
+  --minifi-dark: 240 33% 14%; /* #1A1A2E */
   
   /* Light, clean background */
   --background: 0 0% 100%; /* Pure white */
-  --foreground: 240 10% 10%; /* Near black text */
+  --foreground: 240 33% 14%; /* Mini.Fi Dark */
   --card: 0 0% 100%;
-  --card-foreground: 240 10% 10%;
+  --card-foreground: 240 33% 14%;
   --popover: 0 0% 100%;
-  --popover-foreground: 240 10% 10%;
+  --popover-foreground: 240 33% 14%;
   
-  /* Primary: Indigo - Trust & Innovation */
-  --primary: 239 84% 67%; /* Indigo #6366f1 */
+  /* Primary: Mini.Fi Purple */
+  --primary: 249 86% 73%; /* Purple #8B7CF6 */
   --primary-foreground: 0 0% 100%;
   
-  /* Secondary: Violet - Premium & Creative */
-  --secondary: 258 90% 66%; /* Violet #8b5cf6 */
+  /* Secondary: Darker Purple */
+  --secondary: 249 86% 60%; /* Darker purple */
   --secondary-foreground: 0 0% 100%;
   
   --muted: 240 5% 96%; /* Light gray */
-  --muted-foreground: 240 4% 46%; /* Muted text */
+  --muted-foreground: 240 10% 40%; /* Muted text */
   
-  /* Accent: Purple */
-  --accent: 270 91% 65%; /* Purple #a855f7 */
-  --accent-foreground: 0 0% 100%;
+  /* Accent: Light Purple */
+  --accent: 249 86% 90%; /* Light purple tint */
+  --accent-foreground: 249 86% 40%;
   
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
   --border: 240 6% 90%;
   --input: 240 6% 90%;
-  --ring: 239 84% 67%;
+  --ring: 249 86% 73%;
   
-  /* Chart colors */
-  --chart-1: 239 84% 67%; /* Indigo */
-  --chart-2: 258 90% 66%; /* Violet */
-  --chart-3: 0 84% 60%; /* Red */
-  --chart-4: 160 84% 39%; /* Emerald */
-  --chart-5: 270 91% 65%; /* Purple */
+  /* Chart colors - Purple theme */
+  --chart-1: 249 86% 73%; /* Primary Purple */
+  --chart-2: 249 86% 60%; /* Darker Purple */
+  --chart-3: 0 84% 60%; /* Red for losses */
+  --chart-4: 142 76% 45%; /* Green for gains */
+  --chart-5: 249 86% 85%; /* Light Purple */
   
-  --radius: 1rem;
+  --radius: 0.75rem;
   
   /* Sidebar */
-  --sidebar-background: 240 5% 98%;
-  --sidebar-foreground: 240 10% 10%;
-  --sidebar-primary: 239 84% 67%;
+  --sidebar-background: 249 86% 98%;
+  --sidebar-foreground: 240 33% 14%;
+  --sidebar-primary: 249 86% 73%;
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 240 5% 96%;
-  --sidebar-accent-foreground: 240 10% 10%;
-  --sidebar-border: 240 6% 90%;
-  --sidebar-ring: 239 84% 67%;
+  --sidebar-accent: 249 86% 95%;
+  --sidebar-accent-foreground: 249 86% 40%;
+  --sidebar-border: 249 30% 90%;
+  --sidebar-ring: 249 86% 73%;
 }
 
 @layer base {
@@ -94,7 +100,7 @@
 /* Premium gradient text */
 .text-gradient {
   @apply bg-clip-text text-transparent;
-  background-image: linear-gradient(135deg, #6366f1, #8b5cf6, #a855f7);
+  background-image: linear-gradient(135deg, #8B7CF6, #7C6AE8, #6B5AD4);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════

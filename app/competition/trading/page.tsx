@@ -111,7 +111,7 @@ export default function TradingPage() {
             
             <div className="flex items-center gap-2">
               <Image
-                src="/minifi-header-logo.png"
+                src="/minifi-logo.svg"
                 alt="Mini.Fi"
                 width={100}
                 height={36}

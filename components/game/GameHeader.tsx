@@ -173,7 +173,7 @@ export function GameHeader({
           {/* Logo */}
           <Link href="/" className="flex items-center group">
             <Image
-              src="/minifi-header-logo.png"
+              src="/minifi-logo.svg"
               alt="Mini.Fi"
               width={120}
               height={44}
