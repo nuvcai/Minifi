@@ -469,7 +469,7 @@ function NextTarget({ currentRank, players, league }: NextTargetProps) {
             <div className="flex items-center gap-2">
               <ChevronUp className="h-4 w-4 text-emerald-400" />
               <span className="text-sm text-gray-300">
-                <span className="font-medium text-emerald-400">{xpToNext} XP</span> to pass{' '}
+                <span className="font-medium text-emerald-400">{xpToNext} 🪙</span> to pass{' '}
                 <span className="font-medium text-white">{playerAbove.displayName}</span>
               </span>
             </div>
@@ -486,7 +486,7 @@ function NextTarget({ currentRank, players, league }: NextTargetProps) {
               <AlertTriangle className="h-4 w-4 text-orange-400" />
               <span className="text-sm text-gray-300">
                 <span className="font-medium text-white">{playerBelow.displayName}</span> is{' '}
-                <span className="font-medium text-orange-400">{xpLead} XP</span> behind you
+                <span className="font-medium text-orange-400">{xpLead} 🪙</span> behind you
                 {playerBelow.lastActive === 'now' && (
                   <span className="text-red-400 font-medium"> (active now!)</span>
                 )}
@@ -577,7 +577,7 @@ export function LeagueSystem({
               <div className="text-2xl font-black text-white">
                 {currentPlayer?.weeklyXp.toLocaleString()}
               </div>
-              <div className="text-xs text-gray-500">Weekly XP</div>
+              <div className="text-xs text-gray-500">Weekly 🪙</div>
             </div>
             <div className="w-px h-10 bg-white/10" />
             <div className="text-center">
@@ -698,7 +698,7 @@ export function LeagueSystem({
             className={`w-full bg-gradient-to-r ${currentLeague.bgGradient} hover:opacity-90 border ${currentLeague.borderColor} text-white font-bold`}
           >
             <Zap className="h-4 w-4 mr-2" />
-            Complete a Mission to Earn XP
+            Complete a Mission to Earn 🪙
           </Button>
         </div>
       ) : (
@@ -728,7 +728,7 @@ export function LeagueSystem({
                     <div>
                       <div className={`font-bold ${league.textColor}`}>{league.name}</div>
                       <div className="text-xs text-gray-400">
-                        {league.minXpToEnter.toLocaleString()}+ XP to enter
+                        {league.minXpToEnter.toLocaleString()}+ 🪙 to enter
                       </div>
                     </div>
                   </div>

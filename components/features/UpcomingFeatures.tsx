@@ -51,7 +51,7 @@ const upcomingFeatures: FeaturePreview[] = [
   {
     id: "daily-challenge",
     title: "Risk Roulette",
-    description: "Daily mini-game: Predict which asset wins! Earn bonus XP & streaks",
+    description: "Daily mini-game: Predict which asset wins! Earn bonus 🪙 & streaks",
     icon: <Gamepad2 className="h-5 w-5" />,
     status: "coming_soon",
     eta: "Dec 2025",

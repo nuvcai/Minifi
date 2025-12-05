@@ -588,7 +588,7 @@ export function formatPoints(points: number): string {
  */
 export function getEarnRateDescription(tier: PointsTier): string {
   const multiplier = POINTS_CONFIG.TIER_MULTIPLIERS[tier];
-  if (multiplier === 1) return "1 point per 10 XP";
-  return `${multiplier}x points (${multiplier} points per 10 XP)`;
+  if (multiplier === 1) return "1 point per 10 🪙 iii";
+  return `${multiplier}x points (${multiplier} points per 10 🪙)`;
 }
 

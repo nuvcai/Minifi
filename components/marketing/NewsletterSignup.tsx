@@ -47,7 +47,7 @@ const newsletterBenefits: NewsletterBenefit[] = [
   {
     icon: <Gift className="h-4 w-4" />,
     title: "Exclusive Rewards",
-    description: "Subscriber-only XP bonuses & giveaways"
+    description: "Subscriber-only iii bonuses & giveaways"
   },
   {
     icon: <Star className="h-4 w-4" />,
@@ -283,7 +283,7 @@ export function NewsletterSignup({
               </p>
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20">
                 <Sparkles className="h-4 w-4 text-emerald-400" />
-                <span className="text-sm text-emerald-300">+50 XP Welcome Bonus incoming!</span>
+                <span className="text-sm text-emerald-300">+50 🪙 iii Welcome Bonus incoming!</span>
               </div>
             </div>
           ) : (

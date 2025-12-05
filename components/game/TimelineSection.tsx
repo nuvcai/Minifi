@@ -265,7 +265,7 @@ export function TimelineSection({
               {streakMultiplier > 1 && (
                 <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white border-0 px-3 py-1.5 animate-pulse">
                   <Flame className="h-4 w-4 mr-1" />
-                  <span className="font-bold">{streakMultiplier}x XP</span>
+                  <span className="font-bold">{streakMultiplier}x 🪙</span>
                 </Badge>
               )}
               

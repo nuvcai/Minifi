@@ -321,7 +321,7 @@ export function SavingsVault({
             </div>
             <div>
               <h3 className="font-bold text-gray-900">Savings Vault</h3>
-              <p className="text-xs text-gray-500">Grow your XP!</p>
+              <p className="text-xs text-gray-500">Grow your 🪙 iii!</p>
             </div>
           </div>
           
@@ -349,7 +349,7 @@ export function SavingsVault({
           </div>
           <div className="flex items-center justify-between mt-2 text-sm">
             <span className="text-emerald-100">Interest Earned</span>
-            <span className="font-semibold text-emerald-100">+{stats.totalInterestEarned.toLocaleString()} XP</span>
+            <span className="font-semibold text-emerald-100">+{stats.totalInterestEarned.toLocaleString()} 🪙</span>
           </div>
         </div>
 
@@ -472,11 +472,11 @@ export function SavingsVault({
             <DialogTitle className="flex items-center gap-2">
               <PiggyBank className="h-6 w-6 text-emerald-500" />
               <span className="text-xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-                {selectedGoal ? `Save to ${selectedGoal.name}` : "Save XP"}
+                {selectedGoal ? `Save to ${selectedGoal.name}` : "Save 🪙 iii"}
               </span>
             </DialogTitle>
             <DialogDescription>
-              Put your XP to work! Watch it grow with daily interest.
+              Put your 🪙 iii to work! Watch it grow with daily interest.
             </DialogDescription>
           </DialogHeader>
 
@@ -511,7 +511,7 @@ export function SavingsVault({
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <p className="text-sm font-semibold text-gray-700">Amount to Save</p>
-                <p className="text-sm text-gray-500">Available: {availableXP.toLocaleString()} XP</p>
+                <p className="text-sm text-gray-500">Available: {availableXP.toLocaleString()} 🪙</p>
               </div>
               
               <div className="p-4 rounded-xl bg-white border border-gray-200">
@@ -527,8 +527,8 @@ export function SavingsVault({
                   className="mb-2"
                 />
                 <div className="flex justify-between text-xs text-gray-400">
-                  <span>10 XP</span>
-                  <span>{availableXP.toLocaleString()} XP</span>
+                  <span>10 🪙</span>
+                  <span>{availableXP.toLocaleString()} 🪙</span>
                 </div>
               </div>
 
@@ -595,7 +595,7 @@ export function SavingsVault({
                 className="w-full border-gray-300 text-gray-600"
               >
                 <Unlock className="h-4 w-4 mr-2" />
-                Withdraw All ({selectedGoal.currentAmount.toLocaleString()} XP)
+                Withdraw All ({selectedGoal.currentAmount.toLocaleString()} 🪙)
               </Button>
             )}
           </div>
@@ -640,7 +640,7 @@ export function SavingsVault({
                       <span>{goal.emoji}</span>
                       <span className="font-medium text-gray-900 text-sm">{goal.name}</span>
                     </div>
-                    <p className="text-xs text-gray-500">{goal.target.toLocaleString()} XP</p>
+                    <p className="text-xs text-gray-500">{goal.target.toLocaleString()} 🪙</p>
                   </button>
                 ))}
               </div>

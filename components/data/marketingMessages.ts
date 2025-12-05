@@ -47,7 +47,7 @@ export const valuePropositions: ValueProposition[] = [
     subheadline: "Learn from both wins AND losses - because real investors do both",
     emoji: "💪",
     bulletPoints: [
-      "Earn XP for trying new asset classes",
+      "Earn 🪙 iii for trying new asset classes",
       "Get 'Courage Badges' for taking calculated risks",
       "Learn from losses without real money consequences",
       "Build resilience that transfers to real investing"
@@ -315,7 +315,7 @@ export const futureFeatureTeasers: FutureFeatureTeaser[] = [
   {
     id: "risk-roulette",
     title: "Risk Roulette",
-    teaser: "Daily prediction game with XP rewards",
+    teaser: "Daily prediction game with 🪙 iii rewards",
     fullDescription: "Predict which asset class wins tomorrow! Learn market dynamics through daily micro-games. Build streaks for bonus rewards.",
     icon: "🎰",
     status: "development",
@@ -481,7 +481,7 @@ export const viralTriggers: ViralTrigger[] = [
       imagePrompt: "Level badge with confetti, showing level number",
       platforms: ["twitter", "instagram", "tiktok"]
     },
-    referralHook: "Invite a friend to level up together - both get bonus XP! 🎁",
+    referralHook: "Invite a friend to level up together - both get bonus 🪙! 🎁",
     viralCoefficient: "high",
     socialProof: "Join {{userCount}}+ teens building wealth knowledge"
   },
@@ -754,7 +754,7 @@ export const viralMoments: ViralMoment[] = [
     trigger: "first_mission_complete",
     timing: "immediate",
     sharePrompt: "🎉 You survived your first market crisis! Share your victory?",
-    referralPrompt: "Know someone who should learn this? Invite them and both get 50 bonus XP!",
+    referralPrompt: "Know someone who should learn this? Invite them and both get 50 bonus 🪙!",
     trackingEvent: MARKETING_EVENTS.MISSION_COMPLETED,
     conversionGoal: "referral_link_created"
   },
@@ -762,7 +762,7 @@ export const viralMoments: ViralMoment[] = [
     trigger: "level_up",
     timing: "delayed_5s",
     sharePrompt: "Level {{level}} unlocked! Show off your progress?",
-    referralPrompt: "Level up faster with friends! Each referral = 100 XP",
+    referralPrompt: "Level up faster with friends! Each referral = 100 🪙 iii",
     trackingEvent: MARKETING_EVENTS.LEVEL_UP,
     conversionGoal: "share_clicked"
   },
@@ -786,7 +786,7 @@ export const viralMoments: ViralMoment[] = [
     trigger: "fo_certification_earned",
     timing: "immediate",
     sharePrompt: "👑 FO FELLOW CERTIFIED! Share your credential!",
-    referralPrompt: "You've mastered everything. Now teach others - 500 XP per referral!",
+    referralPrompt: "You've mastered everything. Now teach others - 500 🪙 per referral!",
     trackingEvent: MARKETING_EVENTS.ACHIEVEMENT_EARNED,
     conversionGoal: "premium_viewed"
   },

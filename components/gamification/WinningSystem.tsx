@@ -260,7 +260,7 @@ export function WinningSystem({
               </div>
               <Progress value={levelProgress} className="h-2" />
               <p className="text-[10px] text-gray-400 mt-1">
-                {xpToNextLevel - currentLevelXP} XP to Level {playerLevel + 1}
+                {xpToNextLevel - currentLevelXP} 🪙 to Level {playerLevel + 1}
               </p>
             </div>
           </div>
@@ -326,7 +326,7 @@ export function WinningSystem({
             </div>
             <div className="text-center p-2 bg-amber-50 rounded-lg">
               <p className="text-lg font-black text-amber-600">{playerXP.toLocaleString()}</p>
-              <p className="text-[9px] text-gray-500">Total XP</p>
+              <p className="text-[9px] text-gray-500">Total 🪙 iii</p>
             </div>
             <div className="text-center p-2 bg-emerald-50 rounded-lg">
               <p className="text-lg font-black text-emerald-600">{earnedBadgeIds.length}</p>
@@ -485,7 +485,7 @@ function WinningSystemModal({
                     <span className="text-2xl">{levelInfo.icon}</span>
                     <span className="text-lg font-bold">{levelInfo.title}</span>
                   </div>
-                  <p className="text-sm opacity-80 mb-2">{currentLevelXP.toLocaleString()} / {xpToNextLevel.toLocaleString()} XP</p>
+                  <p className="text-sm opacity-80 mb-2">{currentLevelXP.toLocaleString()} / {xpToNextLevel.toLocaleString()} 🪙</p>
                   <div className="h-2 bg-white/20 rounded-full overflow-hidden">
                     <div 
                       className="h-full bg-white rounded-full transition-all duration-500"
@@ -551,7 +551,7 @@ function WinningSystemModal({
               <div className="p-4 rounded-xl bg-amber-50 border border-amber-100">
                 <div className="flex items-center gap-2 mb-2">
                   <Zap className="h-4 w-4 text-amber-500" />
-                  <span className="text-sm font-semibold text-gray-700">Total XP</span>
+                  <span className="text-sm font-semibold text-gray-700">Total 🪙 iii</span>
                 </div>
                 <p className="text-2xl font-black text-amber-600">{playerXP.toLocaleString()}</p>
                 <p className="text-xs text-gray-500 mt-1">Wisdom earned</p>

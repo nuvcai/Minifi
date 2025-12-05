@@ -97,38 +97,80 @@ export function ShareResultCard({
   year,
   performance,
   returnPercent,
-  finalAmount,
+  finalAmount: _finalAmount,
   lessonLearned,
   streakDays = 0,
-  level = 1,
-  totalXp = 0,
+  level: _level = 1,
+  totalXp: _totalXp = 0,
   onShareComplete,
   compact = false,
 }: ShareResultCardProps) {
+  // Note: _level, _totalXp, _finalAmount reserved for enhanced share cards
+  void _level;
+  void _totalXp;
+  void _finalAmount;
   const [showShareModal, setShowShareModal] = useState(false);
   const [sharedPlatform, setSharedPlatform] = useState<string | null>(null);
   const [showXpAnimation, setShowXpAnimation] = useState(false);
   const [earnedXp, setEarnedXp] = useState(0);
   const [copiedLink, setCopiedLink] = useState(false);
 
-  // Generate share text
+  // Generate share text with EDUCATIONAL VIRAL HOOKS
   const generateShareText = (platform: string): string => {
-    const emoji = performance === "profit" ? "📈" : "📚";
-    const resultText = performance === "profit" 
-      ? `gained ${returnPercent.toFixed(1)}%` 
-      : `learned valuable lessons about ${lessonLearned}`;
+    const emoji = performance === "profit" ? "📈" : "🧠";
     
-    const baseText = `${emoji} Just survived the ${year} ${missionTitle} in Mini.Fi! I ${resultText}.`;
+    // Educational framing that makes user look smart
+    const educationalHooks: Record<string, { win: string; learn: string }> = {
+      "1990": {
+        win: `beat Japan's 1990 bubble crash! While most lost 60%, I made ${returnPercent.toFixed(1)}%`,
+        learn: `survived Japan's 1990 bubble crash and learned why 'everyone's buying' is a WARNING sign, not a green light`
+      },
+      "1997": {
+        win: `navigated the 1997 Asian Crisis with a ${returnPercent.toFixed(1)}% return! Global diversification FTW`,
+        learn: `experienced the 1997 Asian Crisis - learned why rich families NEVER concentrate in one region`
+      },
+      "2000": {
+        win: `avoided the Dot-com bust! Made ${returnPercent.toFixed(1)}% when Nasdaq crashed 78%`,
+        learn: `lost money in the Dot-com crash but learned to separate GOOD tech from HYPED tech (hello AI bubble?)`
+      },
+      "2008": {
+        win: `found opportunity in the 2008 crash! ${returnPercent.toFixed(1)}% return while banks collapsed`,
+        learn: `survived 2008 and learned: "Be greedy when others are fearful" - Warren Buffett wasn't kidding`
+      },
+      "2020": {
+        win: `crushed COVID investing! ${returnPercent.toFixed(1)}% return by spotting accelerated trends`,
+        learn: `learned the COVID investor's question: "What was growing that this crisis ACCELERATES?"`
+      },
+      "2025": {
+        win: `made my AI era bet! Time will tell if ${returnPercent.toFixed(1)}% was the right move`,
+        learn: `building my AI era investment thesis - this is OUR generation's defining moment`
+      }
+    };
     
-    const cta = "Learn to invest through history at minifi.app";
-    const hashtags = "#MiniFi #FinancialLiteracy #Investing";
+    const yearKey = year.toString();
+    const hook = educationalHooks[yearKey] || {
+      win: `gained ${returnPercent.toFixed(1)}% during the ${year} ${missionTitle}`,
+      learn: `learned valuable lessons about ${lessonLearned} from the ${missionTitle}`
+    };
+    
+    const resultText = performance === "profit" ? hook.win : hook.learn;
+    
+    // Add "I'm smarter than most adults" angle for virality
+    const flexLine = performance === "profit" 
+      ? "Learning investing through history > watching TikTok traders lose money 📚"
+      : "Every billionaire has losing trades. Difference? They learn from them 💎";
+    
+    const baseText = `${emoji} Just ${resultText}`;
+    
+    const cta = "minifi.app - Learn investing through history (free)";
+    const hashtags = "#MiniFi #FinLit #GenZInvestor";
     
     if (platform === "twitter") {
-      return `${baseText}\n\n${cta}\n\n${hashtags}`;
+      return `${baseText}\n\n${flexLine}\n\n${cta} ${hashtags}`;
     } else if (platform === "linkedin") {
-      return `${baseText}\n\nMini.Fi teaches investing through historical market events - from the 1990 Japanese Bubble to the 2008 Financial Crisis. Every decision is a learning opportunity!\n\n${cta}`;
+      return `${baseText}\n\nMini.Fi taught me something most finance courses skip: actual market history. Not theory - what REALLY happened during crashes and how smart money positioned.\n\nEvery generation has wealth-building moments. Understanding history helps you spot yours.\n\n${cta}`;
     } else if (platform === "whatsapp" || platform === "email") {
-      return `${baseText}\n\nYou should try it! ${cta}`;
+      return `${baseText}\n\n${flexLine}\n\nYou should try this - way better than guessing with real money: ${cta}`;
     }
     return baseText;
   };
@@ -236,7 +278,7 @@ export function ShareResultCard({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Share2 className="h-5 w-5 text-violet-500" />
-            <span className="font-medium text-gray-800">Share & Earn XP</span>
+            <span className="font-medium text-gray-800">Share & Earn 🪙</span>
           </div>
           <Button
             size="sm"
@@ -257,7 +299,6 @@ export function ShareResultCard({
           sharedPlatform={sharedPlatform}
           showXpAnimation={showXpAnimation}
           earnedXp={earnedXp}
-          copiedLink={copiedLink}
         />
       </div>
     );
@@ -283,7 +324,7 @@ export function ShareResultCard({
             <Sparkles className="h-5 w-5 text-white" />
           </div>
           <div>
-            <p className="font-medium text-gray-800">Earn XP for sharing!</p>
+            <p className="font-medium text-gray-800">Earn 🪙 for sharing!</p>
             <p className="text-sm text-gray-600">
               Help friends learn investing and get rewarded. Every share helps build financial literacy! 🎓
             </p>
@@ -334,7 +375,7 @@ export function ShareResultCard({
             <>
               <Copy className="h-4 w-4 mr-2" />
               Copy Shareable Link
-              <Badge className="ml-2 bg-amber-100 text-amber-700 border-0">+10 XP</Badge>
+              <Badge className="ml-2 bg-amber-100 text-amber-700 border-0">+10 🪙</Badge>
             </>
           )}
         </Button>
@@ -367,7 +408,6 @@ function ShareModal({
   sharedPlatform,
   showXpAnimation,
   earnedXp,
-  copiedLink,
 }: {
   open: boolean;
   onClose: () => void;
@@ -377,7 +417,6 @@ function ShareModal({
   sharedPlatform: string | null;
   showXpAnimation: boolean;
   earnedXp: number;
-  copiedLink: boolean;
 }) {
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -385,10 +424,10 @@ function ShareModal({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Share2 className="h-5 w-5 text-violet-500" />
-            Share & Earn XP
+            Share & Earn 🪙
           </DialogTitle>
           <DialogDescription>
-            Share your progress and earn XP rewards!
+            Share your progress and earn 🪙 iii rewards!
           </DialogDescription>
         </DialogHeader>
 
@@ -412,7 +451,7 @@ function ShareModal({
                 {isShared && showXpAnimation ? (
                   <Badge className="bg-emerald-400 text-emerald-900">
                     <CheckCircle className="h-3 w-3 mr-1" />
-                    +{earnedXp} XP!
+                    +{earnedXp} 🪙
                   </Badge>
                 ) : !reward.canClaim ? (
                   <div className="flex items-center gap-1 text-xs opacity-75">
@@ -421,7 +460,7 @@ function ShareModal({
                   </div>
                 ) : (
                   <Badge className="bg-amber-400/80 text-amber-900">
-                    +{reward.xp} XP
+                    +{reward.xp} 🪙
                   </Badge>
                 )}
               </Button>

@@ -753,7 +753,7 @@ export default function HomePage() {
               </h2>
               <p className="text-lg text-white/70 max-w-2xl mx-auto">
                 Join weekly league competitions and climb through 5 tiers from Bronze to Diamond.
-                Earn XP, get promoted, and prove you're the best!
+                Earn 🪙 iii, get promoted, and prove you're the best!
               </p>
             </div>
 
@@ -783,8 +783,8 @@ export default function HomePage() {
                 <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center mb-4">
                   <span className="text-2xl">📈</span>
                 </div>
-                <h4 className="font-bold text-white mb-2">Earn XP</h4>
-                <p className="text-white/70 text-sm">Complete missions, maintain streaks, and learn from history to earn XP points.</p>
+                <h4 className="font-bold text-white mb-2">Earn 🪙 iii</h4>
+                <p className="text-white/70 text-sm">Complete missions, maintain streaks, and learn from history to earn iii tokens.</p>
               </div>
               <div className="p-6 rounded-2xl bg-white/[0.03] border border-white/10">
                 <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center mb-4">

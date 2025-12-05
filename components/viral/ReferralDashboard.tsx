@@ -172,7 +172,7 @@ export function ReferralDashboard({
         <div className="bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-xl p-4">
           <h4 className="font-bold text-white mb-2">Share on social media</h4>
           <p className="text-sm text-gray-400 mb-4">
-            Your friends get +50 XP bonus when they use your code!
+            Your friends get +50 🪙 iii bonus when they use your code!
           </p>
           <ShareButton
             contentType="invite"

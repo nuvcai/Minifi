@@ -277,7 +277,7 @@ export function WhatIfAnalysis({
                       {!isViewed && (
                         <div className="flex items-center gap-1 mt-2">
                           <Sparkles className="h-3 w-3 text-amber-400" />
-                          <span className="text-xs text-amber-400">+3 XP for exploring!</span>
+                          <span className="text-xs text-amber-400">+3 🪙 for exploring!</span>
                         </div>
                       )}
                     </div>
@@ -286,7 +286,7 @@ export function WhatIfAnalysis({
                   {/* Click to reveal hint */}
                   {!isViewed && (
                     <p className="text-xs text-slate-500 text-center">
-                      Click to reveal insight (+3 XP)
+                      Click to reveal insight (+3 🪙)
                     </p>
                   )}
                 </div>

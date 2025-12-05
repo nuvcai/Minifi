@@ -109,7 +109,7 @@ export function SummaryModal({
     {
       id: "xp",
       icon: <Trophy className="h-8 w-8 text-yellow-500" />,
-      title: "Total XP",
+      title: "Total 🪙 iii",
       value: playerXP,
     },
     {

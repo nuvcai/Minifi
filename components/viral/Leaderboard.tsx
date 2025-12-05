@@ -102,7 +102,7 @@ export function Leaderboard({
               <div className="text-xs text-white mt-1 font-medium text-center max-w-[80px] truncate">
                 {podiumEntry.displayName}
               </div>
-              <div className="text-xs text-yellow-400">{podiumEntry.score.toLocaleString()} XP</div>
+              <div className="text-xs text-yellow-400">{podiumEntry.score.toLocaleString()} 🪙</div>
               <div className={`${height} w-16 bg-gradient-to-t from-yellow-600/50 to-yellow-400/30 rounded-t-lg mt-2`} />
             </div>
           );
@@ -171,10 +171,10 @@ export function Leaderboard({
           <div className="flex items-center gap-3">
             <div className="text-gray-400">Your rank: #234</div>
             <div className="flex-1 h-px bg-white/10" />
-            <div className="text-yellow-400">5,420 XP</div>
+            <div className="text-yellow-400">5,420 🪙 iii</div>
           </div>
           <div className="text-xs text-gray-500 mt-1">
-            2,080 XP to enter top 100
+            2,080 🪙 to enter top 100
           </div>
         </div>
       )}

@@ -248,7 +248,7 @@ function LeaguePopoverContent({
       {/* Stats Grid */}
       <div className="grid grid-cols-2 gap-2 mb-3">
         <div className="p-2.5 rounded-xl bg-[#9898f2]/10 border border-[#9898f2]/20">
-          <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wide">Weekly XP</p>
+          <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wide">Weekly 🪙</p>
           <p className="text-lg font-bold text-[#9898f2]">{weeklyXp.toLocaleString()}</p>
         </div>
         <div className="p-2.5 rounded-xl bg-[#9898f2]/10 border border-[#9898f2]/20">
@@ -271,7 +271,7 @@ function LeaguePopoverContent({
                 <ChevronUp className="h-3 w-3 text-emerald-500 dark:text-emerald-400" />
                 <span className="text-xs text-slate-600 dark:text-slate-300">To next rank</span>
               </div>
-              <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">+{xpToNextRank} XP</span>
+              <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">+{xpToNextRank} 🪙</span>
             </div>
           </div>
         )}
@@ -283,7 +283,7 @@ function LeaguePopoverContent({
                 <ChevronDown className="h-3 w-3 text-amber-500 dark:text-amber-400" />
                 <span className="text-xs text-slate-600 dark:text-slate-300">Lead over #{rank + 1}</span>
               </div>
-              <span className="text-xs font-bold text-amber-600 dark:text-amber-400">{xpLead} XP</span>
+              <span className="text-xs font-bold text-amber-600 dark:text-amber-400">{xpLead} 🪙</span>
             </div>
           </div>
         )}
@@ -302,7 +302,7 @@ function LeaguePopoverContent({
             ? `Top ${league.promotionSlots} get promoted!`
             : zone === 'danger'
               ? `Bottom ${league.relegationSlots} get relegated!`
-              : 'Keep earning XP to climb!'
+              : 'Keep earning 🪙 to climb!'
           }
         </p>
       </div>

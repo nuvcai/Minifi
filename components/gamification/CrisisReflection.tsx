@@ -266,7 +266,7 @@ export function CrisisReflection({
                   className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-semibold"
                 >
                   <Brain className="h-4 w-4 mr-2" />
-                  Reflect & Earn +{bonusXpForReflection} Bonus XP
+                  Reflect & Earn +{bonusXpForReflection} Bonus 🪙
                   <ChevronRight className="h-4 w-4 ml-2" />
                 </Button>
               </CardContent>
@@ -283,7 +283,7 @@ export function CrisisReflection({
                     Self Reflection
                   </Badge>
                   <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30">
-                    +{bonusXpForReflection} Bonus XP Available
+                    +{bonusXpForReflection} Bonus 🪙 Available
                   </Badge>
                 </div>
                 

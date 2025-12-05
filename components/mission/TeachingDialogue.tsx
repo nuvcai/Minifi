@@ -12,15 +12,18 @@ import {
   TrendingUp,
   BarChart3,
   Shield,
-  HelpCircle,
   Target,
-  Zap,
-  Activity,
-  TrendingDown,
-  AlertTriangle,
 } from "lucide-react";
 import { PerformanceChart } from "@/components/PerformanceChart";
 import { api, InvestmentMetrics, CoachRequest, CoachResponse } from "@/lib/api";
+import { 
+  AICoach, 
+  aiCoaches,
+  getCoachResponse, 
+  getCoachCatchphrase,
+  getCoachEncouragement,
+  isCoachAlignedDecision 
+} from "@/components/data/coaches";
  
 
 // ============================================================================
@@ -29,6 +32,7 @@ import { api, InvestmentMetrics, CoachRequest, CoachResponse } from "@/lib/api";
 
 interface TeachingDialogueProps {
   coach: {
+    id?: string;
     name: string;
     avatar: string;
     personality: string;
@@ -48,7 +52,13 @@ interface TeachingDialogueProps {
     title: string;
     description: string;
   };
-  simulationResult?: any;
+  simulationResult?: {
+    performance_chart?: {
+      dates: string[];
+      values: number[];
+    };
+    [key: string]: unknown;
+  };
   onComplete: () => void;
   onXpEarned?: (amount: number) => void;
 }
@@ -189,10 +199,11 @@ const extractEventYear = (eventTitle: string): number => {
 /**
  * Formats percentage with sign
  */
-const formatPercentage = (value: number): string => {
+const _formatPercentage = (value: number): string => {
   const sign = value > 0 ? "+" : "";
   return `${sign}${value.toFixed(2)}%`;
 };
+void _formatPercentage;
 
 /**
  * Determines player level based on mission difficulty, performance, and experience
@@ -390,12 +401,13 @@ export function TeachingDialogue({
   actualReturn,
   finalAmount,
   performance,
-  outcome,
+  outcome: _outcome,
   event,
   simulationResult,
   onComplete,
   onXpEarned,
 }: TeachingDialogueProps) {
+  void _outcome; // Kept for future use
   // Add custom styles for animations
   useEffect(() => {
     const style = document.createElement('style');
@@ -461,8 +473,8 @@ export function TeachingDialogue({
 
   const [messages, setMessages] = useState<TeachingMessage[]>([]);
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
-  const [displayedText, setDisplayedText] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
+  const [_displayedText, setDisplayedText] = useState(""); void _displayedText;
+  const [_isTyping, setIsTyping] = useState(false); void _isTyping;
   const [showContinue, setShowContinue] = useState(false);
   const [realMetrics, setRealMetrics] = useState<InvestmentMetrics | null>(
     null
@@ -484,7 +496,7 @@ export function TeachingDialogue({
   // Track hover state for metric highlighting
   const [hoveredMetric, setHoveredMetric] = useState<string | null>(null);
   // Track XP earned this session
-  const [sessionXp, setSessionXp] = useState<number>(0);
+  const [_sessionXp, setSessionXp] = useState<number>(0); void _sessionXp;
   // Track XP animation
   const [showXpAnimation, setShowXpAnimation] = useState<boolean>(false);
   // Track coach typing effect
@@ -671,11 +683,20 @@ export function TeachingDialogue({
       return;
     }
 
+    // Get coach-specific greeting
+    const coachEmoji = fullCoach?.speechStyle?.emoji || "🎯";
+    const profitReaction = fullCoach 
+      ? getCoachResponse(fullCoach, "profit").split("!")[0] + "!"
+      : "Nice work!";
+    const lossReaction = fullCoach
+      ? getCoachResponse(fullCoach, "loss").split(".")[0] + "."
+      : "Let's analyze this.";
+
     // Step 1: Portfolio Performance (Annual) - Combined greeting + chart
     newMessages.push({
       id: "portfolio_performance",
       type: "greeting",
-      content: `${performance === "profit" ? "🎉 Nice work!" : "📊"} Ask ${coach.name} about your ${selectedOption.name} results!`,
+      content: `${coachEmoji} ${performance === "profit" ? profitReaction : lossReaction} Ask ${coach.name} about your ${selectedOption.name} results!`,
       showContinue: true,
       showMetrics: true,
       showChart: true,
@@ -821,34 +842,90 @@ export function TeachingDialogue({
       ? aiCoachAdvice.recommendations.slice(0, 3) 
       : fallbackRecommendations;
       
-    const nextSteps = aiCoachAdvice.next_steps && aiCoachAdvice.next_steps.length > 0
+    const _nextSteps = aiCoachAdvice.next_steps && aiCoachAdvice.next_steps.length > 0
       ? aiCoachAdvice.next_steps.slice(0, 2)
       : fallbackNextSteps;
+    void _nextSteps; // Available for future enhancements
       
     const encouragement = aiCoachAdvice.encouragement || fallbackEncouragement;
     
-    // Generate intelligent summary based on mission results
+    // Generate intelligent summary based on mission results - NOW WITH COACH PERSONALITY
     const generateIntelligentSummary = (): string => {
       const actualFinalValue = realMetrics ? realMetrics.final_value : finalAmount;
       const actualTotalReturn = realMetrics ? realMetrics.total_return : actualReturn;
       
-      // Mission-specific insights
-      let missionContext = "";
-      if (event.title.toLowerCase().includes("bubble")) {
-        missionContext = actualTotalReturn > 0 ? 
-          "You successfully navigated the market bubble by staying disciplined during volatile times." :
-          "Market bubbles are challenging - this experience teaches valuable lessons about market psychology.";
-      } else if (event.title.toLowerCase().includes("crisis")) {
-        missionContext = actualTotalReturn > 0 ?
-          "Impressive! You found opportunity during the crisis when others were paralyzed by fear." :
-          "Financial crises test every investor - your experience builds resilience for future challenges.";
-      } else {
-        missionContext = actualTotalReturn > 0 ?
-          "Your investment approach worked well for this market environment." :
-          "This challenging period provided valuable learning about market dynamics.";
-      }
+      // Coach-specific mission context
+      const getCoachMissionContext = () => {
+        if (!fullCoach) {
+          // Default context
+          if (event.title.toLowerCase().includes("bubble")) {
+            return actualTotalReturn > 0 ? 
+              "You successfully navigated the market bubble by staying disciplined during volatile times." :
+              "Market bubbles are challenging - this experience teaches valuable lessons about market psychology.";
+          } else if (event.title.toLowerCase().includes("crisis")) {
+            return actualTotalReturn > 0 ?
+              "Impressive! You found opportunity during the crisis when others were paralyzed by fear." :
+              "Financial crises test every investor - your experience builds resilience for future challenges.";
+          }
+          return actualTotalReturn > 0 ?
+            "Your investment approach worked well for this market environment." :
+            "This challenging period provided valuable learning about market dynamics.";
+        }
+        
+        // Coach-specific context
+        switch (fullCoach.id) {
+          case "steady-sam":
+            if (event.title.toLowerCase().includes("bubble") || event.title.toLowerCase().includes("crisis")) {
+              return actualTotalReturn > 0 ?
+                "Your defensive approach protected capital while capturing gains. This is exactly how wealth is preserved across generations!" :
+                "The market was brutal, but our conservative stance limited the damage. Remember: it takes 100% gain to recover a 50% loss. Protection first!";
+            }
+            return actualTotalReturn > 0 ?
+              "Steady, consistent growth - exactly how the wealthiest families build and preserve their fortunes." :
+              "A setback, but our diversified approach means you're still in the game. That's the most important thing.";
+            
+          case "growth-guru":
+            if (event.title.toLowerCase().includes("bubble") || event.title.toLowerCase().includes("crisis")) {
+              return actualTotalReturn > 0 ?
+                "Your balanced allocation worked perfectly! When some assets fell, others held strong. This is the power of true diversification." :
+                "Market turmoil tested our allocation, but the portfolio structure absorbed the shock. Time to rebalance and move forward.";
+            }
+            return actualTotalReturn > 0 ?
+              "The architecture of your portfolio delivered. Different assets working together in harmony - beautiful!" :
+              "The portfolio behaved as designed. Some assets down, some up. This is why we diversify.";
+            
+          case "adventure-alex":
+            if (event.title.toLowerCase().includes("bubble") || event.title.toLowerCase().includes("crisis")) {
+              return actualTotalReturn > 0 ?
+                "BOOM! 🚀 While others panicked, you saw opportunity! This is how fortunes are made during market chaos!" :
+                "Volatility is the price of admission to the moon! 🌙 Every great investor has down periods. The key is staying in the game!";
+            }
+            return actualTotalReturn > 0 ?
+              "You took the shot and it PAID OFF! This is what happens when you believe in the future! 🔥" :
+              "Not every rocket reaches the moon on the first try. But fortune favors those who keep launching!";
+            
+          case "yield-yoda":
+            if (event.title.toLowerCase().includes("bubble") || event.title.toLowerCase().includes("crisis")) {
+              return actualTotalReturn > 0 ?
+                "Through market turmoil, patience rewarded you. Remember: Buffett made 99% of his wealth after age 50. Time is your ally." :
+                "Paper losses come and go. The compound interest continues its work in silence. Stay the course, young investor.";
+            }
+            return actualTotalReturn > 0 ?
+              "The eighth wonder of the world works in your favor. Compound interest is patient, and so are you." :
+              "A temporary setback in a lifetime of compounding. The journey of a thousand miles continues.";
+            
+          default:
+            return actualTotalReturn > 0 ?
+              "Your investment approach worked well for this market environment." :
+              "This challenging period provided valuable learning about market dynamics.";
+        }
+      };
       
-      return `🎯 **Mission Summary: ${event.title}**\n\nYour ${selectedOption.name} investment achieved a **${actualTotalReturn.toFixed(2)}%** return, ending at **$${Math.round(actualFinalValue).toLocaleString()}**. ${missionContext}\n\n**🎓 My Key Recommendations:**\n${recommendations.slice(0, 3).map(rec => `• ${rec}`).join('\n')}\n\n**💪 ${encouragement}**`;
+      const missionContext = getCoachMissionContext();
+      const coachEmoji = fullCoach?.speechStyle?.emoji || "🎯";
+      const catchphrase = fullCoach ? getCoachCatchphrase(fullCoach) : "Keep learning and growing";
+      
+      return `${coachEmoji} **Mission Summary: ${event.title}**\n\nYour ${selectedOption.name} investment achieved a **${actualTotalReturn.toFixed(2)}%** return, ending at **$${Math.round(actualFinalValue).toLocaleString()}**.\n\n${missionContext}\n\n**🎓 ${coach.name}'s Recommendations:**\n${recommendations.slice(0, 3).map(rec => `• ${rec}`).join('\n')}\n\n**💬 "${catchphrase}"**\n\n**💪 ${encouragement}**`;
     };
     
     const intelligentSummary = generateIntelligentSummary();
@@ -1060,7 +1137,7 @@ export function TeachingDialogue({
   };
 
   // Helper function to clean advice text - remove titles and format properly
-  const cleanAdviceText = (text: string | undefined): string => {
+  const _cleanAdviceText = (text: string | undefined): string => {
     if (!text) return "";
     // Remove common title prefixes and clean up the text
     return text
@@ -1068,9 +1145,27 @@ export function TeachingDialogue({
       .replace(/^[•\-*]\s*/, "") // Remove bullet points
       .trim();
   };
+  void _cleanAdviceText; // Available for future enhancements
 
-  // Generate AI explanation based on metric and current data
-  const generateMetricExplanation = async (metricKey: string, targetMetric: string): Promise<string> => {
+  // Get the full coach object for personality-driven responses
+  const fullCoach: AICoach | undefined = coach.id ? aiCoaches.find(c => c.id === coach.id) : undefined;
+  
+  // Get coach-specific emoji and catchphrase
+  const getCoachEmoji = () => fullCoach?.speechStyle?.emoji || "🎯";
+  const getPersonalizedEncouragement = () => {
+    if (fullCoach) {
+      return getCoachEncouragement(fullCoach);
+    }
+    return aiCoachAdvice?.encouragement || "Great job on this investment!";
+  };
+  
+  // Check if decision aligned with coach's preferences
+  const _isAlignedDecision = fullCoach ? isCoachAlignedDecision(fullCoach, selectedOption.name) : false;
+  void _isAlignedDecision; // Available for future enhancements
+
+  // Generate AI explanation based on metric and current data - NOW WITH COACH PERSONALITY
+  const generateMetricExplanation = async (metricKey: string, _targetMetric: string): Promise<string> => {
+    void _targetMetric; // Available for future enhancements
     if (!aiCoachAdvice) return "Loading explanation...";
     
     // Use actual data from props and realMetrics
@@ -1079,48 +1174,107 @@ export function TeachingDialogue({
     const actualVolatility = realMetrics ? realMetrics.volatility : 16.26;
     const actualSharpe = realMetrics ? realMetrics.sharpe_ratio : 0.1;
     
+    // Get coach-specific intro based on their personality
+    const getCoachIntro = () => {
+      if (!fullCoach) return "";
+      switch (fullCoach.id) {
+        case "steady-sam":
+          return actualTotalReturn > 0 
+            ? "Good news, and more importantly - you stayed safe! " 
+            : "Here's the reality, but remember - preservation is key. ";
+        case "growth-guru":
+          return actualTotalReturn > 0 
+            ? "Let's look at the architecture of this return. " 
+            : "The portfolio structure absorbed this. Here's why: ";
+        case "adventure-alex":
+          return actualTotalReturn > 0 
+            ? "YESSS! Look at these numbers! 🔥 " 
+            : "Volatility is the price of admission! Here's the deal: ";
+        case "yield-yoda":
+          return actualTotalReturn > 0 
+            ? "Patience rewarded. Observe: " 
+            : "Markets fluctuate, wisdom endures. Consider: ";
+        default:
+          return "";
+      }
+    };
+    
+    // Get coach-specific conclusion
+    const getCoachConclusion = () => {
+      if (!fullCoach) return "";
+      const catchphrase = getCoachCatchphrase(fullCoach);
+      return ` Remember: "${catchphrase}" ${getCoachEmoji()}`;
+    };
+    
     switch (metricKey) {
       case "final_value":
-        return `Your final investment value is $${Math.round(actualFinalValue).toLocaleString()}. ${actualTotalReturn > 0 ? 
-          `Congratulations! Your investment grew by ${actualTotalReturn.toFixed(2)}%. ${aiCoachAdvice.encouragement || "Great job on this investment!"}` : 
-          `Though your investment declined by ${Math.abs(actualTotalReturn).toFixed(2)}%, this is valuable learning experience. ${cleanAdviceText(aiCoachAdvice.recommendations?.[0]) || "Remember, investing is a long-term game and losses help us learn."}`}`;
+        return `${getCoachIntro()}Your final investment value is $${Math.round(actualFinalValue).toLocaleString()}. ${actualTotalReturn > 0 ? 
+          `${getCoachEmoji()} Your investment grew by ${actualTotalReturn.toFixed(2)}%! ${getPersonalizedEncouragement()}` : 
+          `Though your investment declined by ${Math.abs(actualTotalReturn).toFixed(2)}%, ${fullCoach ? getCoachResponse(fullCoach, "loss") : "this is valuable learning experience."}`}${getCoachConclusion()}`;
         
-      case "total_return":
-        return `Your total return is ${actualTotalReturn.toFixed(2)}%. This is a ${Math.abs(actualTotalReturn) > 20 ? 
-          "significant" : "moderate"} ${actualTotalReturn > 0 ? "gain" : "loss"}. ${aiCoachAdvice.risk_assessment || "Market conditions played a role in this outcome."} ${cleanAdviceText(aiCoachAdvice.recommendations?.[1]) || "Understanding returns helps you make better future decisions."}`;
+      case "total_return": {
+        const returnAssessment = fullCoach?.id === "adventure-alex" 
+          ? (actualTotalReturn > 20 ? "Now THAT'S what I call a moonshot! 🚀" : actualTotalReturn > 0 ? "Decent gains! But we can go bigger!" : "Temporary setback. The trend is our friend!")
+          : fullCoach?.id === "steady-sam"
+          ? (actualTotalReturn > 0 ? "Solid, steady growth. Just how we like it." : "The defensive position limited our exposure. Smart.")
+          : fullCoach?.id === "yield-yoda"
+          ? (actualTotalReturn > 0 ? "The compound interest force is strong." : "Paper losses. The income stream continues.")
+          : `${Math.abs(actualTotalReturn) > 20 ? "significant" : "moderate"} ${actualTotalReturn > 0 ? "gain" : "loss"}`;
         
-      case "volatility":
-        return `Volatility is ${actualVolatility.toFixed(2)}%, showing your investment's price movement range. ${actualVolatility > 20 ? 
-          "This is high volatility, meaning greater risk and potential returns." : "This is relatively stable, indicating lower risk but potentially lower returns too."} ${cleanAdviceText(aiCoachAdvice.recommendations?.[2]) || "Balancing risk and return is key to successful investing."}`;
+        return `${getCoachIntro()}Your total return is ${actualTotalReturn.toFixed(2)}%. ${returnAssessment} ${aiCoachAdvice.risk_assessment || "Market conditions played a role."}${getCoachConclusion()}`;
+      }
         
-      case "sharpe_ratio":
-        return `Sharpe ratio is ${actualSharpe.toFixed(2)}, measuring risk-adjusted returns. ${actualSharpe > 1 ? 
-          "Excellent risk-adjusted performance!" : actualSharpe > 0 ? "Reasonable risk-return balance." : "This suggests the return may not have justified the risk taken."} ${cleanAdviceText(aiCoachAdvice.next_steps?.[0]) || "Focus on risk-adjusted returns for better investment decisions."}`;
+      case "volatility": {
+        const volatilityView = fullCoach?.id === "adventure-alex"
+          ? (actualVolatility > 20 ? "High volatility = high opportunity! This is where fortunes are made!" : "Pretty calm waters... might want more excitement!")
+          : fullCoach?.id === "steady-sam"
+          ? (actualVolatility > 20 ? "This volatility is concerning. We prefer smoother rides." : "Nice and stable. Just how I like it!")
+          : fullCoach?.id === "growth-guru"
+          ? "Volatility teaches us about asset behavior. This data is valuable for future allocation."
+          : "Volatility reflects the investment's price swings.";
+          
+        return `${getCoachIntro()}Volatility is ${actualVolatility.toFixed(2)}%. ${volatilityView}${getCoachConclusion()}`;
+      }
+        
+      case "sharpe_ratio": {
+        const sharpeView = fullCoach?.id === "yield-yoda"
+          ? (actualSharpe > 1 ? "Excellent risk-adjusted returns. The compound way rewards patience." : "The journey matters more than the destination. Time will improve this.")
+          : fullCoach?.id === "steady-sam"
+          ? (actualSharpe > 1 ? "Great risk-adjusted performance! This is the way." : actualSharpe > 0 ? "Acceptable risk-return trade-off." : "We need to improve our risk management here.")
+          : `${actualSharpe > 1 ? "Excellent risk-adjusted performance!" : actualSharpe > 0 ? "Reasonable risk-return balance." : "The return may not have justified the risk."}`;
+        
+        return `${getCoachIntro()}Sharpe ratio is ${actualSharpe.toFixed(2)}, measuring risk-adjusted returns. ${sharpeView}${getCoachConclusion()}`;
+      }
         
       case "portfolio_chart": {
-        let chartExplanation = "";
+        let chartExplanation = getCoachIntro();
         if (currentMessage.id === "portfolio_performance") {
-          chartExplanation = `This chart shows how your $100,000 investment in ${selectedOption.name} performed over time, ending at $${Math.round(actualFinalValue).toLocaleString()}. `;
+          chartExplanation += `This chart shows how your $100,000 investment in ${selectedOption.name} performed over time, ending at $${Math.round(actualFinalValue).toLocaleString()}. `;
         } else if (currentMessage.id === "annual_returns") {
-          chartExplanation = `This annual returns chart reveals the year-by-year performance patterns of your ${selectedOption.name} investment during ${event.title}. `;
+          chartExplanation += `This annual returns chart reveals the year-by-year performance patterns of your ${selectedOption.name} investment during ${event.title}. `;
         } else if (currentMessage.id === "risk_analysis") {
-          chartExplanation = `The risk analysis shows your investment's volatility (${actualVolatility.toFixed(1)}%) and maximum drawdown, helping you understand the ups and downs you experienced. `;
+          chartExplanation += `The risk analysis shows your investment's volatility (${actualVolatility.toFixed(1)}%) and maximum drawdown, helping you understand the ups and downs you experienced. `;
         }
         
-        chartExplanation += actualTotalReturn > 0 ? 
-          `The overall upward trend demonstrates how markets can reward patient investors even during challenging periods.` : 
-          `While the outcome was negative, understanding these patterns helps you make more informed decisions in similar future scenarios.`;
+        // Coach-specific chart interpretation
+        const chartView = fullCoach?.id === "adventure-alex"
+          ? (actualTotalReturn > 0 ? "See those dips? Those were buying opportunities! The trend was UP!" : "Look at the volatility - that's where the next opportunity hides!")
+          : fullCoach?.id === "steady-sam"
+          ? (actualTotalReturn > 0 ? "Notice the steady climb. Consistency beats chaos." : "The defensive allocation limited the damage. That's the plan working.")
+          : fullCoach?.id === "growth-guru"
+          ? "Notice how different assets behave differently? That's why diversification matters."
+          : "Time in the market beats timing the market.";
         
-        return chartExplanation + ` ${cleanAdviceText(aiCoachAdvice.recommendations?.[0]) || "Track your performance by year to spot trends and patterns."}`;
+        return chartExplanation + chartView + getCoachConclusion();
       }
         
       default:
-        return aiCoachAdvice.advice || "Let me know if you have any questions about your investment performance!";
+        return `${getCoachEmoji()} ${aiCoachAdvice.advice || "Let me know if you have any questions about your investment performance!"}${getCoachConclusion()}`;
     }
   };
 
-  // Get metric value helper
-  const getMetricValue = (targetMetric: string) => {
+  // Get metric value helper - available for future enhancements
+  const _getMetricValue = (targetMetric: string) => {
     switch (targetMetric) {
       case "final_value": return realMetrics ? realMetrics.final_value : finalAmount;
       case "total_return": return realMetrics ? realMetrics.total_return : actualReturn;
@@ -1129,12 +1283,13 @@ export function TeachingDialogue({
       default: return 0;
     }
   };
+  void _getMetricValue;
 
   // ============================================================================
-  // RENDER HELPERS
+  // RENDER HELPERS - Available for future enhancements
   // ============================================================================
 
-  const renderMetricsCard = (
+  const _renderMetricsCard = (
     icon: React.ReactNode,
     label: string,
     value: string | number,
@@ -1152,25 +1307,27 @@ export function TeachingDialogue({
       </div>
     </Card>
   );
+  void _renderMetricsCard;
 
-  const renderMarkdownComponents = {
-    p: ({ children, ...props }: any) => <span {...props}>{children}</span>,
-    strong: ({ children, ...props }: any) => (
+  const _renderMarkdownComponents = {
+    p: ({ children, ...props }: React.HTMLAttributes<HTMLSpanElement> & { children?: React.ReactNode }) => <span {...props}>{children}</span>,
+    strong: ({ children, ...props }: React.HTMLAttributes<HTMLElement> & { children?: React.ReactNode }) => (
       <strong className="font-bold text-blue-800" {...props}>
         {children}
       </strong>
     ),
-    ul: ({ children, ...props }: any) => (
+    ul: ({ children, ...props }: React.HTMLAttributes<HTMLUListElement> & { children?: React.ReactNode }) => (
       <ul className="list-disc list-inside space-y-1 mt-2" {...props}>
         {children}
       </ul>
     ),
-    li: ({ children, ...props }: any) => (
+    li: ({ children, ...props }: React.HTMLAttributes<HTMLLIElement> & { children?: React.ReactNode }) => (
       <li className="text-gray-700" {...props}>
         {children}
       </li>
     ),
   };
+  void _renderMarkdownComponents;
 
   // ============================================================================
   // RENDER
@@ -1233,35 +1390,57 @@ export function TeachingDialogue({
 
   return (
     <div className="w-full max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg">
-      {/* Coach Header */}
-      <div className="flex items-center gap-3 mb-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
-        <div className="relative w-20 h-20 shrink-0">
-          {/* Simple glow effect based on performance */}
-          <div
-            className={`absolute -inset-1 rounded-full ${
-              performance === "profit" ? "bg-green-400/20" : "bg-orange-400/20"
-            } animate-pulse`}
-          ></div>
-          <Image
-            src={
-              isCoachTyping ? coach.animatedAvatar : coach.avatar
-            }
-            alt={coach.name}
-            fill
-            sizes="80px"
-            className="rounded-full object-cover border-2 border-white shadow-lg relative z-10"
-          />
-        </div>
-        <div className="flex-1">
-          <div className="flex items-center gap-2">
-            <h3 className="font-bold text-lg">{coach.name}</h3>
-            <Badge variant="secondary" className={coach.color}>
-              {coach.personality}
-            </Badge>
+      {/* Coach Header - Enhanced with personality */}
+      {(() => {
+        // Get coach-specific colors
+        const coachColors = fullCoach?.id === "steady-sam" 
+          ? { gradient: "from-blue-50 to-cyan-50", glow: "bg-blue-400/30", border: "border-blue-300" }
+          : fullCoach?.id === "growth-guru"
+          ? { gradient: "from-emerald-50 to-teal-50", glow: "bg-emerald-400/30", border: "border-emerald-300" }
+          : fullCoach?.id === "adventure-alex"
+          ? { gradient: "from-purple-50 to-violet-50", glow: "bg-purple-400/30", border: "border-purple-300" }
+          : fullCoach?.id === "yield-yoda"
+          ? { gradient: "from-amber-50 to-yellow-50", glow: "bg-amber-400/30", border: "border-amber-300" }
+          : { gradient: "from-blue-50 to-purple-50", glow: "bg-violet-400/30", border: "border-violet-300" };
+        
+        return (
+          <div className={`flex items-center gap-3 mb-6 p-4 bg-gradient-to-r ${coachColors.gradient} rounded-lg border ${coachColors.border}`}>
+            <div className="relative w-20 h-20 shrink-0">
+              {/* Coach-specific glow effect */}
+              <div className={`absolute -inset-1 rounded-full ${coachColors.glow} ${isCoachTyping ? 'animate-pulse' : ''}`}></div>
+              {/* Performance indicator ring */}
+              <div className={`absolute -inset-2 rounded-full ${performance === "profit" ? "bg-green-400/10" : "bg-orange-400/10"} ${isCoachTyping ? 'animate-ping' : ''}`} style={{ animationDuration: '2s' }}></div>
+              <Image
+                src={isCoachTyping ? coach.animatedAvatar : coach.avatar}
+                alt={coach.name}
+                fill
+                sizes="80px"
+                className={`rounded-full object-cover border-2 ${coachColors.border} shadow-lg relative z-10`}
+              />
+              {/* Status indicator */}
+              <div className={`absolute -bottom-1 -right-1 w-6 h-6 rounded-full ${isCoachTyping ? 'bg-green-500' : 'bg-gray-400'} border-2 border-white flex items-center justify-center z-20`}>
+                <span className="text-xs">{isCoachTyping ? "💬" : fullCoach?.speechStyle?.emoji || "🎯"}</span>
+              </div>
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <h3 className="font-bold text-lg">{coach.name}</h3>
+                <span className="text-xl">{fullCoach?.speechStyle?.emoji || "🎯"}</span>
+                <Badge variant="secondary" className={coach.color}>
+                  {coach.personality}
+                </Badge>
+              </div>
+              <p className="text-sm text-muted-foreground">{coach.description}</p>
+              {/* Teaching style hint */}
+              {fullCoach && (
+                <p className="text-xs text-gray-500 mt-1 italic">
+                  💡 Teaching style: {fullCoach.teachingStyle?.approach || "balanced"}
+                </p>
+              )}
+            </div>
           </div>
-          <p className="text-sm text-muted-foreground">{coach.description}</p>
-        </div>
-      </div>
+        );
+      })()}
 
       {/* Coach Interaction Panel - Always Visible */}
       <div className="mb-4 relative">
@@ -1298,7 +1477,7 @@ export function TeachingDialogue({
               {showXpAnimation && (
                 <div className="absolute -top-2 right-0 z-10">
                   <div className="text-yellow-600 font-bold text-lg animate-bounce-slide-up">
-                    +5 XP
+                    +5 🪙
                   </div>
                   {/* Sparkle effects */}
                   <div className="absolute -inset-4 pointer-events-none">
@@ -1439,7 +1618,7 @@ export function TeachingDialogue({
                 simulationResult?.performance_chart?.dates?.map(
                   (date: string, index: number) => ({
                     date: date,
-                    value: simulationResult.performance_chart.values[index],
+                    value: simulationResult?.performance_chart?.values[index] ?? 0,
                   })
                 ) ||
                 []

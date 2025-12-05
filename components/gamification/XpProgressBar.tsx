@@ -136,7 +136,7 @@ export function XpProgressBar({
         <div className="flex items-center justify-between text-xs">
           <div className="flex items-center gap-1 text-slate-400">
             <Zap className="h-3 w-3" />
-            <span>{xpToNextLevel.toLocaleString()} XP to Level {level + 1}</span>
+            <span>{xpToNextLevel.toLocaleString()} 🪙 to Level {level + 1}</span>
           </div>
           {nextLevelInfo && (
             <div className="flex items-center gap-1 text-slate-500">

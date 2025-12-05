@@ -57,7 +57,7 @@ const sponsorTiers: SponsorTier[] = [
     perks: [
       "Early access to new features",
       "Supporter badge on profile",
-      "Double daily XP bonus",
+      "Double daily iii bonus",
       "Access to beta features",
       "Monthly newsletter with tips"
     ]
