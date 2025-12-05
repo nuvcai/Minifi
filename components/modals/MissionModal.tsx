@@ -15,7 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { TrendingUp, TrendingDown, Brain, BarChart3, GraduationCap, PenLine, Diamond, Zap, Sparkles, Target, Flame } from "lucide-react";
+import { TrendingUp, Brain, BarChart3, GraduationCap, PenLine, Diamond, Zap } from "lucide-react";
 import { MissionIntro } from "@/components/mission/MissionIntro";
 import { InvestmentDecision } from "@/components/mission/InvestmentDecision";
 import { MissionResult } from "@/components/mission/MissionResult";
@@ -23,6 +23,7 @@ import { InvestmentThesis } from "@/components/mission/InvestmentThesis";
 import { WhatIfAnalysis } from "@/components/mission/WhatIfAnalysis";
 import { KnowledgeQuiz } from "@/components/mission/KnowledgeQuiz";
 import { MissionErrorBoundary } from "@/components/shared/ErrorBoundary";
+import { ResultsLoadingState } from "@/components/shared/LoadingStates";
 import { FinancialEvent } from "@/components/data/events";
 import { AICoach } from "@/components/data/coaches";
 import { MissionData, InvestmentOption } from "@/components/data/missions";
@@ -43,6 +44,7 @@ interface MissionModalProps {
     finalAmount: number;
     performance: "profit" | "loss";
   } | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   simulationResult: any;
   playerLevel: number;
   completedMissions: string[];
@@ -76,8 +78,9 @@ export function MissionModal({
   onXpEarned,
 }: MissionModalProps) {
   // Local state for enhanced features
-  const [investmentThesis, setInvestmentThesis] = useState<string>("");
-  const [quizCompleted, setQuizCompleted] = useState(false);
+  const [_investmentThesis, setInvestmentThesis] = useState<string>("");
+  const [_quizCompleted, setQuizCompleted] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   // Handle moving from decision to thesis step
   const handleDecisionConfirm = useCallback(() => {
@@ -86,18 +89,27 @@ export function MissionModal({
     }
   }, [selectedInvestment, onStepChange]);
 
-  // Handle thesis submission - proceed to confirm investment
+  // Handle thesis submission - proceed to confirm investment with loading
   const handleThesisSubmit = useCallback((thesis: string) => {
     setInvestmentThesis(thesis);
     if (selectedInvestment) {
-      onInvestmentConfirm(selectedInvestment);
+      setIsTransitioning(true);
+      // Simulate calculation delay for better UX
+      setTimeout(() => {
+        onInvestmentConfirm(selectedInvestment);
+        setIsTransitioning(false);
+      }, 800);
     }
   }, [selectedInvestment, onInvestmentConfirm]);
 
-  // Handle thesis skip - directly confirm investment
+  // Handle thesis skip - directly confirm investment with loading
   const handleThesisSkip = useCallback(() => {
     if (selectedInvestment) {
-      onInvestmentConfirm(selectedInvestment);
+      setIsTransitioning(true);
+      setTimeout(() => {
+        onInvestmentConfirm(selectedInvestment);
+        setIsTransitioning(false);
+      }, 600);
     }
   }, [selectedInvestment, onInvestmentConfirm]);
 
@@ -112,7 +124,7 @@ export function MissionModal({
   }, [onStepChange]);
 
   // Handle Quiz completion
-  const handleQuizComplete = useCallback((score: number, totalXp: number) => {
+  const handleQuizComplete = useCallback((_score: number, _totalXp: number) => {
     setQuizCompleted(true);
     // Note: XP is awarded incrementally during quiz, not here
     // After quiz, complete the mission
@@ -254,8 +266,13 @@ export function MissionModal({
         </DialogHeader>
 
         <MissionErrorBoundary>
+          {/* Loading state during transitions */}
+          {isTransitioning && (
+            <ResultsLoadingState />
+          )}
+
           {/* Step 1: Mission Introduction */}
-          {missionStep === "intro" && (
+          {!isTransitioning && missionStep === "intro" && (
             <MissionIntro
               missionData={missionData}
               selectedCoach={selectedCoach}
@@ -265,7 +282,7 @@ export function MissionModal({
           )}
 
           {/* Step 2: Investment Decision */}
-          {missionStep === "decision" && (
+          {!isTransitioning && missionStep === "decision" && (
             <InvestmentDecision
               options={missionData.options}
               selectedInvestment={selectedInvestment}
@@ -277,7 +294,7 @@ export function MissionModal({
           )}
 
           {/* Step 3: Investment Thesis (NEW - Forces deliberate thinking) */}
-          {missionStep === "thesis" && selectedOption && (
+          {!isTransitioning && missionStep === "thesis" && selectedOption && (
             <InvestmentThesis
               selectedOption={selectedOption}
               coach={selectedCoach}
@@ -290,7 +307,7 @@ export function MissionModal({
           )}
 
           {/* Step 4: Mission Results */}
-          {missionStep === "result" && missionResult && (
+          {!isTransitioning && missionStep === "result" && missionResult && (
             <MissionResult
               selectedOption={missionResult.option}
               actualReturn={missionResult.actualReturn}
@@ -308,7 +325,7 @@ export function MissionModal({
           )}
 
           {/* Step 5: What-If Analysis (NEW - Shows all possible outcomes) */}
-          {missionStep === "whatif" && missionResult && (
+          {!isTransitioning && missionStep === "whatif" && missionResult && (
             <WhatIfAnalysis
               options={missionData.options}
               selectedOptionId={missionResult.option.id}
@@ -319,7 +336,7 @@ export function MissionModal({
           )}
 
           {/* Step 6: Knowledge Quiz (NEW - Validates understanding) */}
-          {missionStep === "quiz" && missionResult && (
+          {!isTransitioning && missionStep === "quiz" && missionResult && (
             <KnowledgeQuiz
               missionData={missionData}
               eventYear={event.year}

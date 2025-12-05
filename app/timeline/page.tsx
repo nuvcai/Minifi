@@ -24,6 +24,7 @@ import { IIIDashboard } from "@/components/gamification/IIIDashboard";
 import { DailyWisdom } from "@/components/library/DailyWisdom";
 import { WelcomeModal } from "@/components/onboarding/WelcomeModal";
 import { GameErrorBoundary } from "@/components/shared/ErrorBoundary";
+import { OfflineIndicator } from "@/components/shared/OfflineIndicator";
 
 // Hooks
 import { useIII } from "@/hooks/useIII";
@@ -851,6 +852,9 @@ export default function TimelinePage() {
         completedMissions={completedMissions.length}
         streakDays={streakDays}
       />
+      
+      {/* Offline Status Indicator */}
+      <OfflineIndicator />
       
     </div>
   );

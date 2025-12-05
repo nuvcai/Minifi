@@ -10,12 +10,20 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import { ArrowLeft, Loader2, RefreshCw, AlertCircle, TrendingUp, TrendingDown, Activity, BarChart3, Shield, Target, Zap } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import CompetitionResults from "@/components/competition-results";
 import { api, handleApiError } from "@/lib/api";
+
+// Lazy load components that use client-only features
+const CompetitionResults = dynamic(
+  () => import("@/components/competition-results"),
+  { ssr: false }
+);
+
+// Lazy load recharts to avoid SSR issues
 import {
   LineChart,
   Line,

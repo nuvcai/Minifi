@@ -10,8 +10,14 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import { ArrowLeft, Loader2 } from "lucide-react";
-import TradingDashboard from "@/components/trading-dashboard";
+
+// Lazy load to avoid SSR issues with client-only components
+const TradingDashboard = dynamic(
+  () => import("@/components/trading-dashboard"),
+  { ssr: false }
+);
 
 function TradingContent() {
   const router = useRouter();

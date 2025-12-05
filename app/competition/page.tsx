@@ -9,8 +9,27 @@
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft } from "lucide-react";
-import InvestmentCompetition from "@/components/investment-competition";
+import dynamicImport from "next/dynamic";
+import { ArrowLeft, Loader2 } from "lucide-react";
+
+// Force dynamic rendering to prevent SSG issues
+export const dynamic = 'force-dynamic';
+
+// Lazy load the competition component to avoid SSR issues
+const InvestmentCompetition = dynamicImport(
+  () => import("@/components/investment-competition"),
+  { 
+    ssr: false,
+    loading: () => (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin text-emerald-500 mx-auto mb-4" />
+          <p className="text-sm text-gray-500">Loading competition...</p>
+        </div>
+      </div>
+    )
+  }
+);
 
 export default function CompetitionPage() {
   const router = useRouter();

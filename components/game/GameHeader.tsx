@@ -28,6 +28,7 @@ import { useTheme } from "next-themes";
 import { levelTitles } from "@/components/gamification/LevelUpCelebration";
 import { SeasonEndCelebration } from "@/components/gamification";
 import { useLeague } from "@/hooks/useLeague";
+import { OfflineBadge } from "@/components/shared/OfflineIndicator";
 import {
   Dialog,
   DialogContent,
@@ -189,6 +190,9 @@ export function GameHeader({
                 {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
               </button>
             )}
+            
+            {/* Offline Status Badge */}
+            <OfflineBadge />
             
             {/* User Status */}
             {userEmail ? (
