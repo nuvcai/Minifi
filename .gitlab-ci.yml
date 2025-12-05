@@ -131,27 +131,6 @@ deploy:vercel:
     - npm install -g vercel
   script:
     - |
-      echo "🚀 Deploying Frontend to Vercel..."
-      vercel pull --yes --environment=production --token=$VERCEL_TOKEN
-      vercel build --prod --token=$VERCEL_TOKEN
-      vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
-  environment:
-    name: production-frontend
-    url: https://minifi.vercel.app
-  only:
-    - main
-  when: manual
-  needs:
-    - build:frontend
-
-deploy:vercel:auto:
-  stage: deploy
-  image: node:${NODE_VERSION}-alpine
-  <<: *node_cache
-  before_script:
-    - npm install -g vercel
-  script:
-    - |
       echo "🚀 Auto-deploying Frontend to Vercel..."
       vercel pull --yes --environment=production --token=$VERCEL_TOKEN
       vercel build --prod --token=$VERCEL_TOKEN
@@ -161,6 +140,7 @@ deploy:vercel:auto:
     name: production-frontend
     url: https://minifi.vercel.app
   only:
+    - main
     - v1.2-release
   needs:
     - build:frontend
@@ -172,7 +152,7 @@ deploy:render:
     - apk add --no-cache curl
   script:
     - |
-      echo "🚀 Triggering Render Backend Deployment..."
+      echo "🚀 Auto-deploying Backend to Render..."
       curl -X POST "https://api.render.com/v1/services/$RENDER_SERVICE_ID/deploys" \
         -H "Authorization: Bearer $RENDER_API_KEY" \
         -H "Content-Type: application/json" \
@@ -183,27 +163,6 @@ deploy:render:
     url: https://minifi-backend.onrender.com
   only:
     - main
-  when: manual
-  needs:
-    - build:backend
-
-deploy:render:auto:
-  stage: deploy
-  image: alpine:latest
-  before_script:
-    - apk add --no-cache curl
-  script:
-    - |
-      echo "🚀 Auto-triggering Render Backend Deployment..."
-      curl -X POST "https://api.render.com/v1/services/$RENDER_SERVICE_ID/deploys" \
-        -H "Authorization: Bearer $RENDER_API_KEY" \
-        -H "Content-Type: application/json" \
-        -d '{"clearCache": false}'
-      echo "✅ Render deployment triggered!"
-  environment:
-    name: production-backend
-    url: https://minifi-backend.onrender.com
-  only:
     - v1.2-release
   needs:
     - build:backend
