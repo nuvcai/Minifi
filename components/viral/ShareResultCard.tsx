@@ -3,6 +3,8 @@
  * 
  * Encourages users to share their results and earn XP rewards.
  * Implements viral moments defined in marketingMessages.ts
+ * 
+ * Designed for light AND dark themes with Apple-inspired aesthetics.
  */
 
 "use client";
@@ -30,9 +32,13 @@ import {
   Gift,
   Users,
   Clock,
+  Zap,
 } from "lucide-react";
 import { SHARE_REWARDS, calculateShareReward, claimShareReward } from "@/lib/marketing";
 import { InlineFloatingXp } from "@/components/gamification/FloatingXp";
+
+// MiniFi website URL
+const MINIFI_URL = "https://minifi.games";
 
 interface ShareResultCardProps {
   missionTitle: string;
@@ -51,43 +57,55 @@ interface ShareResultCardProps {
 const platformConfig: Record<string, { 
   icon: React.ReactNode; 
   label: string; 
-  color: string;
-  hoverColor: string;
+  lightColor: string;
+  darkColor: string;
+  hoverLight: string;
+  hoverDark: string;
   key: string;
 }> = {
   twitter: { 
     icon: <Twitter className="h-4 w-4" />, 
     label: "X (Twitter)", 
-    color: "bg-black text-white",
-    hoverColor: "hover:bg-gray-800",
+    lightColor: "bg-slate-900 text-white",
+    darkColor: "dark:bg-white dark:text-slate-900",
+    hoverLight: "hover:bg-slate-800",
+    hoverDark: "dark:hover:bg-slate-100",
     key: "twitter"
   },
   whatsapp: { 
     icon: <MessageCircle className="h-4 w-4" />, 
     label: "WhatsApp", 
-    color: "bg-emerald-500 text-white",
-    hoverColor: "hover:bg-emerald-600",
+    lightColor: "bg-emerald-500 text-white",
+    darkColor: "dark:bg-emerald-500 dark:text-white",
+    hoverLight: "hover:bg-emerald-600",
+    hoverDark: "dark:hover:bg-emerald-400",
     key: "whatsapp"
   },
   linkedin: { 
     icon: <Linkedin className="h-4 w-4" />, 
     label: "LinkedIn", 
-    color: "bg-blue-600 text-white",
-    hoverColor: "hover:bg-blue-700",
+    lightColor: "bg-blue-600 text-white",
+    darkColor: "dark:bg-blue-500 dark:text-white",
+    hoverLight: "hover:bg-blue-700",
+    hoverDark: "dark:hover:bg-blue-400",
     key: "linkedin"
   },
   email: { 
     icon: <Mail className="h-4 w-4" />, 
     label: "Email", 
-    color: "bg-violet-500 text-white",
-    hoverColor: "hover:bg-violet-600",
+    lightColor: "bg-violet-500 text-white",
+    darkColor: "dark:bg-violet-500 dark:text-white",
+    hoverLight: "hover:bg-violet-600",
+    hoverDark: "dark:hover:bg-violet-400",
     key: "email"
   },
   copy_link: { 
     icon: <Copy className="h-4 w-4" />, 
     label: "Copy Link", 
-    color: "bg-gray-200 text-gray-800",
-    hoverColor: "hover:bg-gray-300",
+    lightColor: "bg-slate-100 text-slate-800",
+    darkColor: "dark:bg-slate-700 dark:text-slate-200",
+    hoverLight: "hover:bg-slate-200",
+    hoverDark: "dark:hover:bg-slate-600",
     key: "copy_link"
   },
 };
@@ -162,13 +180,13 @@ export function ShareResultCard({
     
     const baseText = `${emoji} Just ${resultText}`;
     
-    const cta = "minifi.app - Learn investing through history (free)";
+    const cta = "minifi.games - Learn investing through history (free)";
     const hashtags = "#MiniFi #FinLit #GenZInvestor";
     
     if (platform === "twitter") {
       return `${baseText}\n\n${flexLine}\n\n${cta} ${hashtags}`;
     } else if (platform === "linkedin") {
-      return `${baseText}\n\nMini.Fi taught me something most finance courses skip: actual market history. Not theory - what REALLY happened during crashes and how smart money positioned.\n\nEvery generation has wealth-building moments. Understanding history helps you spot yours.\n\n${cta}`;
+      return `${baseText}\n\nMiniFi taught me something most finance courses skip: actual market history. Not theory - what REALLY happened during crashes and how smart money positioned.\n\nEvery generation has wealth-building moments. Understanding history helps you spot yours.\n\n${cta}`;
     } else if (platform === "whatsapp" || platform === "email") {
       return `${baseText}\n\n${flexLine}\n\nYou should try this - way better than guessing with real money: ${cta}`;
     }
@@ -177,9 +195,8 @@ export function ShareResultCard({
 
   // Generate share URL
   const getShareUrl = (): string => {
-    const baseUrl = "https://minifi.app";
     const refCode = `share_${Date.now().toString(36)}`;
-    return `${baseUrl}/timeline?ref=${refCode}&utm_source=share&utm_medium=social`;
+    return `${MINIFI_URL}/timeline?ref=${refCode}&utm_source=share&utm_medium=social`;
   };
 
   // Handle share click
@@ -274,18 +291,20 @@ export function ShareResultCard({
   // Compact version - inline buttons
   if (compact) {
     return (
-      <div className="p-4 bg-gradient-to-r from-violet-50 to-indigo-50 rounded-xl border border-violet-200">
+      <div className="p-4 bg-gradient-to-r from-violet-50 to-indigo-50 dark:from-violet-950/50 dark:to-indigo-950/50 rounded-xl border border-violet-200 dark:border-violet-800/50">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Share2 className="h-5 w-5 text-violet-500" />
-            <span className="font-medium text-gray-800">Share & Earn 🪙</span>
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-indigo-500 flex items-center justify-center">
+              <Share2 className="h-4 w-4 text-white" />
+            </div>
+            <span className="font-medium text-slate-800 dark:text-white">Share & Earn 🪙</span>
           </div>
           <Button
             size="sm"
             onClick={() => setShowShareModal(true)}
-            className="bg-gradient-to-r from-violet-500 to-indigo-500 hover:from-violet-600 hover:to-indigo-600"
+            className="bg-gradient-to-r from-violet-500 to-indigo-500 hover:from-violet-600 hover:to-indigo-600 text-white shadow-md shadow-violet-500/25"
           >
-            <Gift className="h-4 w-4 mr-1" />
+            <Zap className="h-4 w-4 mr-1" />
             Share
           </Button>
         </div>

@@ -5,7 +5,7 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -25,11 +25,13 @@ import {
   ChevronRight,
   Share2,
   BookOpen,
+  Brain,
 } from "lucide-react";
 import { useIII, BADGES } from "@/hooks/useIII";
 import { useLeague } from "@/hooks/useLeague";
 import { levelTitles } from "@/components/gamification/LevelUpCelebration";
 import { Button } from "@/components/ui/button";
+import { WisdomLearned, calculateWisdomStats } from "@/components/gamification/WisdomLearned";
 
 const III_CONFIG = {
   symbol: 'iii',
@@ -52,7 +54,20 @@ export default function ProfilePage() {
   const levelInfo = levelTitles[level] || levelTitles[1];
   const nextLevelInfo = levelTitles[level + 1];
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'badges' | 'history'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'wisdom' | 'badges' | 'history'>('overview');
+  
+  // Get completed missions for wisdom tracking (based on missions completed stat)
+  // This maps to the years of the missions completed
+  const completedMissionYears = useMemo(() => {
+    // Map mission count to completed years for wisdom tracking
+    const missionYears = [1990, 1997, 2000, 2008, 2020, 2025];
+    return missionYears.slice(0, stats.missionsCompleted);
+  }, [stats.missionsCompleted]);
+  
+  const wisdomStats = useMemo(() => 
+    calculateWisdomStats(completedMissionYears), 
+    [completedMissionYears]
+  );
 
   // All possible badges from BADGES
   const allBadges = BADGES;
@@ -155,20 +170,43 @@ export default function ProfilePage() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-6 p-1 rounded-xl bg-white/5 border border-white/10">
-          {(['overview', 'badges', 'history'] as const).map((tab) => (
+        <div className="flex gap-2 mb-6 p-1 rounded-xl bg-white/5 border border-white/10 overflow-x-auto">
+          {(['overview', 'wisdom', 'badges', 'history'] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`flex-1 px-4 py-2.5 rounded-lg font-medium text-sm transition-all ${
+              className={`flex-1 min-w-fit px-4 py-2.5 rounded-lg font-medium text-sm transition-all flex items-center justify-center gap-2 ${
                 activeTab === tab
                   ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
                   : 'text-white/60 hover:text-white hover:bg-white/5'
               }`}
             >
-              {tab === 'overview' && 'Overview'}
-              {tab === 'badges' && `Badges (${earnedBadges.length})`}
-              {tab === 'history' && 'History'}
+              {tab === 'overview' && (
+                <>
+                  <Trophy className="h-4 w-4" />
+                  <span className="hidden sm:inline">Overview</span>
+                </>
+              )}
+              {tab === 'wisdom' && (
+                <>
+                  <Brain className="h-4 w-4" />
+                  <span className="hidden sm:inline">Wisdom ({wisdomStats.wisdomScore})</span>
+                  <span className="sm:hidden">Wisdom</span>
+                </>
+              )}
+              {tab === 'badges' && (
+                <>
+                  <Award className="h-4 w-4" />
+                  <span className="hidden sm:inline">Badges ({earnedBadges.length})</span>
+                  <span className="sm:hidden">{earnedBadges.length}</span>
+                </>
+              )}
+              {tab === 'history' && (
+                <>
+                  <Zap className="h-4 w-4" />
+                  <span className="hidden sm:inline">History</span>
+                </>
+              )}
             </button>
           ))}
         </div>
@@ -187,6 +225,45 @@ export default function ProfilePage() {
                   <p className="text-2xl font-black text-white">{stat.value}</p>
                 </div>
               ))}
+            </div>
+
+            {/* Wisdom Score Preview */}
+            <div 
+              className="p-5 rounded-2xl bg-gradient-to-br from-[#9898f2]/10 via-purple-500/5 to-transparent border border-[#9898f2]/30 cursor-pointer hover:from-[#9898f2]/15 transition-all"
+              onClick={() => setActiveTab('wisdom')}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-bold text-white flex items-center gap-2">
+                  <Brain className="h-5 w-5 text-[#9898f2]" />
+                  Wisdom Score
+                </h3>
+                <button className="text-sm text-[#9898f2] hover:underline flex items-center gap-1">
+                  View Details <ChevronRight className="h-4 w-4" />
+                </button>
+              </div>
+              <div className="flex items-center gap-6">
+                <div className="flex items-baseline gap-2">
+                  <span className="text-4xl font-black text-[#9898f2]">{wisdomStats.wisdomScore}</span>
+                  <span className="text-white/40">/ 1000</span>
+                </div>
+                <div className="flex-1">
+                  <div className="flex justify-between text-xs mb-1">
+                    <span className="text-white/50">Progress</span>
+                    <span className="text-[#9898f2]">{wisdomStats.overallProgress}%</span>
+                  </div>
+                  <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-gradient-to-r from-[#9898f2] to-purple-500 rounded-full"
+                      style={{ width: `${wisdomStats.overallProgress}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="mt-3 flex items-center gap-4 text-xs text-white/50">
+                <span>🏛️ {wisdomStats.pillarsUnlocked}/{wisdomStats.pillarsTotal} Pillars</span>
+                <span>📊 {wisdomStats.assetsUnlocked}/{wisdomStats.assetsTotal} Assets</span>
+                <span>🎯 {wisdomStats.strategiesUnlocked}/{wisdomStats.strategiesTotal} Strategies</span>
+              </div>
             </div>
 
             {/* Quick Badges Preview */}
@@ -244,6 +321,13 @@ export default function ProfilePage() {
               </div>
             </div>
           </div>
+        )}
+
+        {activeTab === 'wisdom' && (
+          <WisdomLearned 
+            completedMissions={completedMissionYears}
+            showInsights={true}
+          />
         )}
 
         {activeTab === 'badges' && (
