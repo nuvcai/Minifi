@@ -1,6 +1,6 @@
 /**
  * Mini.Fi Timeline Page
- * Light, fun game interface with all features
+ * Simplified XP + League game interface
  * © 2025 NUVC.AI. All Rights Reserved.
  */
 
@@ -9,22 +9,26 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { BookOpen, Trophy, Zap, ChevronRight } from "lucide-react";
+import { BookOpen, ChevronRight } from "lucide-react";
 
-// Components
+// Import components
 import { GameHeader } from "@/components/game/GameHeader";
 import { CoachSidebar } from "@/components/game/CoachSidebar";
-import { TimelineSection } from "@/components/game/TimelineSection";
+import { JourneyHub } from "@/components/game/JourneyHub";
 import { EventDetailModal } from "@/components/modals/EventDetailModal";
 import { MissionModal } from "@/components/modals/MissionModal";
 import { SummaryModal } from "@/components/modals/SummaryModal";
-import { LevelUpCelebration, BadgeDisplay, MilestoneAchievement, SavingsVault, InvestorJourney, RewardsStore } from "@/components/gamification";
-import { DailyStreak } from "@/components/gamification/DailyStreak";
+import { SaveProgressModal } from "@/components/modals/SaveProgressModal";
+import { LevelUpCelebration, MilestoneAchievement } from "@/components/gamification";
+import { IIIDashboard } from "@/components/gamification/IIIDashboard";
 import { DailyWisdom } from "@/components/library/DailyWisdom";
+import { WelcomeModal } from "@/components/onboarding/WelcomeModal";
+import { GameErrorBoundary } from "@/components/shared/ErrorBoundary";
+import { OfflineIndicator } from "@/components/shared/OfflineIndicator";
 
 // Hooks
-import { useEffortRewards } from "@/hooks/useEffortRewards";
-import { usePoints } from "@/hooks/usePoints";
+import { useIII } from "@/hooks/useIII";
+import { useLeague } from "@/hooks/useLeague";
 
 // Data
 import { financialEvents, FinancialEvent } from "@/components/data/events";
@@ -49,20 +53,44 @@ const getOrCreateSessionId = () => {
 };
 
 export default function TimelinePage() {
-  // State
+  // =========================================================================
+  // UNIFIED iii TOKEN SYSTEM
+  // =========================================================================
+  const {
+    totalIII,
+    level,
+    levelProgress,
+    iiiToNextLevel,
+    weeklyIII,
+    stats: _stats,
+    earnedBadges,
+    addIII,
+    recordInvestment,
+    recordCoachAdvice,
+    recordMissionComplete,
+    recordStreakClaim,
+    getStreakBonus,
+  } = useIII();
+  
+  // League system
+  const { league, userRank, zone, addXp: addLeagueIII } = useLeague();
+  
+  // =========================================================================
+  // GAME STATE
+  // =========================================================================
+  // Use state for events to trigger re-renders when completed status changes
+  const [events, setEvents] = useState<FinancialEvent[]>(() => 
+    financialEvents.map(e => ({ ...e })) // Create a copy to avoid mutating imported data
+  );
   const [selectedEvent, setSelectedEvent] = useState<FinancialEvent | null>(null);
   const [missionEvent, setMissionEvent] = useState<FinancialEvent | null>(null);
   const [selectedCoach, setSelectedCoach] = useState(aiCoaches[0]);
   const [gameStarted, setGameStarted] = useState(false);
-  const [playerLevel, setPlayerLevel] = useState(1);
-  const [playerXP, setPlayerXP] = useState(0);
-  const [totalScore, setTotalScore] = useState(0);
   const [showSummary, setShowSummary] = useState(false);
   const [summaryDismissed, setSummaryDismissed] = useState(false);
   const summaryTimerRef = useRef<number | null>(null);
   const [completedMissions, setCompletedMissions] = useState<string[]>([]);
   const [competitionUnlocked, setCompetitionUnlocked] = useState(false);
-  const [showRewardsStore, setShowRewardsStore] = useState(false);
   const [showLevelUp, setShowLevelUp] = useState(false);
   const [levelUpInfo, setLevelUpInfo] = useState({ newLevel: 1, previousLevel: 0 });
   const [missionStep, setMissionStep] = useState<"intro" | "decision" | "thesis" | "result" | "whatif" | "quiz">("intro");
@@ -70,55 +98,57 @@ export default function TimelinePage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [missionResult, setMissionResult] = useState<any>(null);
   const [streakDays, setStreakDays] = useState(0);
+  const [streakBonusAvailable, setStreakBonusAvailable] = useState(false);
+  const [_showBadgeModal, setShowBadgeModal] = useState(false);
+  
+  // Compute streak bonus based on current streak days
+  const streakBonus = getStreakBonus(streakDays);
   
   // Random scenario state for post-completion gameplay
   const [randomScenarios, setRandomScenarios] = useState<{ event: FinancialEvent; missionData: MissionData }[]>([]);
   const [completedRandomCount, setCompletedRandomCount] = useState(0);
   
-  // Flybuys-style points system
-  const { 
-    balance: pointsBalance, 
-    earnFromXP, 
-    redeemReward, 
-    canAfford, 
-    meetsTier 
-  } = usePoints();
-  
-  // Effort rewards tracking
-  const {
-    stats: effortStats,
-    earnedRewards,
-    pendingNotifications,
-    recordInvestment,
-    recordCoachAdviceViewed,
-    recordMissionCompleted,
-    clearPendingNotification,
-  } = useEffortRewards();
-  
   // Milestone notification state
   const [showMilestoneModal, setShowMilestoneModal] = useState(false);
-  const [currentMilestoneNotification, setCurrentMilestoneNotification] = useState<typeof pendingNotifications[0] | null>(null);
+  const [currentMilestoneData, setCurrentMilestoneData] = useState<{ type: string; xp: number; name: string } | null>(null);
   
-  // Handle pending notifications (milestones, badges, courage rewards)
-  useEffect(() => {
-    if (pendingNotifications.length > 0 && !showMilestoneModal) {
-      const notification = pendingNotifications[0];
-      setCurrentMilestoneNotification(notification);
-      setShowMilestoneModal(true);
-    }
-  }, [pendingNotifications, showMilestoneModal]);
+  // Track previous badge count to detect new badges
+  const [previousBadgeCount, setPreviousBadgeCount] = useState(0);
+  
+  // Onboarding state
+  const [showWelcome, setShowWelcome] = useState(false);
+  
+  // Save Progress prompt state
+  const [showSaveProgress, setShowSaveProgress] = useState(false);
+  const [lastMissionReward, setLastMissionReward] = useState(0);
 
-  // Load saved progress on mount
+  // =========================================================================
+  // CHECK FOR FIRST-TIME USER & SHOW ONBOARDING
+  // =========================================================================
+  useEffect(() => {
+    const hasSeenWelcome = localStorage.getItem('minifi_seen_welcome');
+    if (!hasSeenWelcome) {
+      // Delay to let page load first
+      const timer = setTimeout(() => setShowWelcome(true), 500);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  const handleWelcomeClose = () => {
+    setShowWelcome(false);
+    localStorage.setItem('minifi_seen_welcome', 'true');
+  };
+
+  // =========================================================================
+  // LOAD SAVED PROGRESS & STREAK
+  // =========================================================================
   useEffect(() => {
     const loadProgress = async () => {
       const savedEmail = localStorage.getItem(USER_EMAIL_KEY);
-      const sessionId = getOrCreateSessionId(); // Create session ID if needed
+      const sessionId = getOrCreateSessionId();
+      const today = new Date().toDateString();
       
-      let dbXP = 0;
-      let dbLevel = 1;
-      let loadedFromDb = false;
-      
-      // Try to load from database first
+      // Try to load streak from database first
       if (savedEmail || sessionId) {
         try {
           const params = new URLSearchParams();
@@ -129,78 +159,131 @@ export default function TimelinePage() {
           const result = await response.json();
           
           if (result.success && result.data) {
-            const data = result.data;
-            if (data.totalXP > 0) {
-              dbXP = data.totalXP;
-              dbLevel = data.playerLevel || Math.floor(data.totalXP / 1000) + 1;
-              loadedFromDb = true;
-            }
+            const dbStreak = result.data.currentStreak || 0;
+            setStreakDays(dbStreak);
+            
+            // Check if bonus was already claimed today
+            const lastClaimDate = result.data.lastClaimDate 
+              ? new Date(result.data.lastClaimDate).toDateString() 
+              : null;
+            const todayClaimed = result.data.todayClaimed || lastClaimDate === today;
+            setStreakBonusAvailable(!todayClaimed && dbStreak > 0);
           }
         } catch {
-          console.log("Falling back to localStorage for game progress");
+          console.log("Falling back to localStorage for streak");
+          loadStreakFromLocal(today);
         }
+      } else {
+        loadStreakFromLocal(today);
       }
+
+      // Note: iii tokens are automatically loaded by useIII hook from localStorage
       
-      // Also check localStorage for completed missions and compare XP
+      // Load completed missions from localStorage
       try {
         const saved = localStorage.getItem(GAME_PROGRESS_KEY);
         if (saved) {
           const progress = JSON.parse(saved);
           if (progress.completedMissions) {
             setCompletedMissions(progress.completedMissions);
-            // Restore completed status on events
-            progress.completedMissions.forEach((title: string) => {
-              const event = financialEvents.find(e => e.title === title);
-              if (event) event.completed = true;
+            // Restore completed status on events using state
+            setEvents(prevEvents => {
+              const updatedEvents = prevEvents.map(event => ({
+                ...event,
+                completed: progress.completedMissions.includes(event.title)
+              }));
+              return updateUnlockStatus(updatedEvents);
             });
-            updateUnlockStatus();
           }
-          
-          // Use higher XP value between DB and localStorage
-          const localXP = progress.playerXP || 0;
-          const localLevel = progress.playerLevel || 1;
-          
-          if (localXP > dbXP) {
-            setPlayerXP(localXP);
-            setTotalScore(localXP);
-            setPlayerLevel(localLevel);
-          } else if (loadedFromDb) {
-            setPlayerXP(dbXP);
-            setTotalScore(dbXP);
-            setPlayerLevel(dbLevel);
-          }
-        } else if (loadedFromDb) {
-          // No local storage, use DB values
-          setPlayerXP(dbXP);
-          setTotalScore(dbXP);
-          setPlayerLevel(dbLevel);
         }
       } catch (e) {
         console.error("Failed to load game progress:", e);
-        // Still apply DB values if available
-        if (loadedFromDb) {
-          setPlayerXP(dbXP);
-          setTotalScore(dbXP);
-          setPlayerLevel(dbLevel);
+      }
+    };
+    
+    // Fallback streak loader from localStorage
+    const loadStreakFromLocal = (today: string) => {
+      try {
+        const STREAK_KEY = "minifi_streak_data";
+        const saved = localStorage.getItem(STREAK_KEY);
+        if (saved) {
+          const data = JSON.parse(saved);
+          const lastClaim = data.lastClaimDate;
+          const yesterday = new Date();
+          yesterday.setDate(yesterday.getDate() - 1);
+          
+          let streak = data.currentStreak || 0;
+          
+          // Update streak logic
+          if (lastClaim !== today) {
+            if (lastClaim === yesterday.toDateString()) {
+              streak += 1;
+            } else if (lastClaim) {
+              streak = 1; // Reset streak
+            } else {
+              streak = 1; // First day
+            }
+            
+            // Update localStorage
+            localStorage.setItem(STREAK_KEY, JSON.stringify({
+              ...data,
+              currentStreak: streak,
+              lastClaimDate: today,
+              todayClaimed: false,
+            }));
+            
+            setStreakBonusAvailable(true);
+          } else {
+            setStreakBonusAvailable(!data.todayClaimed);
+          }
+          
+          setStreakDays(streak);
+        } else {
+          // First time - initialize streak
+          setStreakDays(1);
+          setStreakBonusAvailable(true);
+          localStorage.setItem("minifi_streak_data", JSON.stringify({
+            currentStreak: 1,
+            lastClaimDate: today,
+            todayClaimed: false,
+          }));
         }
+      } catch (e) {
+        console.error("Failed to load streak:", e);
       }
     };
     
     loadProgress();
   }, []);
 
-  // Save progress to localStorage and database when it changes
-  const saveProgress = async (xp: number, level: number, missions: string[]) => {
-    // Save to localStorage
+  // =========================================================================
+  // DETECT NEW BADGES & SHOW CELEBRATION
+  // =========================================================================
+  useEffect(() => {
+    if (earnedBadges.length > previousBadgeCount && previousBadgeCount > 0) {
+      // New badge earned!
+      const newestBadge = earnedBadges[earnedBadges.length - 1];
+      setCurrentMilestoneData({
+        type: 'badge',
+        xp: 0, // Badges don't give extra XP in simplified system
+        name: newestBadge.name,
+      });
+      setShowMilestoneModal(true);
+    }
+    setPreviousBadgeCount(earnedBadges.length);
+  }, [earnedBadges, previousBadgeCount]);
+
+  // =========================================================================
+  // SAVE PROGRESS
+  // =========================================================================
+  const saveProgress = async (missions: string[]) => {
     const progress = {
-      playerXP: xp,
-      playerLevel: level,
       completedMissions: missions,
       lastUpdated: new Date().toISOString(),
     };
     localStorage.setItem(GAME_PROGRESS_KEY, JSON.stringify(progress));
     
-    // Sync to database - always try (will create profile if needed)
+    // Sync to database
     const savedEmail = localStorage.getItem(USER_EMAIL_KEY);
     const sessionId = getOrCreateSessionId();
     
@@ -214,7 +297,7 @@ export default function TimelinePage() {
             email: savedEmail,
             sessionId,
             streakData: {
-              totalXP: xp,
+              totalXP: totalIII, // iii tokens stored as XP in backend
               playerLevel: level,
               completedMissions: missions,
             },
@@ -226,22 +309,26 @@ export default function TimelinePage() {
     }
   };
 
-  const updateUnlockStatus = () => {
-    financialEvents.forEach((event) => {
+  // =========================================================================
+  // UNLOCK LOGIC
+  // =========================================================================
+  const updateUnlockStatus = (currentEvents: FinancialEvent[]) => {
+    return currentEvents.map((event) => {
       if (event.unlockRequirements.length > 0) {
         const allRequirementsMet = event.unlockRequirements.every((requiredYear) => {
-          const requiredEvent = financialEvents.find((e) => e.year === requiredYear);
+          const requiredEvent = currentEvents.find((e) => e.year === requiredYear);
           return requiredEvent?.completed === true;
         });
-        event.unlocked = allRequirementsMet;
+        return { ...event, unlocked: allRequirementsMet };
       }
+      return event;
     });
   };
 
-  const allMissionsCompleted = financialEvents.every((event) => event.completed);
+  const allMissionsCompleted = events.every((event) => event.completed);
 
   useEffect(() => {
-    updateUnlockStatus();
+    setEvents(prevEvents => updateUnlockStatus(prevEvents));
   }, []);
 
   useEffect(() => {
@@ -250,6 +337,7 @@ export default function TimelinePage() {
         setShowSummary(true);
       }, 1000);
     }
+
     return () => {
       if (summaryTimerRef.current) {
         clearTimeout(summaryTimerRef.current);
@@ -258,6 +346,9 @@ export default function TimelinePage() {
     };
   }, [allMissionsCompleted, showSummary, summaryDismissed]);
 
+  // =========================================================================
+  // EVENT HANDLERS
+  // =========================================================================
   const handleEventClick = async (event: FinancialEvent) => {
     if (event.unlocked) {
       setSelectedEvent(event);
@@ -279,24 +370,36 @@ export default function TimelinePage() {
     if (option) {
       setSelectedInvestment(optionId);
 
-      const getCoachAdjustedReturn = (baseReturn: number, coachPersonality: string) => {
-        const adjustmentFactors: Record<string, number> = {
-          "Conservative Coach": 0.8,
-          "Balanced Coach": 1.0,
-          "Aggressive Coach": 1.3,
-          "Income Coach": 0.9,
+      // Calculate coach-adjusted returns based on selected coach
+      const getCoachAdjustedReturn = (
+        baseReturn: number,
+        coachPersonality: string
+      ) => {
+        const adjustmentFactors = {
+          "Conservative Coach": 0.8, // More conservative, reduce extreme losses/gains
+          "Balanced Coach": 1.0, // No adjustment, balanced approach
+          "Aggressive Coach": 1.3, // More aggressive, amplify returns
+          "Income Coach": 0.9, // Slightly conservative, focus on stability
         };
-        const factor = adjustmentFactors[coachPersonality] || 1.0;
-        const randomFactor = 0.9 + Math.random() * 0.2;
+        const factor =
+          adjustmentFactors[
+            coachPersonality as keyof typeof adjustmentFactors
+          ] || 1.0;
+        // Apply adjustment with some randomness
+        const randomFactor = 0.9 + Math.random() * 0.2; // 0.9 to 1.1
         const adjustedReturn = baseReturn * factor * randomFactor;
+        // Ensure returns stay within reasonable bounds
         return Math.max(-0.8, Math.min(2.0, adjustedReturn));
       };
 
-      const adjustedReturn = getCoachAdjustedReturn(option.actualReturn, selectedCoach.personality);
+      const adjustedReturn = getCoachAdjustedReturn(
+        option.actualReturn,
+        selectedCoach.personality
+      );
       const finalAmount = 10000 * (1 + adjustedReturn);
       const performance = adjustedReturn > 0 ? "profit" : "loss";
       
-      // Track investment for effort rewards
+      // Track investment and earn XP via unified system
       const riskLevel = option.risk.toLowerCase();
       const assetClass = option.assetClass || "equities";
       const wasLoss = performance === "loss";
@@ -313,30 +416,30 @@ export default function TimelinePage() {
     }
   };
   
-  // Track coach selection for exploration rewards
+  // Track coach selection
   const handleCoachSelect = (coach: typeof aiCoaches[0]) => {
     setSelectedCoach(coach);
-    recordCoachAdviceViewed(coach.id);
+    recordCoachAdvice(coach.id);
   };
 
   const completeMission = () => {
     if (missionEvent && missionResult) {
       const missionReward = missionEvent.reward;
-      const newXP = playerXP + missionReward;
       const newMissions = [...completedMissions, missionEvent.title];
 
-      setPlayerXP(newXP);
-      setTotalScore(newXP);
-      setCompletedMissions(newMissions);
+      // Use unified iii token system
+      const iiiEarned = recordMissionComplete(missionEvent.title, missionReward);
+      addLeagueIII(iiiEarned); // Also update league weekly iii
       
-      // Record mission completion for effort rewards
-      recordMissionCompleted();
+      // Track the reward for the save progress modal
+      setLastMissionReward(iiiEarned);
+      
+      setCompletedMissions(newMissions);
 
       // Check if this is a random scenario
       const isRandomScenario = randomScenarios.some(s => s.event.title === missionEvent.title);
       
       if (isRandomScenario) {
-        // Mark the random scenario as completed
         setRandomScenarios(prev => 
           prev.map(s => 
             s.event.title === missionEvent.title 
@@ -346,114 +449,97 @@ export default function TimelinePage() {
         );
         setCompletedRandomCount(prev => prev + 1);
       } else {
-        // Handle predefined missions
-        const eventIndex = financialEvents.findIndex((e) => e.year === missionEvent.year);
-        if (eventIndex !== -1) {
-          financialEvents[eventIndex].completed = true;
-          updateUnlockStatus();
-        }
+        // Update events state to mark mission as completed
+        setEvents(prevEvents => {
+          const updatedEvents = prevEvents.map(event => 
+            event.year === missionEvent.year 
+              ? { ...event, completed: true }
+              : event
+          );
+          return updateUnlockStatus(updatedEvents);
+        });
       }
 
-      const newLevel = Math.floor(newXP / 1000) + 1;
-      if (newLevel > playerLevel) {
-        setLevelUpInfo({ newLevel, previousLevel: playerLevel });
-        setPlayerLevel(newLevel);
+      // Check for level up
+      const newLevel = Math.floor(totalIII / 1000) + 1;
+      if (newLevel > level) {
+        setLevelUpInfo({ newLevel, previousLevel: level });
         setTimeout(() => setShowLevelUp(true), 500);
-        // Save with new level
-        saveProgress(newXP, newLevel, newMissions);
-      } else {
-        // Save with current level
-        saveProgress(newXP, playerLevel, newMissions);
       }
+      
+      // Save progress
+      saveProgress(newMissions);
 
       if (missionEvent.year === 2025 && missionEvent.title === "Current Challenges") {
         setCompetitionUnlocked(true);
       }
 
       closeMissionModal();
+      
+      // Show save progress modal if user hasn't saved yet
+      // Show after every mission completion (1st, 3rd, 5th, etc.) until they save
+      const savedEmail = localStorage.getItem(USER_EMAIL_KEY);
+      const savePromptDismissed = localStorage.getItem('minifi_save_prompt_dismissed');
+      const shouldShowSavePrompt = !savedEmail && !savePromptDismissed && 
+        (newMissions.length === 1 || newMissions.length === 3 || newMissions.length % 2 === 1);
+      
+      if (shouldShowSavePrompt) {
+        // Delay to let level up animation show first if triggered
+        const delay = newLevel > level ? 2500 : 1000;
+        setTimeout(() => setShowSaveProgress(true), delay);
+      }
     }
   };
 
   const startCompetition = () => {
+    // Navigate to competition page using Next.js router
     window.location.href = "/competition";
   };
 
-  const handleXpEarned = (amount: number, source?: string) => {
-    const newXP = playerXP + amount;
-    setPlayerXP(newXP);
-    setTotalScore(newXP);
+  const handleIIIEarned = (amount: number, source?: string) => {
+    addIII(amount, source || 'bonus', source);
+    addLeagueIII(amount);
     
-    const newLevel = Math.floor(newXP / 1000) + 1;
-    if (newLevel > playerLevel) {
-      setPlayerLevel(newLevel);
-      // Earn level up bonus points
-      earnFromXP(newLevel, "level_up");
+    // Check for level up
+    const newLevel = Math.floor((totalIII + amount) / 1000) + 1;
+    if (newLevel > level) {
+      setLevelUpInfo({ newLevel, previousLevel: level });
+      setTimeout(() => setShowLevelUp(true), 500);
     }
-    
-    // Earn Flybuys-style points based on source
-    if (source === "mission_complete") {
-      earnFromXP(amount, "mission_complete");
-    } else if (source === "savings_interest") {
-      earnFromXP(amount, "savings_interest");
-    } else if (source === "daily_streak") {
-      earnFromXP(amount, "daily_streak");
-    }
-    
-    // Save progress
-    saveProgress(newXP, Math.max(newLevel, playerLevel), completedMissions);
   };
 
-  const handleStreakBonus = (bonus: number, days?: number) => {
-    const newXP = playerXP + bonus;
-    setPlayerXP(newXP);
-    setTotalScore(newXP);
-    if (days) {
-      setStreakDays(days);
+  // Handle claiming daily streak bonus
+  const handleClaimStreak = () => {
+    if (!streakBonusAvailable) return;
+    
+    const bonus = getStreakBonus(streakDays);
+    recordStreakClaim(streakDays);
+    addLeagueIII(bonus);
+    setStreakBonusAvailable(false);
+    
+    // Sync with server
+    const savedEmail = localStorage.getItem(USER_EMAIL_KEY);
+    const sessionId = getOrCreateSessionId();
+    if (savedEmail || sessionId) {
+      fetch('/api/streak', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'claim',
+          email: savedEmail,
+          sessionId,
+        }),
+      }).catch(() => console.log("Failed to sync claim"));
     }
-    
-    const newLevel = Math.floor(newXP / 1000) + 1;
-    if (newLevel > playerLevel) {
-      setPlayerLevel(newLevel);
+  };
+  
+  // Handle milestone iii token claim
+  const handleMilestoneIIIClaim = (iii: number) => {
+    if (iii > 0) {
+      handleIIIEarned(iii, 'milestone');
     }
-    
-    // Save progress
-    saveProgress(newXP, Math.max(newLevel, playerLevel), completedMissions);
-  };
-  
-  // Savings vault handlers
-  const handleSavingsDeposit = (amount: number) => {
-    // Deduct from available XP (XP moves to savings)
-    const newXP = playerXP - amount;
-    setPlayerXP(newXP);
-    setTotalScore(newXP);
-    saveProgress(newXP, playerLevel, completedMissions);
-  };
-  
-  const handleSavingsWithdraw = (amount: number) => {
-    // Add back to available XP
-    const newXP = playerXP + amount;
-    setPlayerXP(newXP);
-    setTotalScore(newXP);
-    
-    const newLevel = Math.floor(newXP / 1000) + 1;
-    if (newLevel > playerLevel) {
-      setPlayerLevel(newLevel);
-    }
-    
-    saveProgress(newXP, Math.max(newLevel, playerLevel), completedMissions);
-  };
-  
-  const handleSavingsInterest = (amount: number) => {
-    // Interest is "free" XP earned from saving
-    handleXpEarned(amount, "savings_interest");
-  };
-  
-  // Handle milestone XP claim
-  const handleMilestoneXpClaim = (xp: number) => {
-    handleXpEarned(xp);
-    clearPendingNotification();
     setShowMilestoneModal(false);
-    setCurrentMilestoneNotification(null);
+    setCurrentMilestoneData(null);
   };
 
   const closeMissionModal = () => {
@@ -463,18 +549,51 @@ export default function TimelinePage() {
     setSelectedInvestment(null);
     setMissionResult(null);
   };
+  
+  // Handle saving progress via email
+  const handleSaveProgress = async (email: string): Promise<boolean> => {
+    try {
+      const sessionId = getOrCreateSessionId();
+      const response = await fetch('/api/streak', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'signup',
+          email,
+          streakData: {
+            currentStreak: streakDays,
+            totalXP: totalIII,
+            sessionId,
+          },
+        }),
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        // Save email to localStorage
+        localStorage.setItem(USER_EMAIL_KEY, email);
+        // Give bonus iii for saving
+        addIII(50, 'save_progress', '🎁 Progress saved bonus!');
+        addLeagueIII(50);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Failed to save progress:', error);
+      return false;
+    }
+  };
 
-  // Get mission data - check random scenarios first, then predefined
+  // Get mission data
   const getCurrentMissionData = (): MissionData | null => {
     if (!missionEvent) return null;
     
-    // Check if this is a random scenario
     const randomScenario = randomScenarios.find(s => s.event.title === missionEvent.title);
     if (randomScenario) {
       return randomScenario.missionData;
     }
     
-    // Fall back to predefined mission data
     return missionData[missionEvent.year as keyof typeof missionData] || null;
   };
   
@@ -495,31 +614,38 @@ export default function TimelinePage() {
     setMissionStep("intro");
   };
 
-  const completedCount = financialEvents.filter((e) => e.completed).length;
-  const availableCount = financialEvents.filter((e) => e.unlocked && !e.completed).length;
-
   return (
-    <div className="min-h-screen w-full bg-gradient-to-b from-indigo-50 via-white to-violet-50 overflow-x-hidden">
-      {/* Fun background blobs - Full viewport coverage */}
+    <div className="min-h-screen w-full page-bg overflow-x-hidden">
+      {/* Background - Theme-aware with Teen Tech Purple */}
       <div className="fixed inset-0 w-screen h-screen pointer-events-none overflow-hidden">
-        <div className="absolute top-20 right-4 sm:right-20 w-48 sm:w-64 h-48 sm:h-64 bg-indigo-200/30 rounded-full blur-3xl" />
-        <div className="absolute bottom-40 left-0 sm:left-10 w-64 sm:w-80 h-64 sm:h-80 bg-violet-200/30 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 right-1/4 sm:right-1/3 w-40 sm:w-48 h-40 sm:h-48 bg-purple-200/20 rounded-full blur-3xl" />
+        {/* Dark mode background */}
+        <div className="dark:block hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#9898f2]/15 via-transparent to-transparent" />
+          <div className="absolute bottom-0 left-0 right-0 h-[500px] bg-gradient-to-t from-purple-950/20 to-transparent" />
+          <div className="absolute top-1/4 left-4 sm:left-1/4 w-64 sm:w-96 h-64 sm:h-96 bg-[#9898f2]/10 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-1/4 right-4 sm:right-1/4 w-56 sm:w-80 h-56 sm:h-80 bg-emerald-500/10 rounded-full blur-3xl animate-pulse delay-1000" />
+        </div>
+        {/* Light mode background */}
+        <div className="dark:hidden block">
+          <div className="absolute top-20 right-4 sm:right-20 w-48 sm:w-64 h-48 sm:h-64 bg-[#9898f2]/20 rounded-full blur-3xl" />
+          <div className="absolute bottom-40 left-0 sm:left-10 w-64 sm:w-80 h-64 sm:h-80 bg-emerald-200/30 rounded-full blur-3xl" />
+          <div className="absolute top-1/2 right-1/4 sm:right-1/3 w-40 sm:w-48 h-40 sm:h-48 bg-[#9898f2]/15 rounded-full blur-3xl" />
+        </div>
       </div>
       
       <div className="relative w-full">
         <GameHeader
-          playerLevel={playerLevel}
-          playerXP={playerXP}
-          totalScore={totalScore}
-          onRewardsClick={() => setShowRewardsStore(true)}
+          playerLevel={level}
+          playerXP={totalIII}
+          weeklyXP={weeklyIII}
         />
 
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-8">
-          <div className="grid lg:grid-cols-4 gap-6 lg:gap-8">
+        <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-8">
+          <GameErrorBoundary>
+            <div className="grid lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
             
-            {/* Sidebar - All Features */}
-            <div className="lg:col-span-1 space-y-5">
+            {/* Sidebar - Coach appears FIRST on mobile, then stats */}
+            <div className="lg:col-span-1 space-y-4 sm:space-y-5 order-1 lg:order-1">
               
               {/* Coach Selection */}
               <CoachSidebar
@@ -528,150 +654,111 @@ export default function TimelinePage() {
                 onCoachSelect={handleCoachSelect}
               />
 
-              {/* Daily Streak */}
-              <DailyStreak onBonusClaimed={handleStreakBonus} />
-              
-              {/* Savings Vault - Teach saving habits */}
-              <SavingsVault
-                availableXP={playerXP}
+              {/* Consolidated iii Dashboard */}
+              <IIIDashboard
+                totalIII={totalIII}
+                level={level}
+                levelProgress={levelProgress}
+                iiiToNextLevel={iiiToNextLevel}
+                weeklyIII={weeklyIII}
+                league={league}
+                leagueRank={userRank}
+                leagueZone={zone}
                 streakDays={streakDays}
-                onDeposit={handleSavingsDeposit}
-                onWithdraw={handleSavingsWithdraw}
-                onInterestEarned={handleSavingsInterest}
-              />
-              
-              {/* Effort Badges */}
-              <BadgeDisplay
-                earnedBadgeIds={earnedRewards.filter(r => r.type === "badge").map(r => r.data.id)}
-                earnedMilestoneIds={earnedRewards.filter(r => r.type === "milestone").map(r => r.data.id)}
-                stats={{
-                  missionsCompleted: effortStats.missionsCompleted,
-                  differentRiskLevelsTried: effortStats.differentRiskLevelsTried.size,
-                  differentAssetClassesTried: effortStats.differentAssetClassesTried.size,
-                  coachesUsed: effortStats.coachesUsed.size,
-                  lossesExperienced: effortStats.lossesExperienced,
-                  investmentsAfterLoss: effortStats.investmentsAfterLoss,
-                  investmentsMade: effortStats.investmentsMade,
-                }}
-                compact={true}
+                streakBonusAvailable={streakBonusAvailable}
+                streakBonus={streakBonus}
+                onClaimStreak={handleClaimStreak}
+                badgeCount={earnedBadges.length}
+                onViewLeague={() => setShowBadgeModal(true)}
+                onViewBadges={() => setShowBadgeModal(true)}
               />
 
-              {/* Investor Journey - Narrative Progression */}
-              <InvestorJourney
-                stats={{
-                  missionsCompleted: completedMissions.length,
-                  totalXp: playerXP,
-                  badgesEarned: earnedRewards.filter(r => r.type === "badge").length,
-                  assetClassesExplored: effortStats.differentAssetClassesTried.size,
-                  coachesUsed: effortStats.coachesUsed.size,
-                  quizScore: 0, // TODO: Track quiz scores
-                }}
-                onStageRewardClaim={(stage) => handleXpEarned(stage.rewards.xpBonus, `${stage.title} reward`)}
-                compact={true}
-              />
+              {/* Daily Wisdom & Library - DESKTOP ONLY (hidden on mobile) */}
+              <div className="hidden lg:block space-y-4">
+                <DailyWisdom compact showControls={false} />
 
-              {/* Progress Card */}
-              <div className="p-5 rounded-2xl bg-white shadow-xl shadow-indigo-100 border border-indigo-100">
-                <h3 className="text-sm font-semibold text-gray-500 mb-4 flex items-center gap-2">
-                  <Trophy className="h-4 w-4 text-amber-500" />
-                  Your Progress
-                </h3>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-500 text-sm">Missions</span>
-                    <span className="font-bold text-gray-900">
-                      {completedCount} / {financialEvents.length}
-                    </span>
-                  </div>
-                  {/* Progress bar */}
-                  <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full transition-all duration-500"
-                      style={{ width: `${(completedCount / financialEvents.length) * 100}%` }}
-                    />
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-500 text-sm">Available</span>
-                    <span className="font-bold text-indigo-600">{availableCount} 🎮</span>
-                  </div>
-                  <div className="h-px bg-gray-100" />
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-500 text-sm">Total XP</span>
-                    <span className="font-bold text-violet-600">{playerXP.toLocaleString()} ⭐</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Upcoming Features Teaser */}
-              <div className="p-5 rounded-2xl bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200 shadow-lg shadow-purple-100">
-                <h3 className="text-sm font-semibold text-purple-700 mb-3 flex items-center gap-2">
-                  <Zap className="h-4 w-4" />
-                  Coming Soon 🚀
-                </h3>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 p-2 bg-white/60 rounded-lg border border-purple-100">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-400 to-blue-500 flex items-center justify-center text-white text-sm">📈</div>
-                    <div className="flex-1">
-                      <p className="text-xs font-semibold text-gray-800">Asset Mastery</p>
-                      <p className="text-[10px] text-gray-500">Track your skills</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 p-2 bg-white/60 rounded-lg border border-purple-100">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white text-sm">🏆</div>
-                    <div className="flex-1">
-                      <p className="text-xs font-semibold text-gray-800">Certifications</p>
-                      <p className="text-[10px] text-gray-500">Earn badges</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 p-2 bg-white/60 rounded-lg border border-purple-100">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white text-sm">👥</div>
-                    <div className="flex-1">
-                      <p className="text-xs font-semibold text-gray-800">Multiplayer</p>
-                      <p className="text-[10px] text-gray-500">Challenge friends</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Daily Wisdom - Compact */}
-              <DailyWisdom compact showControls={false} />
-
-              {/* Wisdom Library Link */}
-              <Link href="/library">
-                <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 shadow-lg shadow-amber-100 hover:shadow-xl hover:shadow-amber-200 hover:-translate-y-1 transition-all cursor-pointer">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
-                        <BookOpen className="h-5 w-5 text-white" />
+                <Link href="/library">
+                  <div className="group p-4 rounded-2xl 
+                    bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 
+                    dark:from-amber-500/10 dark:via-orange-500/10 dark:to-yellow-500/5
+                    border border-amber-200 dark:border-amber-500/30 
+                    hover:border-amber-300 dark:hover:border-amber-500/50 
+                    hover:shadow-lg hover:shadow-amber-200/30 dark:hover:shadow-amber-500/10
+                    hover:-translate-y-1 transition-all cursor-pointer">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-400/30">
+                          <BookOpen className="h-5 w-5 text-white" />
+                        </div>
+                        <div>
+                          <p className="font-bold text-amber-900 dark:text-white text-sm group-hover:text-amber-700 dark:group-hover:text-amber-300 transition-colors">
+                            Wealth Library 📚
+                          </p>
+                          <p className="text-xs text-amber-700/70 dark:text-amber-300/60">
+                            Learn from the greats
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-semibold text-gray-900 text-sm">Wealth Library 📚</p>
-                        <p className="text-xs text-gray-500">Learn from the greats</p>
+                      <div className="p-2 rounded-lg bg-amber-100 dark:bg-amber-500/20 group-hover:bg-amber-200 dark:group-hover:bg-amber-500/30 transition-colors">
+                        <ChevronRight className="h-4 w-4 text-amber-600 dark:text-amber-400" />
                       </div>
                     </div>
-                    <ChevronRight className="h-5 w-5 text-amber-500" />
                   </div>
-                </div>
-              </Link>
+                </Link>
+              </div>
             </div>
 
-            {/* Timeline - Main Content */}
-            <div className="lg:col-span-3">
-              <TimelineSection
-                events={financialEvents}
+            {/* Journey Hub - Main Content - Appears after coach on mobile */}
+            <div className="lg:col-span-3 order-2 lg:order-2">
+              <JourneyHub
+                events={events}
                 competitionUnlocked={competitionUnlocked}
                 onEventClick={handleEventClick}
                 onStartCompetition={startCompetition}
                 randomScenarios={randomScenarios}
                 completedRandomCount={completedRandomCount}
                 onGenerateRandomScenario={startRandomMission}
+                streakDays={streakDays}
               />
+              
+              {/* Daily Wisdom & Library - MOBILE ONLY (after game cards) */}
+              <div className="lg:hidden space-y-4 mt-6">
+                <DailyWisdom compact showControls={false} />
+
+                <Link href="/library">
+                  <div className="group p-3 sm:p-4 rounded-xl sm:rounded-2xl 
+                    bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 
+                    dark:from-amber-500/10 dark:via-orange-500/10 dark:to-yellow-500/5
+                    border border-amber-200 dark:border-amber-500/30 
+                    active:scale-[0.98] transition-all cursor-pointer touch-manipulation">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-400/30">
+                          <BookOpen className="h-5 w-5 text-white" />
+                        </div>
+                        <div>
+                          <p className="font-bold text-amber-900 dark:text-white text-sm">
+                            Wealth Library 📚
+                          </p>
+                          <p className="text-xs text-amber-700/70 dark:text-amber-300/60">
+                            Learn from the greats
+                          </p>
+                        </div>
+                      </div>
+                      <div className="p-2 rounded-lg bg-amber-100 dark:bg-amber-500/20">
+                        <ChevronRight className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              </div>
             </div>
-          </div>
+            </div>
+          </GameErrorBoundary>
         </div>
 
         {/* Footer */}
-        <footer className="mt-12 w-full border-t border-gray-100 bg-white/50 backdrop-blur">
+        <footer className="mt-12 w-full border-t border-slate-200 dark:border-white/10 bg-white/80 dark:bg-black/40">
           <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-8">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-3">
@@ -682,27 +769,25 @@ export default function TimelinePage() {
                   height={32}
                   className="rounded-lg"
                 />
-                <span className="text-sm text-gray-500">
-                  Made with 💜 by{" "}
-                  <a href="https://nuvc.ai" target="_blank" rel="noopener noreferrer" className="text-indigo-500 hover:underline font-medium">
+                <span className="text-sm text-slate-500 dark:text-white/60">
+                  Made with 💚 by{" "}
+                  <a href="https://nuvc.ai" target="_blank" rel="noopener noreferrer" className="text-emerald-600 dark:text-emerald-400 hover:underline font-medium">
                     NUVC.AI
                   </a>
                 </span>
               </div>
-              <div className="flex items-center gap-6 text-sm text-gray-500">
-                <Link href="/" className="hover:text-indigo-600 transition-colors">Home</Link>
-                <Link href="/library" className="hover:text-indigo-600 transition-colors">Library</Link>
-                <Link href="/support" className="hover:text-indigo-600 transition-colors">Support</Link>
-                <a href="https://github.com/nuvcai/MiniFi" target="_blank" rel="noopener noreferrer" className="hover:text-indigo-600 transition-colors">
-                  GitHub
-                </a>
+              <div className="flex items-center gap-6 text-sm text-slate-500 dark:text-white/60">
+                <Link href="/" className="hover:text-slate-900 dark:hover:text-white transition-colors">Home</Link>
+                <Link href="/library" className="hover:text-slate-900 dark:hover:text-white transition-colors">Library</Link>
+                <Link href="/leaderboard" className="hover:text-slate-900 dark:hover:text-white transition-colors">Leaderboard</Link>
+                <Link href="/profile" className="hover:text-slate-900 dark:hover:text-white transition-colors">Profile</Link>
               </div>
             </div>
           </div>
         </footer>
       </div>
 
-      {/* Modals */}
+      {/* Event Detail Modal */}
       <EventDetailModal
         event={selectedEvent}
         selectedCoach={selectedCoach}
@@ -710,6 +795,7 @@ export default function TimelinePage() {
         onStartMission={() => selectedEvent && startMission(selectedEvent)}
       />
 
+      {/* Mission Modal */}
       <MissionModal
         open={gameStarted}
         event={missionEvent}
@@ -719,35 +805,27 @@ export default function TimelinePage() {
         selectedInvestment={selectedInvestment}
         missionResult={missionResult}
         simulationResult={null}
-        playerLevel={playerLevel}
+        playerLevel={level}
         completedMissions={completedMissions}
         onClose={closeMissionModal}
         onStepChange={setMissionStep}
         onInvestmentSelect={setSelectedInvestment}
         onInvestmentConfirm={makeInvestment}
         onMissionComplete={completeMission}
-        onXpEarned={handleXpEarned}
+        onXpEarned={handleIIIEarned}
       />
 
+      {/* Summary Modal */}
       <SummaryModal
         open={showSummary}
-        playerXP={playerXP}
-        totalScore={totalScore}
-        events={financialEvents}
+        playerXP={totalIII}
+        totalScore={totalIII}
+        events={events}
         onClose={() => {
           setShowSummary(false);
           setSummaryDismissed(true);
         }}
         onRestart={() => window.location.reload()}
-      />
-
-      <RewardsStore
-        open={showRewardsStore}
-        onOpenChange={setShowRewardsStore}
-        balance={pointsBalance}
-        onRedeem={redeemReward}
-        canAfford={canAfford}
-        meetsTier={meetsTier}
       />
 
       <LevelUpCelebration
@@ -757,18 +835,52 @@ export default function TimelinePage() {
         onClose={() => setShowLevelUp(false)}
       />
       
-      {/* Milestone Achievement Modal */}
+      {/* Badge/Milestone Achievement Modal */}
       <MilestoneAchievement
         open={showMilestoneModal}
-        milestone={currentMilestoneNotification?.type === "milestone" ? currentMilestoneNotification.data as any : undefined}
-        courageReward={currentMilestoneNotification?.type === "courage" ? currentMilestoneNotification.data as any : undefined}
+        milestone={currentMilestoneData?.type === 'milestone' ? {
+          id: 'milestone',
+          name: currentMilestoneData.name,
+          description: 'Achievement unlocked!',
+          xpReward: currentMilestoneData.xp,
+          requirement: 0,
+          type: 'missions_attempted' as const,
+        } : undefined}
+        courageReward={currentMilestoneData?.type === 'badge' ? {
+          id: 'badge',
+          name: currentMilestoneData.name,
+          description: 'Badge earned!',
+          xpReward: 0,
+          trigger: 'badge',
+          emoji: '🏆',
+        } : undefined}
         onClose={() => {
-          clearPendingNotification();
           setShowMilestoneModal(false);
-          setCurrentMilestoneNotification(null);
+          setCurrentMilestoneData(null);
         }}
-        onXpClaimed={handleMilestoneXpClaim}
+        onXpClaimed={handleMilestoneIIIClaim}
       />
+      
+      {/* Welcome Onboarding Modal */}
+      <WelcomeModal
+        open={showWelcome}
+        onClose={handleWelcomeClose}
+        onStartPlaying={handleWelcomeClose}
+      />
+      
+      {/* Save Progress Modal - Shows after mission completion */}
+      <SaveProgressModal
+        open={showSaveProgress}
+        onClose={() => setShowSaveProgress(false)}
+        onSave={handleSaveProgress}
+        currentIII={totalIII}
+        completedMissions={completedMissions.length}
+        streakDays={streakDays}
+        lastMissionReward={lastMissionReward}
+      />
+      
+      {/* Offline Status Indicator */}
+      <OfflineIndicator />
       
     </div>
   );

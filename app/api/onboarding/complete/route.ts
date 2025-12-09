@@ -1,16 +1,20 @@
 /**
  * Onboarding Completion API Endpoint
  * Stores user profile in Supabase and syncs with marketing systems
+ * Also awards welcome bonus III tokens
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { userProfilesService, isSupabaseConfigured } from '@/lib/supabase';
+import { userProfilesService, rewardsService, isSupabaseConfigured } from '@/lib/supabase';
 import { loopsHelpers } from '@/lib/loops';
 import { MARKETING_EVENTS } from '@/components/data/marketingData';
 
+// Welcome bonus III tokens
+const WELCOME_BONUS_III = 100;
+
 interface OnboardingPayload {
   // Core profile
-  ageRange: "12-14" | "15-16" | "17-18";
+  ageRange: "12-14" | "15-16" | "17-18" | "19-24" | "25+";
   country: string;
   
   // Financial background
@@ -48,6 +52,7 @@ interface OnboardingPayload {
   // Optional email (if collected)
   email?: string;
   firstName?: string;
+  adventureName?: string;  // Player's adventure name
 }
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
@@ -148,7 +153,41 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const userSegment = determineUserSegment(body);
 
     // ==========================================================================
-    // 4. WHATSAPP NOTIFICATION (Admin Alert)
+    // 4. AWARD WELCOME BONUS III TOKENS
+    // ==========================================================================
+    let welcomeBonusAwarded = false;
+    if (body.sessionId) {
+      try {
+        const rewardsResult = await rewardsService.addIII({
+          sessionId: body.sessionId,
+          email: body.email,
+          amount: WELCOME_BONUS_III,
+          transactionType: 'welcome_bonus',
+          description: 'Welcome bonus for completing onboarding!',
+        });
+        welcomeBonusAwarded = rewardsResult.success;
+        
+        // Update adventure name if provided
+        if (body.adventureName) {
+          await rewardsService.syncFromLocalStorage(body.sessionId, {
+            email: body.email,
+            adventureName: body.adventureName,
+            totalIII: WELCOME_BONUS_III,
+            weeklyIII: WELCOME_BONUS_III,
+            stakedIII: 0,
+            earnedBadgeIds: [],
+            progress: {},
+          });
+        }
+        
+        console.log('✅ Welcome bonus III awarded:', WELCOME_BONUS_III);
+      } catch (rewardsError) {
+        console.warn('⚠️ Welcome bonus award failed:', rewardsError);
+      }
+    }
+
+    // ==========================================================================
+    // 5. WHATSAPP NOTIFICATION (Admin Alert)
     // ==========================================================================
     try {
       const { whatsappNotify } = await import('@/lib/marketing-stack');
@@ -173,7 +212,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         userSegment,
         riskPersonality: body.riskPersonality,
         selectedCoach: body.selectedCoach,
-        profileId: profileResult.data?.id
+        profileId: profileResult.data?.id,
+        welcomeBonus: welcomeBonusAwarded ? WELCOME_BONUS_III : 0,
+        adventureName: body.adventureName,
       }
     });
 
@@ -192,7 +233,9 @@ function determineUserSegment(data: OnboardingPayload): string {
   const ageSegments: Record<string, string> = {
     '12-14': 'teens_early',
     '15-16': 'teens_mid',
-    '17-18': 'teens_late'
+    '17-18': 'teens_late',
+    '19-24': 'young_adult',
+    '25+': 'adult'
   };
   
   // Risk-based modifier
@@ -200,7 +243,7 @@ function determineUserSegment(data: OnboardingPayload): string {
                        data.riskScore >= 40 ? 'moderate_risk' : 
                        'conservative';
   
-  return `${ageSegments[data.ageRange]}_${riskModifier}`;
+  return `${ageSegments[data.ageRange] || 'unknown'}_${riskModifier}`;
 }
 
 

@@ -1,22 +1,3 @@
-"""
-╔══════════════════════════════════════════════════════════════════════════════╗
-║                                                                              ║
-║   MiniFi - Financial Literacy Platform                                       ║
-║   MVP Version for AWS AI Hackathon 2025                                      ║
-║                                                                              ║
-║   ✨ VIBE-CODED BY TICK.AI ✨                                                ║
-║                                                                              ║
-║   Copyright (c) 2025 NUVC.AI / Tick.AI. All Rights Reserved.                ║
-║   PROPRIETARY - NO COMMERCIAL USE WITHOUT LICENSE                            ║
-║                                                                              ║
-║   https://nuvc.ai | legal@nuvc.ai                                           ║
-║   Built with Amazon Q Developer & Kiro CLI                                   ║
-║                                                                              ║
-╚══════════════════════════════════════════════════════════════════════════════╝
-"""
-
-from contextlib import asynccontextmanager
-import logging
 from services.investment_metrics_service import InvestmentMetricsService
 from services.leaderboard_service import LeaderboardService
 from services.coach_service import CoachService
@@ -27,11 +8,6 @@ from services.simulation_service import SimulationService
 from services.price_service import PriceService
 from services.coach_chat import CoachChatService
 from services.email_service import EmailService
-from services.newsletter_service import (
-    newsletter_service, 
-    cron_weekly_newsletter, 
-    cron_reengagement_check
-)
 from models import (
     PriceRequest, SimulationRequest, OptimizationRequest,
     RebalanceRequest, YieldSimRequest, CoachRequest, CoachResponse,
@@ -53,13 +29,6 @@ import os
 import uuid
 from functools import lru_cache
 from dotenv import load_dotenv
-
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO if os.getenv("DEBUG") != "true" else logging.DEBUG,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
 
 
 # Load environment variables from .env file
@@ -92,40 +61,23 @@ def safe_json_serializer(obj):
     return obj
 
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    """Application lifespan manager - replaces deprecated on_event handlers"""
-    # Startup
-    logger.info("🚀 Starting MiniFi API server...")
-    init_db()
-    logger.info("✅ Database initialized")
-    yield
-    # Shutdown
-    logger.info("👋 Shutting down MiniFi API server...")
-
 app = FastAPI(
     title="NUVC Financial Literacy API",
     description="AI-Powered Investment Education Platform for Australian Teenagers",
-    version="1.0.0",
-    lifespan=lifespan
+    version="1.0.0"
 )
 
-# Request ID and Copyright tracking middleware
+# Request ID tracking middleware
 @app.middleware("http")
-async def add_request_headers(request: Request, call_next):
+async def add_request_id(request: Request, call_next):
     request_id = str(uuid.uuid4())
     request.state.request_id = request_id
     response = await call_next(request)
-    # Request tracking
     response.headers["X-Request-ID"] = request_id
-    # NUVC.AI Copyright watermark
-    response.headers["X-Powered-By"] = "MiniFi MVP - Vibe-coded by Tick.AI"
-    response.headers["X-Copyright"] = "(c) 2025 NUVC.AI / Tick.AI. All Rights Reserved."
-    response.headers["X-Version"] = "MVP - AWS AI Hackathon 2025"
-    response.headers["X-License"] = "Proprietary - No Commercial Use Without License"
     return response
 
 # CORS middleware for frontend integration
+<<<<<<< HEAD
 # Note: In production, restrict to specific domains only
 ALLOWED_ORIGINS = [
     "https://minifi-app.vercel.app",  # Primary production
@@ -147,8 +99,20 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
     allow_origin_regex=r"https://.*\.(vercel\.app|minifi\.games)",  # Allow all Vercel preview deployments and minifi.games subdomains
+=======
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",
+        "http://localhost:8501",  # React + Streamlit
+        # Vercel production (old)
+        "https://next-gen-ai-hackathon-2025.vercel.app",
+        "https://nextgen-ai-nuvc.vercel.app",  # Vercel production (new)
+        "https://*.vercel.app",  # All Vercel subdomains
+    ],
+>>>>>>> 5aef7d17f05bbd153335b11d7293d95085a3fa51
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
@@ -197,6 +161,13 @@ ID_TO_SYMBOL = {
 }
 
 
+# Initialize database
+
+
+@app.on_event("startup")
+async def startup_event():
+    init_db()
+
 # Root path
 
 
@@ -242,14 +213,12 @@ async def health_check(db: sqlite3.Connection = Depends(get_db)):
         cursor = db.cursor()
         cursor.execute("SELECT 1")
         health_status["services"]["database"] = "connected"
-    except Exception as db_error:
-        logger.error(f"Database health check failed: {db_error}")
+    except:
         health_status["services"]["database"] = "disconnected"
         health_status["status"] = "degraded"
     
     # Check OpenAI
-    openai_key = os.getenv("OPENAI_API_KEY")
-    if openai_key and len(openai_key) > 10:
+    if os.getenv("OPENAI_API_KEY"):
         health_status["services"]["openai"] = "configured"
     else:
         health_status["services"]["openai"] = "missing"
@@ -567,13 +536,11 @@ def get_quotes(request: Request, ids: List[str] = Query(None)):
         raw = request.query_params.get("ids", "")
         ids = [x for x in raw.split(",") if x] if raw else []
 
-    # Validate and filter to allowed tickers only
-    valid_ids = [i.lower().strip() for i in ids if i.lower().strip() in ID_TO_SYMBOL]
-    syms = {i: ID_TO_SYMBOL.get(i) for i in valid_ids if ID_TO_SYMBOL.get(i)}
+    syms = {i: ID_TO_SYMBOL.get(i) for i in ids if ID_TO_SYMBOL.get(i)}
     if not syms:
         return {"quotes": []}
 
-    logger.info(f"Fetching quotes for symbols: {list(syms.values())}")
+    print(f"🔍 Fetching quotes for symbols: {list(syms.values())}")
 
     # Use longer period to ensure sufficient data
     try:
@@ -586,39 +553,42 @@ def get_quotes(request: Request, ids: List[str] = Query(None)):
             progress=False,
             threads=True,
         )
-        logger.debug(f"Downloaded data shape: {df.shape}")
+        print(f"📊 Downloaded data shape: {df.shape}")
+        print(f"📊 Data columns: {df.columns}")
 
         if df.empty:
-            logger.warning("No data downloaded, using fallback")
+            print("⚠️ No data downloaded, using fallback")
             return {"quotes": _get_fallback_quotes(syms)}
 
     except Exception as e:
-        logger.error(f"Error downloading data: {e}")
+        print(f"❌ Error downloading data: {e}")
         return {"quotes": _get_fallback_quotes(syms)}
 
     results = []
     for _id, sym in syms.items():
         try:
-            logger.debug(f"Processing {_id} -> {sym}")
+            print(f"🔍 Processing {_id} -> {sym}")
 
             # Compatible with both yfinance return structures (multi/single ticker)
             if isinstance(df.columns, pd.MultiIndex):
                 if sym in df.columns.levels[0]:
                     close = df[sym]["Close"]
+                    print(f"📈 MultiIndex data for {sym}: {close.values}")
                 else:
-                    logger.debug(f"Symbol {sym} not found in MultiIndex columns")
+                    print(f"⚠️ Symbol {sym} not found in MultiIndex columns")
                     continue
             else:
                 close = df["Close"]
+                print(f"📈 Single ticker data: {close.values}")
 
             if close.empty:
-                logger.debug(f"No data for {sym}")
+                print(f"⚠️ No data for {sym}")
                 continue
 
             # Find the last valid price (non-nan)
             valid_prices = close.dropna()
             if valid_prices.empty:
-                logger.debug(f"No valid prices for {sym}")
+                print(f"⚠️ No valid prices for {sym}")
                 continue
 
             latest = safe_float(valid_prices.iloc[-1])
@@ -629,8 +599,10 @@ def get_quotes(request: Request, ids: List[str] = Query(None)):
             else:
                 prev = latest
 
+            print(f"💰 {sym}: latest={latest}, prev={prev}")
+
             if latest <= 0:
-                logger.warning(f"Invalid price for {sym}: {latest}")
+                print(f"⚠️ Invalid price for {sym}: {latest}")
                 continue
 
             change = safe_float(((latest - prev) / prev * 100)
@@ -641,16 +613,17 @@ def get_quotes(request: Request, ids: List[str] = Query(None)):
                 "currentPrice": round(latest, 2),
                 "change": round(change, 2),
             })
+            print(f"✅ Added quote for {_id}: price={latest}, change={change}%")
 
         except Exception as e:
-            logger.error(f"Error processing {_id} ({sym}): {e}")
+            print(f"❌ Error processing {_id} ({sym}): {e}")
             continue
 
-    logger.debug(f"Quotes fetched: {len(results)} results")
+    print(f"📊 Final results: {results}")
 
     # Use fallback data if no data is retrieved
     if not results:
-        logger.warning("No results obtained, using fallback")
+        print("🔄 No results obtained, using fallback")
         return {"quotes": _get_fallback_quotes(syms)}
 
     return {"quotes": results}
@@ -658,7 +631,7 @@ def get_quotes(request: Request, ids: List[str] = Query(None)):
 
 def _get_fallback_quotes(syms: Dict[str, str]) -> List[Dict[str, Any]]:
     """Return fallback quotes when yfinance fails"""
-    logger.debug("Using fallback quotes")
+    print("🔄 Using fallback quotes")
 
     # Mock price data
     fallback_prices = {
@@ -684,6 +657,8 @@ def _get_fallback_quotes(syms: Dict[str, str]) -> List[Dict[str, Any]]:
                 "currentPrice": price,
                 "change": change,
             })
+            print(
+                f"🔄 Fallback quote for {_id}: price={price}, change={change}%")
 
     return results
 
@@ -704,8 +679,10 @@ email_service = EmailService()
 async def redeem_reward(request: RewardRedeemRequest):
     """Redeem a reward and send voucher email to user"""
     try:
-        logger.info(f"Processing reward redemption for {request.user_email}")
-        logger.debug(f"Reward: {request.reward_name} from {request.partner}, Cost: {request.reward_cost} XP")
+        print(f"🎁 Processing reward redemption for {request.user_email}")
+        print(f"📦 Reward: {request.reward_name} from {request.partner}")
+        print(
+            f"💰 Cost: {request.reward_cost} XP (Player has: {request.player_xp} XP)")
 
         # Validate XP balance
         if request.player_xp < request.reward_cost:
@@ -739,116 +716,12 @@ async def redeem_reward(request: RewardRedeemRequest):
             )
 
     except Exception as e:
-        logger.error(f"Error redeeming reward: {e}")
+        print(f"❌ Error redeeming reward: {e}")
         return RewardRedeemResponse(
             success=False,
-            message="Failed to process reward redemption",
+            message=f"Failed to process reward redemption: {str(e)}",
             email_sent=False
         )
-
-
-# =============================================================================
-# CRON ENDPOINTS (called by Render Cron Jobs)
-# =============================================================================
-
-# Secret token to protect cron endpoints - NO FALLBACK for security
-CRON_SECRET = os.getenv("CRON_SECRET")
-
-
-@app.post("/cron/newsletter")
-async def trigger_weekly_newsletter(
-    secret: str = Query(None, description="Cron job secret token")
-):
-    """
-    🗓️ RENDER CRON: Weekly Newsletter
-    
-    Schedule: Every Tuesday at 10am UTC
-    Cron Expression: 0 10 * * 2
-    
-    Usage from Render Cron Job:
-    curl -X POST "https://your-api.onrender.com/cron/newsletter?secret=YOUR_SECRET"
-    """
-    # Validate secret - require in production
-    is_production = os.getenv("ENV") == "production"
-    if is_production:
-        if not CRON_SECRET:
-            logger.error("CRON_SECRET not configured in production")
-            raise HTTPException(status_code=500, detail="Server configuration error")
-        if secret != CRON_SECRET:
-            raise HTTPException(status_code=403, detail="Invalid cron secret")
-    
-    logger.info("Cron job triggered: Weekly Newsletter")
-    
-    try:
-        result = await cron_weekly_newsletter()
-        return {
-            "status": "success",
-            "job": "weekly_newsletter",
-            "timestamp": datetime.now().isoformat(),
-            "result": result
-        }
-    except Exception as e:
-        logger.error(f"Newsletter cron failed: {e}")
-        raise HTTPException(status_code=500, detail="Newsletter cron job failed")
-
-
-@app.post("/cron/reengagement")
-async def trigger_reengagement(
-    secret: str = Query(None, description="Cron job secret token")
-):
-    """
-    🗓️ RENDER CRON: Daily Re-engagement Check
-    
-    Schedule: Daily at 9am UTC
-    Cron Expression: 0 9 * * *
-    """
-    is_production = os.getenv("ENV") == "production"
-    if is_production:
-        if not CRON_SECRET:
-            logger.error("CRON_SECRET not configured in production")
-            raise HTTPException(status_code=500, detail="Server configuration error")
-        if secret != CRON_SECRET:
-            raise HTTPException(status_code=403, detail="Invalid cron secret")
-    
-    logger.info("Cron job triggered: Re-engagement Check")
-    
-    try:
-        result = await cron_reengagement_check()
-        return {
-            "status": "success",
-            "job": "reengagement",
-            "timestamp": datetime.now().isoformat(),
-            "result": result
-        }
-    except Exception as e:
-        logger.error(f"Re-engagement cron failed: {e}")
-        raise HTTPException(status_code=500, detail="Re-engagement cron job failed")
-
-
-@app.get("/cron/newsletter/preview")
-async def preview_newsletter():
-    """Preview this week's newsletter content (no sending)"""
-    content = newsletter_service.preview_weekly_digest()
-    return {
-        "status": "preview",
-        "content": content,
-        "note": "This is a preview. POST to /cron/newsletter to send."
-    }
-
-
-@app.post("/api/newsletter/subscribe")
-async def newsletter_subscribe(email: str, first_name: str = None):
-    """Subscribe to newsletter (triggers welcome email)"""
-    try:
-        result = await newsletter_service.send_welcome_email(email, first_name)
-        return {
-            "success": True,
-            "message": "Welcome to Legacy Guardians! Check your inbox.",
-            "result": result
-        }
-    except Exception as e:
-        logger.error(f"Newsletter subscribe failed: {e}")
-        raise HTTPException(status_code=500, detail="Newsletter subscription failed")
 
 
 if __name__ == "__main__":

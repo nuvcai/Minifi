@@ -10,6 +10,21 @@
 export { ShareButton } from './ShareButton';
 export { ShareResultCard } from './ShareResultCard';
 
+// Challenge system - "Beat My Score" viral mechanic
+export { ChallengeButton } from './ChallengeButton';
+
+// Financial Flex Cards - Instagram-worthy shareable achievements
+export { FinancialFlexCard, MissionFlexCard } from './FinancialFlexCard';
+
+// FOMO Activity System - Social proof notifications
+export { 
+  FOMOActivityFeed, 
+  FOMOToast, 
+  FOMOCounter, 
+  StreakWarning,
+  useFOMOToast 
+} from './FOMOActivity';
+
 // Referral system
 export { ReferralDashboard } from './ReferralDashboard';
 

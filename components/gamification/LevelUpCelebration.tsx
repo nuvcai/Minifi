@@ -43,11 +43,11 @@ const levelTitles: Record<number, { title: string; icon: React.ReactNode; color:
 
 // Level unlock rewards
 const levelRewards: Record<number, string[]> = {
-  2: ["New coach advice unlocked!", "Bonus XP multiplier: 1.1x"],
+  2: ["New coach advice unlocked!", "Bonus 🪙 multiplier: 1.1x"],
   3: ["Competition Mode early access!", "Exclusive badge: Early Bird"],
-  4: ["Advanced market insights!", "Bonus XP multiplier: 1.2x"],
+  4: ["Advanced market insights!", "Bonus 🪙 multiplier: 1.2x"],
   5: ["Premium rewards unlocked!", "Exclusive badge: Market Mover"],
-  6: ["Expert challenges available!", "Bonus XP multiplier: 1.3x"],
+  6: ["Expert challenges available!", "Bonus 🪙 multiplier: 1.3x"],
   7: ["Master tier rewards!", "Exclusive badge: Financial Guru"],
   8: ["Legend status achieved!", "All features unlocked!"],
 };
@@ -234,7 +234,7 @@ export function LevelUpCelebration({
           {newLevel < 8 && levelTitles[newLevel + 1] && (
             <div className="text-center text-xs text-slate-500">
               Next: <span className="text-slate-400">{levelTitles[newLevel + 1].title}</span>
-              <span className="text-slate-600"> (1000 XP)</span>
+              <span className="text-slate-600"> (1000 🪙 iii)</span>
             </div>
           )}
 

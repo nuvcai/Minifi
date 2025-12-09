@@ -40,7 +40,7 @@ export function ReferralDashboard({
     : 100;
 
   const copyReferralLink = async () => {
-    const link = `${typeof window !== 'undefined' ? window.location.origin : 'https://minifi.app'}?ref=${referralCode}`;
+    const link = `${typeof window !== 'undefined' ? window.location.origin : 'https://minifi.games'}?ref=${referralCode}`;
     await navigator.clipboard.writeText(link);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -81,7 +81,7 @@ export function ReferralDashboard({
           </button>
         </div>
         <p className="text-xs text-gray-500 mt-2">
-          Share this link: minifi.app?ref={referralCode}
+          Share this link: minifi.games?ref={referralCode}
         </p>
       </div>
 
@@ -172,7 +172,7 @@ export function ReferralDashboard({
         <div className="bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-xl p-4">
           <h4 className="font-bold text-white mb-2">Share on social media</h4>
           <p className="text-sm text-gray-400 mb-4">
-            Your friends get +50 XP bonus when they use your code!
+            Your friends get +50 🪙 iii bonus when they use your code!
           </p>
           <ShareButton
             contentType="invite"

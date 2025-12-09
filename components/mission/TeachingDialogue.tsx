@@ -12,15 +12,18 @@ import {
   TrendingUp,
   BarChart3,
   Shield,
-  HelpCircle,
   Target,
-  Zap,
-  Activity,
-  TrendingDown,
-  AlertTriangle,
 } from "lucide-react";
 import { PerformanceChart } from "@/components/PerformanceChart";
 import { api, InvestmentMetrics, CoachRequest, CoachResponse } from "@/lib/api";
+import { 
+  AICoach, 
+  aiCoaches,
+  getCoachResponse, 
+  getCoachCatchphrase,
+  getCoachEncouragement,
+  isCoachAlignedDecision 
+} from "@/components/data/coaches";
  
 
 // ============================================================================
@@ -29,6 +32,7 @@ import { api, InvestmentMetrics, CoachRequest, CoachResponse } from "@/lib/api";
 
 interface TeachingDialogueProps {
   coach: {
+    id?: string;
     name: string;
     avatar: string;
     personality: string;
@@ -48,7 +52,13 @@ interface TeachingDialogueProps {
     title: string;
     description: string;
   };
-  simulationResult?: any;
+  simulationResult?: {
+    performance_chart?: {
+      dates: string[];
+      values: number[];
+    };
+    [key: string]: unknown;
+  };
   onComplete: () => void;
   onXpEarned?: (amount: number) => void;
 }
@@ -189,10 +199,11 @@ const extractEventYear = (eventTitle: string): number => {
 /**
  * Formats percentage with sign
  */
-const formatPercentage = (value: number): string => {
+const _formatPercentage = (value: number): string => {
   const sign = value > 0 ? "+" : "";
   return `${sign}${value.toFixed(2)}%`;
 };
+void _formatPercentage;
 
 /**
  * Determines player level based on mission difficulty, performance, and experience
@@ -390,12 +401,13 @@ export function TeachingDialogue({
   actualReturn,
   finalAmount,
   performance,
-  outcome,
+  outcome: _outcome,
   event,
   simulationResult,
   onComplete,
   onXpEarned,
 }: TeachingDialogueProps) {
+  void _outcome; // Kept for future use
   // Add custom styles for animations
   useEffect(() => {
     const style = document.createElement('style');
@@ -461,8 +473,8 @@ export function TeachingDialogue({
 
   const [messages, setMessages] = useState<TeachingMessage[]>([]);
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
-  const [displayedText, setDisplayedText] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
+  const [_displayedText, setDisplayedText] = useState(""); void _displayedText;
+  const [_isTyping, setIsTyping] = useState(false); void _isTyping;
   const [showContinue, setShowContinue] = useState(false);
   const [realMetrics, setRealMetrics] = useState<InvestmentMetrics | null>(
     null
@@ -484,7 +496,7 @@ export function TeachingDialogue({
   // Track hover state for metric highlighting
   const [hoveredMetric, setHoveredMetric] = useState<string | null>(null);
   // Track XP earned this session
-  const [sessionXp, setSessionXp] = useState<number>(0);
+  const [_sessionXp, setSessionXp] = useState<number>(0); void _sessionXp;
   // Track XP animation
   const [showXpAnimation, setShowXpAnimation] = useState<boolean>(false);
   // Track coach typing effect
@@ -671,11 +683,20 @@ export function TeachingDialogue({
       return;
     }
 
+    // Get coach-specific greeting
+    const coachEmoji = fullCoach?.speechStyle?.emoji || "🎯";
+    const profitReaction = fullCoach 
+      ? getCoachResponse(fullCoach, "profit").split("!")[0] + "!"
+      : "Nice work!";
+    const lossReaction = fullCoach
+      ? getCoachResponse(fullCoach, "loss").split(".")[0] + "."
+      : "Let's analyze this.";
+
     // Step 1: Portfolio Performance (Annual) - Combined greeting + chart
     newMessages.push({
       id: "portfolio_performance",
       type: "greeting",
-      content: `${performance === "profit" ? "🎉 Nice work!" : "📊"} Ask ${coach.name} about your ${selectedOption.name} results!`,
+      content: `${coachEmoji} ${performance === "profit" ? profitReaction : lossReaction} Ask ${coach.name} about your ${selectedOption.name} results!`,
       showContinue: true,
       showMetrics: true,
       showChart: true,
@@ -821,34 +842,90 @@ export function TeachingDialogue({
       ? aiCoachAdvice.recommendations.slice(0, 3) 
       : fallbackRecommendations;
       
-    const nextSteps = aiCoachAdvice.next_steps && aiCoachAdvice.next_steps.length > 0
+    const _nextSteps = aiCoachAdvice.next_steps && aiCoachAdvice.next_steps.length > 0
       ? aiCoachAdvice.next_steps.slice(0, 2)
       : fallbackNextSteps;
+    void _nextSteps; // Available for future enhancements
       
     const encouragement = aiCoachAdvice.encouragement || fallbackEncouragement;
     
-    // Generate intelligent summary based on mission results
+    // Generate intelligent summary based on mission results - NOW WITH COACH PERSONALITY
     const generateIntelligentSummary = (): string => {
       const actualFinalValue = realMetrics ? realMetrics.final_value : finalAmount;
       const actualTotalReturn = realMetrics ? realMetrics.total_return : actualReturn;
       
-      // Mission-specific insights
-      let missionContext = "";
-      if (event.title.toLowerCase().includes("bubble")) {
-        missionContext = actualTotalReturn > 0 ? 
-          "You successfully navigated the market bubble by staying disciplined during volatile times." :
-          "Market bubbles are challenging - this experience teaches valuable lessons about market psychology.";
-      } else if (event.title.toLowerCase().includes("crisis")) {
-        missionContext = actualTotalReturn > 0 ?
-          "Impressive! You found opportunity during the crisis when others were paralyzed by fear." :
-          "Financial crises test every investor - your experience builds resilience for future challenges.";
-      } else {
-        missionContext = actualTotalReturn > 0 ?
-          "Your investment approach worked well for this market environment." :
-          "This challenging period provided valuable learning about market dynamics.";
-      }
+      // Coach-specific mission context
+      const getCoachMissionContext = () => {
+        if (!fullCoach) {
+          // Default context
+          if (event.title.toLowerCase().includes("bubble")) {
+            return actualTotalReturn > 0 ? 
+              "You successfully navigated the market bubble by staying disciplined during volatile times." :
+              "Market bubbles are challenging - this experience teaches valuable lessons about market psychology.";
+          } else if (event.title.toLowerCase().includes("crisis")) {
+            return actualTotalReturn > 0 ?
+              "Impressive! You found opportunity during the crisis when others were paralyzed by fear." :
+              "Financial crises test every investor - your experience builds resilience for future challenges.";
+          }
+          return actualTotalReturn > 0 ?
+            "Your investment approach worked well for this market environment." :
+            "This challenging period provided valuable learning about market dynamics.";
+        }
+        
+        // Coach-specific context
+        switch (fullCoach.id) {
+          case "steady-sam":
+            if (event.title.toLowerCase().includes("bubble") || event.title.toLowerCase().includes("crisis")) {
+              return actualTotalReturn > 0 ?
+                "Your defensive approach protected capital while capturing gains. This is exactly how wealth is preserved across generations!" :
+                "The market was brutal, but our conservative stance limited the damage. Remember: it takes 100% gain to recover a 50% loss. Protection first!";
+            }
+            return actualTotalReturn > 0 ?
+              "Steady, consistent growth - exactly how the wealthiest families build and preserve their fortunes." :
+              "A setback, but our diversified approach means you're still in the game. That's the most important thing.";
+            
+          case "growth-guru":
+            if (event.title.toLowerCase().includes("bubble") || event.title.toLowerCase().includes("crisis")) {
+              return actualTotalReturn > 0 ?
+                "Your balanced allocation worked perfectly! When some assets fell, others held strong. This is the power of true diversification." :
+                "Market turmoil tested our allocation, but the portfolio structure absorbed the shock. Time to rebalance and move forward.";
+            }
+            return actualTotalReturn > 0 ?
+              "The architecture of your portfolio delivered. Different assets working together in harmony - beautiful!" :
+              "The portfolio behaved as designed. Some assets down, some up. This is why we diversify.";
+            
+          case "adventure-alex":
+            if (event.title.toLowerCase().includes("bubble") || event.title.toLowerCase().includes("crisis")) {
+              return actualTotalReturn > 0 ?
+                "BOOM! 🚀 While others panicked, you saw opportunity! This is how fortunes are made during market chaos!" :
+                "Volatility is the price of admission to the moon! 🌙 Every great investor has down periods. The key is staying in the game!";
+            }
+            return actualTotalReturn > 0 ?
+              "You took the shot and it PAID OFF! This is what happens when you believe in the future! 🔥" :
+              "Not every rocket reaches the moon on the first try. But fortune favors those who keep launching!";
+            
+          case "yield-yoda":
+            if (event.title.toLowerCase().includes("bubble") || event.title.toLowerCase().includes("crisis")) {
+              return actualTotalReturn > 0 ?
+                "Through market turmoil, patience rewarded you. Remember: Buffett made 99% of his wealth after age 50. Time is your ally." :
+                "Paper losses come and go. The compound interest continues its work in silence. Stay the course, young investor.";
+            }
+            return actualTotalReturn > 0 ?
+              "The eighth wonder of the world works in your favor. Compound interest is patient, and so are you." :
+              "A temporary setback in a lifetime of compounding. The journey of a thousand miles continues.";
+            
+          default:
+            return actualTotalReturn > 0 ?
+              "Your investment approach worked well for this market environment." :
+              "This challenging period provided valuable learning about market dynamics.";
+        }
+      };
       
-      return `🎯 **Mission Summary: ${event.title}**\n\nYour ${selectedOption.name} investment achieved a **${actualTotalReturn.toFixed(2)}%** return, ending at **$${Math.round(actualFinalValue).toLocaleString()}**. ${missionContext}\n\n**🎓 My Key Recommendations:**\n${recommendations.slice(0, 3).map(rec => `• ${rec}`).join('\n')}\n\n**💪 ${encouragement}**`;
+      const missionContext = getCoachMissionContext();
+      const coachEmoji = fullCoach?.speechStyle?.emoji || "🎯";
+      const catchphrase = fullCoach ? getCoachCatchphrase(fullCoach) : "Keep learning and growing";
+      
+      return `${coachEmoji} **Mission Summary: ${event.title}**\n\nYour ${selectedOption.name} investment achieved a **${actualTotalReturn.toFixed(2)}%** return, ending at **$${Math.round(actualFinalValue).toLocaleString()}**.\n\n${missionContext}\n\n**🎓 ${coach.name}'s Recommendations:**\n${recommendations.slice(0, 3).map(rec => `• ${rec}`).join('\n')}\n\n**💬 "${catchphrase}"**\n\n**💪 ${encouragement}**`;
     };
     
     const intelligentSummary = generateIntelligentSummary();
@@ -1060,7 +1137,7 @@ export function TeachingDialogue({
   };
 
   // Helper function to clean advice text - remove titles and format properly
-  const cleanAdviceText = (text: string | undefined): string => {
+  const _cleanAdviceText = (text: string | undefined): string => {
     if (!text) return "";
     // Remove common title prefixes and clean up the text
     return text
@@ -1068,9 +1145,27 @@ export function TeachingDialogue({
       .replace(/^[•\-*]\s*/, "") // Remove bullet points
       .trim();
   };
+  void _cleanAdviceText; // Available for future enhancements
 
-  // Generate AI explanation based on metric and current data
-  const generateMetricExplanation = async (metricKey: string, targetMetric: string): Promise<string> => {
+  // Get the full coach object for personality-driven responses
+  const fullCoach: AICoach | undefined = coach.id ? aiCoaches.find(c => c.id === coach.id) : undefined;
+  
+  // Get coach-specific emoji and catchphrase
+  const getCoachEmoji = () => fullCoach?.speechStyle?.emoji || "🎯";
+  const getPersonalizedEncouragement = () => {
+    if (fullCoach) {
+      return getCoachEncouragement(fullCoach);
+    }
+    return aiCoachAdvice?.encouragement || "Great job on this investment!";
+  };
+  
+  // Check if decision aligned with coach's preferences
+  const _isAlignedDecision = fullCoach ? isCoachAlignedDecision(fullCoach, selectedOption.name) : false;
+  void _isAlignedDecision; // Available for future enhancements
+
+  // Generate AI explanation based on metric and current data - NOW WITH COACH PERSONALITY
+  const generateMetricExplanation = async (metricKey: string, _targetMetric: string): Promise<string> => {
+    void _targetMetric; // Available for future enhancements
     if (!aiCoachAdvice) return "Loading explanation...";
     
     // Use actual data from props and realMetrics
@@ -1079,48 +1174,107 @@ export function TeachingDialogue({
     const actualVolatility = realMetrics ? realMetrics.volatility : 16.26;
     const actualSharpe = realMetrics ? realMetrics.sharpe_ratio : 0.1;
     
+    // Get coach-specific intro based on their personality
+    const getCoachIntro = () => {
+      if (!fullCoach) return "";
+      switch (fullCoach.id) {
+        case "steady-sam":
+          return actualTotalReturn > 0 
+            ? "Good news, and more importantly - you stayed safe! " 
+            : "Here's the reality, but remember - preservation is key. ";
+        case "growth-guru":
+          return actualTotalReturn > 0 
+            ? "Let's look at the architecture of this return. " 
+            : "The portfolio structure absorbed this. Here's why: ";
+        case "adventure-alex":
+          return actualTotalReturn > 0 
+            ? "YESSS! Look at these numbers! 🔥 " 
+            : "Volatility is the price of admission! Here's the deal: ";
+        case "yield-yoda":
+          return actualTotalReturn > 0 
+            ? "Patience rewarded. Observe: " 
+            : "Markets fluctuate, wisdom endures. Consider: ";
+        default:
+          return "";
+      }
+    };
+    
+    // Get coach-specific conclusion
+    const getCoachConclusion = () => {
+      if (!fullCoach) return "";
+      const catchphrase = getCoachCatchphrase(fullCoach);
+      return ` Remember: "${catchphrase}" ${getCoachEmoji()}`;
+    };
+    
     switch (metricKey) {
       case "final_value":
-        return `Your final investment value is $${Math.round(actualFinalValue).toLocaleString()}. ${actualTotalReturn > 0 ? 
-          `Congratulations! Your investment grew by ${actualTotalReturn.toFixed(2)}%. ${aiCoachAdvice.encouragement || "Great job on this investment!"}` : 
-          `Though your investment declined by ${Math.abs(actualTotalReturn).toFixed(2)}%, this is valuable learning experience. ${cleanAdviceText(aiCoachAdvice.recommendations?.[0]) || "Remember, investing is a long-term game and losses help us learn."}`}`;
+        return `${getCoachIntro()}Your final investment value is $${Math.round(actualFinalValue).toLocaleString()}. ${actualTotalReturn > 0 ? 
+          `${getCoachEmoji()} Your investment grew by ${actualTotalReturn.toFixed(2)}%! ${getPersonalizedEncouragement()}` : 
+          `Though your investment declined by ${Math.abs(actualTotalReturn).toFixed(2)}%, ${fullCoach ? getCoachResponse(fullCoach, "loss") : "this is valuable learning experience."}`}${getCoachConclusion()}`;
         
-      case "total_return":
-        return `Your total return is ${actualTotalReturn.toFixed(2)}%. This is a ${Math.abs(actualTotalReturn) > 20 ? 
-          "significant" : "moderate"} ${actualTotalReturn > 0 ? "gain" : "loss"}. ${aiCoachAdvice.risk_assessment || "Market conditions played a role in this outcome."} ${cleanAdviceText(aiCoachAdvice.recommendations?.[1]) || "Understanding returns helps you make better future decisions."}`;
+      case "total_return": {
+        const returnAssessment = fullCoach?.id === "adventure-alex" 
+          ? (actualTotalReturn > 20 ? "Now THAT'S what I call a moonshot! 🚀" : actualTotalReturn > 0 ? "Decent gains! But we can go bigger!" : "Temporary setback. The trend is our friend!")
+          : fullCoach?.id === "steady-sam"
+          ? (actualTotalReturn > 0 ? "Solid, steady growth. Just how we like it." : "The defensive position limited our exposure. Smart.")
+          : fullCoach?.id === "yield-yoda"
+          ? (actualTotalReturn > 0 ? "The compound interest force is strong." : "Paper losses. The income stream continues.")
+          : `${Math.abs(actualTotalReturn) > 20 ? "significant" : "moderate"} ${actualTotalReturn > 0 ? "gain" : "loss"}`;
         
-      case "volatility":
-        return `Volatility is ${actualVolatility.toFixed(2)}%, showing your investment's price movement range. ${actualVolatility > 20 ? 
-          "This is high volatility, meaning greater risk and potential returns." : "This is relatively stable, indicating lower risk but potentially lower returns too."} ${cleanAdviceText(aiCoachAdvice.recommendations?.[2]) || "Balancing risk and return is key to successful investing."}`;
+        return `${getCoachIntro()}Your total return is ${actualTotalReturn.toFixed(2)}%. ${returnAssessment} ${aiCoachAdvice.risk_assessment || "Market conditions played a role."}${getCoachConclusion()}`;
+      }
         
-      case "sharpe_ratio":
-        return `Sharpe ratio is ${actualSharpe.toFixed(2)}, measuring risk-adjusted returns. ${actualSharpe > 1 ? 
-          "Excellent risk-adjusted performance!" : actualSharpe > 0 ? "Reasonable risk-return balance." : "This suggests the return may not have justified the risk taken."} ${cleanAdviceText(aiCoachAdvice.next_steps?.[0]) || "Focus on risk-adjusted returns for better investment decisions."}`;
+      case "volatility": {
+        const volatilityView = fullCoach?.id === "adventure-alex"
+          ? (actualVolatility > 20 ? "High volatility = high opportunity! This is where fortunes are made!" : "Pretty calm waters... might want more excitement!")
+          : fullCoach?.id === "steady-sam"
+          ? (actualVolatility > 20 ? "This volatility is concerning. We prefer smoother rides." : "Nice and stable. Just how I like it!")
+          : fullCoach?.id === "growth-guru"
+          ? "Volatility teaches us about asset behavior. This data is valuable for future allocation."
+          : "Volatility reflects the investment's price swings.";
+          
+        return `${getCoachIntro()}Volatility is ${actualVolatility.toFixed(2)}%. ${volatilityView}${getCoachConclusion()}`;
+      }
+        
+      case "sharpe_ratio": {
+        const sharpeView = fullCoach?.id === "yield-yoda"
+          ? (actualSharpe > 1 ? "Excellent risk-adjusted returns. The compound way rewards patience." : "The journey matters more than the destination. Time will improve this.")
+          : fullCoach?.id === "steady-sam"
+          ? (actualSharpe > 1 ? "Great risk-adjusted performance! This is the way." : actualSharpe > 0 ? "Acceptable risk-return trade-off." : "We need to improve our risk management here.")
+          : `${actualSharpe > 1 ? "Excellent risk-adjusted performance!" : actualSharpe > 0 ? "Reasonable risk-return balance." : "The return may not have justified the risk."}`;
+        
+        return `${getCoachIntro()}Sharpe ratio is ${actualSharpe.toFixed(2)}, measuring risk-adjusted returns. ${sharpeView}${getCoachConclusion()}`;
+      }
         
       case "portfolio_chart": {
-        let chartExplanation = "";
+        let chartExplanation = getCoachIntro();
         if (currentMessage.id === "portfolio_performance") {
-          chartExplanation = `This chart shows how your $100,000 investment in ${selectedOption.name} performed over time, ending at $${Math.round(actualFinalValue).toLocaleString()}. `;
+          chartExplanation += `This chart shows how your $100,000 investment in ${selectedOption.name} performed over time, ending at $${Math.round(actualFinalValue).toLocaleString()}. `;
         } else if (currentMessage.id === "annual_returns") {
-          chartExplanation = `This annual returns chart reveals the year-by-year performance patterns of your ${selectedOption.name} investment during ${event.title}. `;
+          chartExplanation += `This annual returns chart reveals the year-by-year performance patterns of your ${selectedOption.name} investment during ${event.title}. `;
         } else if (currentMessage.id === "risk_analysis") {
-          chartExplanation = `The risk analysis shows your investment's volatility (${actualVolatility.toFixed(1)}%) and maximum drawdown, helping you understand the ups and downs you experienced. `;
+          chartExplanation += `The risk analysis shows your investment's volatility (${actualVolatility.toFixed(1)}%) and maximum drawdown, helping you understand the ups and downs you experienced. `;
         }
         
-        chartExplanation += actualTotalReturn > 0 ? 
-          `The overall upward trend demonstrates how markets can reward patient investors even during challenging periods.` : 
-          `While the outcome was negative, understanding these patterns helps you make more informed decisions in similar future scenarios.`;
+        // Coach-specific chart interpretation
+        const chartView = fullCoach?.id === "adventure-alex"
+          ? (actualTotalReturn > 0 ? "See those dips? Those were buying opportunities! The trend was UP!" : "Look at the volatility - that's where the next opportunity hides!")
+          : fullCoach?.id === "steady-sam"
+          ? (actualTotalReturn > 0 ? "Notice the steady climb. Consistency beats chaos." : "The defensive allocation limited the damage. That's the plan working.")
+          : fullCoach?.id === "growth-guru"
+          ? "Notice how different assets behave differently? That's why diversification matters."
+          : "Time in the market beats timing the market.";
         
-        return chartExplanation + ` ${cleanAdviceText(aiCoachAdvice.recommendations?.[0]) || "Track your performance by year to spot trends and patterns."}`;
+        return chartExplanation + chartView + getCoachConclusion();
       }
         
       default:
-        return aiCoachAdvice.advice || "Let me know if you have any questions about your investment performance!";
+        return `${getCoachEmoji()} ${aiCoachAdvice.advice || "Let me know if you have any questions about your investment performance!"}${getCoachConclusion()}`;
     }
   };
 
-  // Get metric value helper
-  const getMetricValue = (targetMetric: string) => {
+  // Get metric value helper - available for future enhancements
+  const _getMetricValue = (targetMetric: string) => {
     switch (targetMetric) {
       case "final_value": return realMetrics ? realMetrics.final_value : finalAmount;
       case "total_return": return realMetrics ? realMetrics.total_return : actualReturn;
@@ -1129,12 +1283,13 @@ export function TeachingDialogue({
       default: return 0;
     }
   };
+  void _getMetricValue;
 
   // ============================================================================
-  // RENDER HELPERS
+  // RENDER HELPERS - Available for future enhancements
   // ============================================================================
 
-  const renderMetricsCard = (
+  const _renderMetricsCard = (
     icon: React.ReactNode,
     label: string,
     value: string | number,
@@ -1152,25 +1307,27 @@ export function TeachingDialogue({
       </div>
     </Card>
   );
+  void _renderMetricsCard;
 
-  const renderMarkdownComponents = {
-    p: ({ children, ...props }: any) => <span {...props}>{children}</span>,
-    strong: ({ children, ...props }: any) => (
+  const _renderMarkdownComponents = {
+    p: ({ children, ...props }: React.HTMLAttributes<HTMLSpanElement> & { children?: React.ReactNode }) => <span {...props}>{children}</span>,
+    strong: ({ children, ...props }: React.HTMLAttributes<HTMLElement> & { children?: React.ReactNode }) => (
       <strong className="font-bold text-blue-800" {...props}>
         {children}
       </strong>
     ),
-    ul: ({ children, ...props }: any) => (
+    ul: ({ children, ...props }: React.HTMLAttributes<HTMLUListElement> & { children?: React.ReactNode }) => (
       <ul className="list-disc list-inside space-y-1 mt-2" {...props}>
         {children}
       </ul>
     ),
-    li: ({ children, ...props }: any) => (
+    li: ({ children, ...props }: React.HTMLAttributes<HTMLLIElement> & { children?: React.ReactNode }) => (
       <li className="text-gray-700" {...props}>
         {children}
       </li>
     ),
   };
+  void _renderMarkdownComponents;
 
   // ============================================================================
   // RENDER
@@ -1232,62 +1389,117 @@ export function TeachingDialogue({
   if (!currentMessage) return null;
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg">
-      {/* Coach Header */}
-      <div className="flex items-center gap-3 mb-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
-        <div className="relative w-20 h-20 shrink-0">
-          {/* Simple glow effect based on performance */}
-          <div
-            className={`absolute -inset-1 rounded-full ${
-              performance === "profit" ? "bg-green-400/20" : "bg-orange-400/20"
-            } animate-pulse`}
-          ></div>
-          <Image
-            src={
-              isCoachTyping ? coach.animatedAvatar : coach.avatar
+    <div className="w-full max-w-4xl mx-auto p-4 sm:p-6 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700">
+      {/* Coach Header - Enhanced with personality & light mode optimized */}
+      {(() => {
+        // Get coach-specific colors - Light mode optimized
+        const coachColors = fullCoach?.id === "steady-sam" 
+          ? { 
+              gradient: "from-blue-50 via-cyan-50 to-blue-50 dark:from-blue-500/20 dark:via-cyan-500/15 dark:to-blue-500/20", 
+              glow: "bg-blue-400/40 dark:bg-blue-400/30", 
+              border: "border-blue-200 dark:border-blue-500/40",
+              accent: "text-blue-700 dark:text-blue-300",
+              badge: "bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300"
             }
-            alt={coach.name}
-            fill
-            sizes="80px"
-            className="rounded-full object-cover border-2 border-white shadow-lg relative z-10"
-          />
-        </div>
-        <div className="flex-1">
-          <div className="flex items-center gap-2">
-            <h3 className="font-bold text-lg">{coach.name}</h3>
-            <Badge variant="secondary" className={coach.color}>
-              {coach.personality}
-            </Badge>
+          : fullCoach?.id === "growth-guru"
+          ? { 
+              gradient: "from-emerald-50 via-teal-50 to-emerald-50 dark:from-emerald-500/20 dark:via-teal-500/15 dark:to-emerald-500/20", 
+              glow: "bg-emerald-400/40 dark:bg-emerald-400/30", 
+              border: "border-emerald-200 dark:border-emerald-500/40",
+              accent: "text-emerald-700 dark:text-emerald-300",
+              badge: "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300"
+            }
+          : fullCoach?.id === "adventure-alex"
+          ? { 
+              gradient: "from-purple-50 via-violet-50 to-purple-50 dark:from-purple-500/20 dark:via-violet-500/15 dark:to-purple-500/20", 
+              glow: "bg-purple-400/40 dark:bg-purple-400/30", 
+              border: "border-purple-200 dark:border-purple-500/40",
+              accent: "text-purple-700 dark:text-purple-300",
+              badge: "bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-300"
+            }
+          : fullCoach?.id === "yield-yoda"
+          ? { 
+              gradient: "from-amber-50 via-yellow-50 to-amber-50 dark:from-amber-500/20 dark:via-yellow-500/15 dark:to-amber-500/20", 
+              glow: "bg-amber-400/40 dark:bg-amber-400/30", 
+              border: "border-amber-200 dark:border-amber-500/40",
+              accent: "text-amber-700 dark:text-amber-300",
+              badge: "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300"
+            }
+          : { 
+              gradient: "from-violet-50 via-purple-50 to-violet-50 dark:from-violet-500/20 dark:via-purple-500/15 dark:to-violet-500/20", 
+              glow: "bg-violet-400/40 dark:bg-violet-400/30", 
+              border: "border-violet-200 dark:border-violet-500/40",
+              accent: "text-violet-700 dark:text-violet-300",
+              badge: "bg-violet-100 text-violet-700 dark:bg-violet-500/20 dark:text-violet-300"
+            };
+        
+        return (
+          <div className={`flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-6 p-4 bg-gradient-to-br ${coachColors.gradient} rounded-xl border-2 ${coachColors.border} shadow-sm`}>
+            <div className="relative w-16 h-16 sm:w-20 sm:h-20 shrink-0">
+              {/* Coach-specific glow effect */}
+              <div className={`absolute -inset-1 rounded-full ${coachColors.glow} blur-sm ${isCoachTyping ? 'animate-pulse' : ''}`}></div>
+              {/* Performance indicator ring */}
+              <div className={`absolute -inset-2 rounded-full ${performance === "profit" ? "bg-emerald-400/20 dark:bg-emerald-400/10" : "bg-orange-400/20 dark:bg-orange-400/10"} ${isCoachTyping ? 'animate-ping' : ''}`} style={{ animationDuration: '2s' }}></div>
+              <Image
+                src={isCoachTyping ? coach.animatedAvatar : coach.avatar}
+                alt={coach.name}
+                fill
+                sizes="80px"
+                className={`rounded-full object-cover border-2 ${coachColors.border} shadow-lg relative z-10`}
+              />
+              {/* Status indicator */}
+              <div className={`absolute -bottom-1 -right-1 w-6 h-6 rounded-full ${isCoachTyping ? 'bg-emerald-500' : 'bg-slate-400'} border-2 border-white dark:border-slate-900 flex items-center justify-center z-20 shadow-md`}>
+                <span className="text-xs">{isCoachTyping ? "💬" : fullCoach?.speechStyle?.emoji || "🎯"}</span>
+              </div>
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                <h3 className={`font-bold text-lg ${coachColors.accent}`}>{coach.name}</h3>
+                <span className="text-xl">{fullCoach?.speechStyle?.emoji || "🎯"}</span>
+                <Badge className={`${coachColors.badge} border-0 text-xs font-semibold`}>
+                  {coach.personality}
+                </Badge>
+              </div>
+              <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{coach.description}</p>
+              {/* Teaching style hint */}
+              {fullCoach && (
+                <div className={`inline-flex items-center gap-1.5 mt-2 px-2.5 py-1 rounded-lg ${coachColors.badge} text-xs font-medium`}>
+                  <span>💡</span>
+                  <span>Teaching style: {fullCoach.teachingStyle?.approach || "balanced"}</span>
+                </div>
+              )}
+            </div>
           </div>
-          <p className="text-sm text-muted-foreground">{coach.description}</p>
-        </div>
-      </div>
+        );
+      })()}
 
-      {/* Coach Interaction Panel - Always Visible */}
+      {/* Coach Interaction Panel - Always Visible - Light Mode Optimized */}
       <div className="mb-4 relative">
-        <div className="bg-white border-2 border-blue-200 rounded-2xl p-4 shadow-sm relative">
+        <div className="bg-slate-50 dark:bg-slate-800/50 border-2 border-slate-200 dark:border-slate-700 rounded-2xl p-4 shadow-sm relative">
           {/* Chat bubble pointer pointing to coach header */}
-          <div className="absolute -top-2 left-20 w-4 h-4 bg-white border-l-2 border-t-2 border-blue-200 transform rotate-45"></div>
+          <div className="absolute -top-2 left-16 sm:left-20 w-4 h-4 bg-slate-50 dark:bg-slate-800/50 border-l-2 border-t-2 border-slate-200 dark:border-slate-700 transform rotate-45"></div>
           
           {/* Coach response area */}
           {selectedMetric && (isCoachTyping || metricExplanation) ? (
-            <div className="text-sm text-gray-700 leading-relaxed mb-4">
+            <div className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed mb-4">
               {isCoachTyping ? (
                 <>
                   {coachTypingText}
-                  <span className="inline-block w-2 h-4 bg-blue-500 ml-1 animate-pulse"></span>
+                  <span className="inline-block w-2 h-4 bg-[#9898f2] ml-1 animate-pulse rounded-sm"></span>
                 </>
               ) : (
                 metricExplanation
               )}
             </div>
           ) : currentMessage.id === "summary_completion" ? (
-            <div className="text-sm text-gray-700 leading-relaxed mb-4 prose prose-sm">
+            <div className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed mb-4 prose prose-sm dark:prose-invert">
               <div dangerouslySetInnerHTML={{ __html: currentMessage.content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>') }} />
             </div>
           ) : (
-            <div className="text-sm text-gray-600 mb-4">
-              💡 <span className="font-medium">Ask {coach.name} about your results:</span> Click any button below to get detailed explanations!
+            <div className="text-sm text-slate-600 dark:text-slate-400 mb-4 p-3 bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-700">
+              <span className="text-base mr-1">💡</span>
+              <span className="font-medium text-slate-800 dark:text-white">Ask {coach.name} about your results:</span>
+              <span className="text-slate-500 dark:text-slate-400"> Click any button below to get detailed explanations!</span>
             </div>
           )}
           
@@ -1298,7 +1510,7 @@ export function TeachingDialogue({
               {showXpAnimation && (
                 <div className="absolute -top-2 right-0 z-10">
                   <div className="text-yellow-600 font-bold text-lg animate-bounce-slide-up">
-                    +5 XP
+                    +5 🪙
                   </div>
                   {/* Sparkle effects */}
                   <div className="absolute -inset-4 pointer-events-none">
@@ -1311,55 +1523,46 @@ export function TeachingDialogue({
                 </div>
               )}
               
-              {/* Metric buttons - first row (4 buttons) - Cloud bubble style */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 mb-2">
+              {/* Metric buttons - first row (4 buttons) - Mobile optimized */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-3">
                 {currentMessage.metricButtons.slice(0, 4).map((button) => {
                   const isViewed = viewedSharedButtons.has(button.key);
                   return (
                     <button
                       key={button.key}
-                      className={`relative px-3 py-2 min-h-[45px] rounded-xl border transition-all duration-200 ${
-                        hoveredMetric === button.key ? "shadow-md scale-105" : ""
+                      className={`relative px-3 py-2.5 min-h-[48px] sm:min-h-[45px] rounded-xl border-2 transition-all duration-200 touch-manipulation active:scale-[0.97] ${
+                        hoveredMetric === button.key ? "shadow-md scale-[1.02]" : ""
                       } ${
                         selectedMetric === button.key
-                          ? "bg-gradient-to-r from-indigo-400 to-purple-500 text-white border-indigo-500 shadow-lg"
+                          ? "bg-gradient-to-r from-[#9898f2] to-violet-500 text-white border-[#9898f2] shadow-lg shadow-[#9898f2]/30"
                           : isViewed
-                          ? "bg-gradient-to-r from-green-50 to-emerald-50 text-emerald-700 border-emerald-200 hover:from-green-100 hover:to-emerald-100"
-                          : "bg-gradient-to-r from-sky-50 to-blue-50 text-blue-700 border-blue-200 hover:from-sky-100 hover:to-blue-100"
+                          ? "bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-500/20 dark:to-teal-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-500/40"
+                          : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-600 hover:border-[#9898f2]/50 hover:bg-slate-50 dark:hover:bg-slate-700"
                       } ${isCoachTyping ? "opacity-50 cursor-not-allowed" : ""}`}
                       onClick={() => !isCoachTyping && handleMetricClick(button.key, button.targetMetric)}
                       onMouseEnter={() => !isCoachTyping && handleMetricHover(button.key)}
                       onMouseLeave={() => !isCoachTyping && handleMetricHover(null)}
                       disabled={isCoachTyping}
                     >
-                      {/* Cloud bubble pointer */}
-                      <div className={`absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 rotate-45 ${
-                        selectedMetric === button.key
-                          ? "bg-gradient-to-r from-indigo-400 to-purple-500 border-r border-b border-indigo-500"
-                          : isViewed
-                          ? "bg-gradient-to-r from-green-50 to-emerald-50 border-r border-b border-emerald-200"
-                          : "bg-gradient-to-r from-sky-50 to-blue-50 border-r border-b border-blue-200"
-                      }`}></div>
-                      
-                      <div className="flex items-center gap-1 justify-center">
+                      <div className="flex items-center gap-1.5 justify-center">
                         {React.cloneElement(button.icon, {
-                          className: `h-3 w-3 ${
+                          className: `h-4 w-4 sm:h-3.5 sm:w-3.5 ${
                             selectedMetric === button.key
                               ? "text-white"
                               : isViewed
-                              ? "text-emerald-600"
-                              : "text-blue-600"
+                              ? "text-emerald-600 dark:text-emerald-400"
+                              : "text-slate-500 dark:text-slate-400"
                           }`,
                         })}
-                        <span className="text-xs font-medium">{button.label}</span>
-                        {isViewed && <span className="text-xs">✓</span>}
+                        <span className="text-xs sm:text-[11px] font-semibold">{button.label}</span>
+                        {isViewed && <span className="text-emerald-500 text-xs">✓</span>}
                       </div>
                     </button>
                   );
                 })}
               </div>
               
-              {/* Chart-specific button - second row */}
+              {/* Chart-specific button - second row - Full width on mobile */}
               {currentMessage.metricButtons.length > 4 && (
                 <div className="flex justify-center">
                   {(() => {
@@ -1369,45 +1572,36 @@ export function TeachingDialogue({
                     return (
                       <button
                         key={extraMetricButton.key}
-                        className={`relative px-4 py-2 min-h-[45px] rounded-xl border transition-all duration-200 ${
-                          hoveredMetric === extraMetricButton.key ? "shadow-md scale-105" : ""
+                        className={`w-full sm:w-auto relative px-4 py-2.5 min-h-[48px] sm:min-h-[45px] rounded-xl border-2 transition-all duration-200 touch-manipulation active:scale-[0.97] ${
+                          hoveredMetric === extraMetricButton.key ? "shadow-md scale-[1.02]" : ""
                         } ${
                           selectedMetric === extraMetricButton.key
-                            ? "bg-gradient-to-r from-purple-400 to-pink-500 text-white border-purple-500 shadow-lg"
+                            ? "bg-gradient-to-r from-[#9898f2] to-violet-500 text-white border-[#9898f2] shadow-lg shadow-[#9898f2]/30"
                             : isViewed
-                            ? "bg-gradient-to-r from-green-50 to-emerald-50 text-emerald-700 border-emerald-200 hover:from-green-100 hover:to-emerald-100"
-                            : "bg-gradient-to-r from-purple-50 to-pink-50 text-purple-700 border-purple-200 hover:from-purple-100 hover:to-pink-100"
+                            ? "bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-500/20 dark:to-teal-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-500/40"
+                            : "bg-gradient-to-r from-violet-50 to-purple-50 dark:from-violet-500/15 dark:to-purple-500/10 text-violet-700 dark:text-violet-300 border-violet-200 dark:border-violet-500/40 hover:border-violet-300 dark:hover:border-violet-500/60"
                         } ${isCoachTyping ? "opacity-50 cursor-not-allowed" : ""}`}
                         onClick={() => !isCoachTyping && handleMetricClick(extraMetricButton.key, extraMetricButton.targetMetric)}
                         onMouseEnter={() => !isCoachTyping && handleMetricHover(extraMetricButton.key)}
                         onMouseLeave={() => !isCoachTyping && handleMetricHover(null)}
                         disabled={isCoachTyping}
                       >
-                        {/* Cloud bubble pointer */}
-                        <div className={`absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 rotate-45 ${
-                          selectedMetric === extraMetricButton.key
-                            ? "bg-gradient-to-r from-purple-400 to-pink-500 border-r border-b border-purple-500"
-                            : isViewed
-                            ? "bg-gradient-to-r from-green-50 to-emerald-50 border-r border-b border-emerald-200"
-                            : "bg-gradient-to-r from-purple-50 to-pink-50 border-r border-b border-purple-200"
-                        }`}></div>
-                        
                         <div className="flex items-center gap-2 justify-center">
                           {React.cloneElement(extraMetricButton.icon, {
-                            className: `h-3 w-3 ${
+                            className: `h-4 w-4 sm:h-3.5 sm:w-3.5 ${
                               selectedMetric === extraMetricButton.key
                                 ? "text-white"
                                 : isViewed
-                                ? "text-emerald-600"
-                                : "text-purple-600"
+                                ? "text-emerald-600 dark:text-emerald-400"
+                                : "text-violet-600 dark:text-violet-400"
                             }`,
                           })}
-                          <span className="text-xs font-medium">
+                          <span className="text-xs sm:text-[11px] font-semibold">
                             {currentMessage.id === "portfolio_performance" && "Portfolio Performance (Annual)"}
                             {currentMessage.id === "annual_returns" && "Annual Returns Chart"}
                             {currentMessage.id === "risk_analysis" && "Risk Analysis Chart"}
                           </span>
-                          {isViewed && <span className="text-xs">✓</span>}
+                          {isViewed && <span className="text-emerald-500 text-xs">✓</span>}
                         </div>
                       </button>
                     );
@@ -1439,7 +1633,7 @@ export function TeachingDialogue({
                 simulationResult?.performance_chart?.dates?.map(
                   (date: string, index: number) => ({
                     date: date,
-                    value: simulationResult.performance_chart.values[index],
+                    value: simulationResult?.performance_chart?.values[index] ?? 0,
                   })
                 ) ||
                 []
@@ -1463,46 +1657,41 @@ export function TeachingDialogue({
       )}
 
       {/* Risk Analysis - REMOVED to avoid duplication with PerformanceChart */}
-      {/* Action Buttons */}
-      <div className="flex justify-between">
+      {/* Action Buttons - Always stacked full width for mobile-first cards */}
+      <div className="flex flex-col gap-3">
+        {/* Continue/Complete Buttons */}
+        {currentMessage.showComplete ? (
+          <Button
+            onClick={handleComplete}
+            className="w-full min-h-[48px] flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700"
+            disabled={isCoachTyping}
+          >
+            <Trophy className="h-4 w-4" />
+            Complete Mission
+          </Button>
+        ) : (
+          <Button
+            onClick={handleContinue}
+            className="w-full min-h-[48px] flex items-center justify-center gap-2 bg-gradient-to-r from-[#9898f2] to-[#7070c0] hover:from-[#8585e0] hover:to-[#6060b0] text-white"
+            disabled={isCoachTyping || !showContinue}
+          >
+            Continue
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        )}
+        
         {/* Back Button - only show after step 1 */}
         {currentMessageIndex > 0 && (
           <Button
             onClick={handleBack}
             variant="outline"
-            className="flex items-center gap-2"
+            className="w-full min-h-[48px] flex items-center justify-center gap-2"
             disabled={isCoachTyping}
           >
             <ChevronRight className="h-4 w-4 rotate-180" />
             Back
           </Button>
         )}
-        
-        {/* Spacer when no back button */}
-        {currentMessageIndex === 0 && <div />}
-        
-        {/* Continue/Complete Buttons */}
-        <div className="flex gap-2">
-          {currentMessage.showComplete ? (
-            <Button
-              onClick={handleComplete}
-              className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
-              disabled={isCoachTyping}
-            >
-              <Trophy className="h-4 w-4" />
-              Complete Mission
-            </Button>
-          ) : (
-            <Button
-              onClick={handleContinue}
-              className="flex items-center gap-2"
-              disabled={isCoachTyping || !showContinue}
-            >
-              Continue
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          )}
-        </div>
       </div>
 
       {/* Progress Indicator */}

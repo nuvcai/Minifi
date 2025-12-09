@@ -27,6 +27,7 @@ import {
   Zap,
 } from "lucide-react";
 import { MissionData, InvestmentOption } from "@/components/data/missions";
+import { III_CONFIG } from "@/hooks/useIII";
 
 // Quiz question types
 interface QuizQuestion {
@@ -47,7 +48,7 @@ const generateQuizQuestions = (
 ): QuizQuestion[] => {
   const questions: QuizQuestion[] = [];
   
-  // Question 1: Understanding the event
+  // Question 1: Understanding the event (FACTUAL)
   const eventQuestions: Record<number, QuizQuestion> = {
     1990: {
       id: "q1",
@@ -134,35 +135,130 @@ const generateQuizQuestions = (
     questions.push(eventQuestions[eventYear]);
   }
   
-  // Question 2: FO Principle from this mission
-  questions.push({
-    id: "q2",
-    question: "What Family Office principle does this mission teach? 🏛️",
-    options: [
-      { id: "a", text: "Put all your money in one investment for maximum gains", isCorrect: false },
-      { id: "b", text: "Diversification protects wealth across market cycles", isCorrect: true },
-      { id: "c", text: "Only invest in cash during uncertain times", isCorrect: false },
-      { id: "d", text: "Follow what everyone else is doing", isCorrect: false },
-    ],
-    explanation: missionData.foWisdom,
-    concept: "Diversification",
-    xpReward: 30,
-  });
+  // Question 2: APPLICATION-BASED SCENARIO (NEW - FO-level thinking)
+  const applicationQuestions: Record<number, QuizQuestion> = {
+    1990: {
+      id: "q2",
+      question: "🎯 SCENARIO: It's 2024. Real estate in a major city has tripled in 5 years. Everyone says 'prices only go up!' Based on Japan 1990, what would a Family Office do?",
+      options: [
+        { id: "a", text: "Go all-in! This trend will continue forever", isCorrect: false },
+        { id: "b", text: "Reduce real estate exposure and diversify into other asset classes", isCorrect: true },
+        { id: "c", text: "Wait until prices go even higher to sell", isCorrect: false },
+        { id: "d", text: "Borrow more money to buy more property", isCorrect: false },
+      ],
+      explanation: "Family Offices recognize bubble patterns. When everyone is euphoric and prices seem too good to be true, they REDUCE exposure—not increase it. Japan 1990 taught us that 'prices always go up' is the most expensive lie in investing.",
+      concept: "Bubble Recognition & Position Management",
+      xpReward: 35,
+    },
+    1997: {
+      id: "q2",
+      question: "🎯 SCENARIO: You have investments in emerging markets. Suddenly, one country's currency crashes 50%. Based on the 1997 Asian Crisis lesson, what's the FO move?",
+      options: [
+        { id: "a", text: "Panic sell everything immediately", isCorrect: false },
+        { id: "b", text: "Double down on the crashing market", isCorrect: false },
+        { id: "c", text: "Review regional correlation risk and rebalance to safe havens", isCorrect: true },
+        { id: "d", text: "Ignore it - single countries don't affect portfolios", isCorrect: false },
+      ],
+      explanation: "FOs understand contagion risk. When one regional market crashes, correlated markets often follow. The smart move is to assess exposure, not panic or ignore. Rebalancing to uncorrelated assets (like US bonds) protects capital.",
+      concept: "Correlation Risk & Crisis Management",
+      xpReward: 35,
+    },
+    2000: {
+      id: "q2",
+      question: "🎯 SCENARIO: AI stocks have tripled in 2 years. Your friend says 'AI will change everything—buy now!' Based on the Dot-com lesson, how would you evaluate this?",
+      options: [
+        { id: "a", text: "Go all-in! AI really IS changing everything", isCorrect: false },
+        { id: "b", text: "The technology is real, but check if companies have real profits before investing heavily", isCorrect: true },
+        { id: "c", text: "Avoid all tech completely - it's always a bubble", isCorrect: false },
+        { id: "d", text: "Wait for the crash, then buy everything", isCorrect: false },
+      ],
+      explanation: "The internet DID change everything—but Pets.com still went to zero. FOs separate technology trends (real) from stock valuations (can be crazy). They invest in companies with actual business models, not just hype.",
+      concept: "Separating Innovation from Speculation",
+      xpReward: 35,
+    },
+    2008: {
+      id: "q2",
+      question: "🎯 SCENARIO: Markets have crashed 40%. Your portfolio is down significantly. Your gut says 'sell everything before it gets worse.' What would a Family Office do?",
+      options: [
+        { id: "a", text: "Trust your gut - sell everything now", isCorrect: false },
+        { id: "b", text: "Review the portfolio, but use cash reserves to buy quality assets at discount prices", isCorrect: true },
+        { id: "c", text: "Leverage up to recover losses faster", isCorrect: false },
+        { id: "d", text: "Move everything to cryptocurrency", isCorrect: false },
+      ],
+      explanation: "'Be fearful when others are greedy, and greedy when others are fearful.' FOs keep cash reserves specifically for crisis buying. The S&P 500 bottom in 2009 created 10-year millionaires. Panic selling locks in losses; discipline creates opportunity.",
+      concept: "Crisis Investing & Emotional Discipline",
+      xpReward: 35,
+    },
+    2020: {
+      id: "q2",
+      question: "🎯 SCENARIO: A new pandemic hits. Markets drop 30% in a month. Some sectors (like healthcare) are booming. How should a FO-trained investor think about this?",
+      options: [
+        { id: "a", text: "All pandemics mean market crashes - go to cash", isCorrect: false },
+        { id: "b", text: "Identify which existing trends will ACCELERATE and position accordingly", isCorrect: true },
+        { id: "c", text: "Wait until the pandemic is over to make any decisions", isCorrect: false },
+        { id: "d", text: "Ignore the pandemic - markets always recover", isCorrect: false },
+      ],
+      explanation: "COVID accelerated digital trends by 10 years in months. FOs don't just react to crises—they analyze which trends get supercharged. Remote work, e-commerce, and digital healthcare were already growing; COVID turbocharged them.",
+      concept: "Trend Acceleration Analysis",
+      xpReward: 35,
+    },
+    2025: {
+      id: "q2",
+      question: "🎯 SCENARIO: You have $100,000 to invest today. AI is hot, but inflation is high and interest rates are elevated. A Family Office would likely...",
+      options: [
+        { id: "a", text: "Put 100% in AI stocks - they're the future!", isCorrect: false },
+        { id: "b", text: "Allocate across AI (15-25%), inflation hedges, bonds, and keep cash for opportunities", isCorrect: true },
+        { id: "c", text: "Put everything in bonds until AI hype dies down", isCorrect: false },
+        { id: "d", text: "Wait for a crash before investing anything", isCorrect: false },
+      ],
+      explanation: "FOs NEVER put 100% in anything—even 'sure things.' A typical allocation might be: 15-25% AI/tech, 20-30% bonds (good yields now!), 10% inflation hedges (commodities/TIPS), and 10-15% cash for opportunities. Balance beats bets.",
+      concept: "Modern Portfolio Construction",
+      xpReward: 35,
+    },
+  };
   
-  // Question 3: Asset class understanding
+  // Add application-based question
+  if (applicationQuestions[eventYear]) {
+    questions.push(applicationQuestions[eventYear]);
+  } else {
+    // Fallback to original FO principle question if no application question exists
+    questions.push({
+      id: "q2",
+      question: "What Family Office principle does this mission teach? 🏛️",
+      options: [
+        { id: "a", text: "Put all your money in one investment for maximum gains", isCorrect: false },
+        { id: "b", text: "Diversification protects wealth across market cycles", isCorrect: true },
+        { id: "c", text: "Only invest in cash during uncertain times", isCorrect: false },
+        { id: "d", text: "Follow what everyone else is doing", isCorrect: false },
+      ],
+      explanation: missionData.foWisdom,
+      concept: "Diversification",
+      xpReward: 30,
+    });
+  }
+  
+  // Question 3: Asset class understanding (ANALYTICAL)
   const bestOption = [...missionData.options].sort((a, b) => b.actualReturn - a.actualReturn)[0];
-  questions.push({
+  const worstOption = [...missionData.options].sort((a, b) => a.actualReturn - b.actualReturn)[0];
+  
+  // Generate correlation insight question
+  const correlationQuestion: QuizQuestion = {
     id: "q3",
-    question: `Which asset class performed BEST in this scenario? 📊`,
-    options: missionData.options.map(opt => ({
-      id: opt.id,
-      text: `${opt.name} (${opt.assetClass || "mixed"})`,
-      isCorrect: opt.id === bestOption.id,
-    })),
-    explanation: `${bestOption.name} performed best with a ${bestOption.actualReturn}% return. Understanding which assets perform well in different conditions is key to Family Office investing.`,
-    concept: "Asset Allocation",
+    question: `📈 Why did ${bestOption.name} outperform ${worstOption.name} in this crisis?`,
+    options: [
+      { id: "a", text: "Just luck - markets are random", isCorrect: false },
+      { id: "b", text: bestOption.assetClass === "fixed_income" || bestOption.assetClass === "commodities" 
+        ? "Safe haven assets have negative correlation with risky assets during crises"
+        : "This asset class benefited from the specific market conditions", isCorrect: true },
+      { id: "c", text: "The government manipulated prices", isCorrect: false },
+      { id: "d", text: "Everyone just happened to buy the same thing", isCorrect: false },
+    ],
+    explanation: `${bestOption.name} returned ${bestOption.actualReturn}% while ${worstOption.name} returned ${worstOption.actualReturn}%. Understanding asset correlations is key—FOs build portfolios where some assets zig when others zag.`,
+    concept: "Asset Correlation",
     xpReward: 35,
-  });
+  };
+  
+  questions.push(correlationQuestion);
   
   return questions;
 };
@@ -215,7 +311,7 @@ export function KnowledgeQuiz({
       if (q.options.find(o => o.id === answer)?.isCorrect) {
         return total + q.xpReward;
       }
-      return total + Math.round(q.xpReward * 0.25); // 25% XP for attempting
+      return total + Math.round(q.xpReward * 0.25); // 25% iii for attempting
     }, 0);
   }, [questions, selectedAnswers]);
   
@@ -371,7 +467,7 @@ export function KnowledgeQuiz({
               </p>
               <Badge className="mt-2 bg-gray-100 text-gray-600 border-gray-200">
                 <Star className="h-3 w-3 mr-1" />
-                +{currentQuestion.xpReward} XP
+                +{currentQuestion.xpReward} {III_CONFIG.symbol}
               </Badge>
             </div>
           </div>
@@ -439,7 +535,7 @@ export function KnowledgeQuiz({
                   </div>
                   <div>
                     <p className="font-medium text-emerald-300 mb-1">
-                      Correct! +{currentQuestion.xpReward} XP 🎉
+                      Correct! +{currentQuestion.xpReward} {III_CONFIG.symbol} 🎉
                     </p>
                     <p className="text-sm text-slate-300">{currentQuestion.explanation}</p>
                   </div>
@@ -451,7 +547,7 @@ export function KnowledgeQuiz({
                   </div>
                   <div>
                     <p className="font-medium text-amber-300 mb-1">
-                      Not quite! +{Math.round(currentQuestion.xpReward * 0.25)} XP for trying
+                      Not quite! +{Math.round(currentQuestion.xpReward * 0.25)} {III_CONFIG.symbol} for trying
                     </p>
                     <p className="text-sm text-slate-300">{currentQuestion.explanation}</p>
                   </div>

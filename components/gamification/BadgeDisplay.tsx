@@ -28,6 +28,7 @@ import {
   Lock,
   Star,
 } from "lucide-react";
+import { III_CONFIG } from "@/hooks/useIII";
 import { EffortBadge, effortBadges, learningMilestones } from "./effortRewards";
 
 interface BadgeDisplayProps {
@@ -438,7 +439,7 @@ function AllBadgesModal({
                         </span>
                       </div>
                       <Badge className={isEarned ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}>
-                        +{milestone.xpReward} XP
+                        +{milestone.xpReward} {III_CONFIG.symbol}
                       </Badge>
                     </div>
                     <p className="text-sm text-gray-600 mb-2">{milestone.description}</p>

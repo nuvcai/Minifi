@@ -130,36 +130,36 @@ export function WhatIfAnalysis({
     <div className="space-y-6">
       {/* Header */}
       <div className="text-center">
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-indigo-100 to-violet-100 border border-indigo-300 mb-4">
-          <BarChart3 className="h-4 w-4 text-indigo-600" />
-          <span className="text-sm font-medium text-indigo-700">Parallel Universes Analysis</span>
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-indigo-500/20 to-violet-500/20 border border-indigo-500/30 mb-4">
+          <BarChart3 className="h-4 w-4 text-indigo-400" />
+          <span className="text-sm font-medium text-indigo-300">Parallel Universes Analysis</span>
         </div>
-        <h3 className="text-xl font-bold text-gray-900 mb-2">
+        <h3 className="text-xl font-bold text-white mb-2">
           What If You'd Chosen Differently? 🔮
         </h3>
-        <p className="text-sm text-gray-500 max-w-lg mx-auto">
+        <p className="text-sm text-slate-400 max-w-lg mx-auto">
           Family Offices always analyze every possible outcome. Here's how each option actually performed.
         </p>
       </div>
 
       {/* Your Choice Summary */}
-      <Card className="bg-gradient-to-r from-indigo-50 to-violet-50 border-indigo-200">
+      <Card className="bg-gradient-to-r from-indigo-500/15 to-violet-500/15 border-indigo-500/40">
         <CardContent className="p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
                 selectedOption && selectedOption.actualReturn >= 0 
-                  ? "bg-emerald-100 border border-emerald-300" 
-                  : "bg-orange-100 border border-orange-300"
+                  ? "bg-emerald-500/20 border border-emerald-500/40" 
+                  : "bg-orange-500/20 border border-orange-500/40"
               }`}>
                 <span className="text-2xl">
                   {selectedRank === 1 ? "🏆" : selectedRank === 2 ? "🥈" : selectedRank === 3 ? "🥉" : "📊"}
                 </span>
               </div>
               <div>
-                <p className="text-xs text-gray-500 uppercase tracking-wider">Your Choice</p>
-                <p className="font-semibold text-gray-900">{selectedOption?.name}</p>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-slate-400 uppercase tracking-wider">Your Choice</p>
+                <p className="font-semibold text-white">{selectedOption?.name}</p>
+                <p className="text-xs text-slate-400">
                   Ranked #{selectedRank} of {options.length} options
                 </p>
               </div>
@@ -169,7 +169,7 @@ export function WhatIfAnalysis({
                 {selectedOption && selectedOption.actualReturn >= 0 ? "+" : ""}
                 {selectedOption?.actualReturn}%
               </p>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-slate-400">
                 ${calculateFinalAmount(initialInvestment, selectedOption?.actualReturn || 0).toLocaleString()}
               </p>
             </div>
@@ -179,8 +179,8 @@ export function WhatIfAnalysis({
 
       {/* All Options Comparison */}
       <div className="space-y-3">
-        <h4 className="text-sm font-semibold text-gray-600 flex items-center gap-2">
-          <Target className="h-4 w-4 text-indigo-600" />
+        <h4 className="text-sm font-semibold text-slate-300 flex items-center gap-2">
+          <Target className="h-4 w-4 text-indigo-400" />
           All Possible Outcomes
         </h4>
         
@@ -199,8 +199,8 @@ export function WhatIfAnalysis({
               key={option.id}
               className={`transition-all duration-300 cursor-pointer hover:scale-[1.01] ${
                 isSelected 
-                  ? "bg-gradient-to-r from-indigo-50 to-violet-50 border-indigo-300 ring-2 ring-indigo-200" 
-                  : "bg-white border-gray-200 hover:border-gray-300 shadow-sm"
+                  ? "bg-gradient-to-r from-indigo-500/20 to-violet-500/20 border-indigo-500/50 ring-2 ring-indigo-500/30" 
+                  : "bg-slate-800/50 border-slate-700/50 hover:border-slate-600"
               }`}
               onClick={() => handleViewInsight(option.id)}
             >
@@ -210,20 +210,20 @@ export function WhatIfAnalysis({
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-lg ${
-                        isBest ? "bg-emerald-100" : isWorst ? "bg-red-100" : "bg-gray-100"
+                        isBest ? "bg-emerald-500/20" : isWorst ? "bg-red-500/20" : "bg-slate-700"
                       }`}>
                         {isBest ? "🏆" : isWorst ? "💀" : `#${index + 1}`}
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="font-medium text-gray-900">{option.name}</span>
+                          <span className="font-medium text-white">{option.name}</span>
                           {isSelected && (
-                            <Badge className="text-xs bg-indigo-100 text-indigo-700 border-indigo-300">
+                            <Badge className="text-xs bg-indigo-500/30 text-indigo-300 border-indigo-500/50">
                               Your Choice
                             </Badge>
                           )}
                           {isBest && !isSelected && (
-                            <Badge className="text-xs bg-emerald-100 text-emerald-700 border-emerald-300">
+                            <Badge className="text-xs bg-emerald-500/30 text-emerald-300 border-emerald-500/50">
                               Best Performer
                             </Badge>
                           )}
@@ -233,7 +233,7 @@ export function WhatIfAnalysis({
                             {option.risk} Risk
                           </Badge>
                           {option.assetClass && (
-                            <span className="text-xs text-gray-500">
+                            <span className="text-xs text-slate-400">
                               {option.assetClass === "equities" ? "📈 Stocks" :
                                option.assetClass === "fixed_income" ? "📊 Bonds" :
                                option.assetClass === "commodities" ? "🥇 Commodities" :
@@ -247,14 +247,14 @@ export function WhatIfAnalysis({
                       <p className={`text-xl font-bold ${getReturnColor(option.actualReturn)}`}>
                         {option.actualReturn >= 0 ? "+" : ""}{option.actualReturn}%
                       </p>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-slate-400">
                         ${finalAmount.toLocaleString()}
                       </p>
                     </div>
                   </div>
                   
                   {/* Performance Bar */}
-                  <div className="relative h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div className="relative h-2 bg-slate-700 rounded-full overflow-hidden">
                     <div 
                       className={`absolute top-0 left-0 h-full rounded-full transition-all duration-500 ${
                         option.actualReturn >= 0 
@@ -267,17 +267,17 @@ export function WhatIfAnalysis({
                   
                   {/* Investment Insight (revealed on click) */}
                   {isViewed && (
-                    <div className="mt-2 p-3 bg-gray-50 rounded-lg border border-gray-200 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div className="mt-2 p-3 bg-slate-900/50 rounded-lg border border-slate-700/50 animate-in fade-in slide-in-from-top-2 duration-300">
                       <div className="flex items-start gap-2">
-                        <Lightbulb className="h-4 w-4 text-amber-500 mt-0.5 flex-shrink-0" />
-                        <p className="text-xs text-gray-600 leading-relaxed">
+                        <Lightbulb className="h-4 w-4 text-amber-400 mt-0.5 flex-shrink-0" />
+                        <p className="text-xs text-slate-300 leading-relaxed">
                           {option.investmentInsight}
                         </p>
                       </div>
                       {!isViewed && (
                         <div className="flex items-center gap-1 mt-2">
-                          <Sparkles className="h-3 w-3 text-amber-500" />
-                          <span className="text-xs text-amber-600">+3 XP for exploring!</span>
+                          <Sparkles className="h-3 w-3 text-amber-400" />
+                          <span className="text-xs text-amber-400">+3 🪙 for exploring!</span>
                         </div>
                       )}
                     </div>
@@ -285,8 +285,8 @@ export function WhatIfAnalysis({
                   
                   {/* Click to reveal hint */}
                   {!isViewed && (
-                    <p className="text-xs text-gray-400 text-center">
-                      Click to reveal insight (+3 XP)
+                    <p className="text-xs text-slate-500 text-center">
+                      Click to reveal insight (+3 🪙)
                     </p>
                   )}
                 </div>
@@ -297,17 +297,17 @@ export function WhatIfAnalysis({
       </div>
 
       {/* Family Office Wisdom */}
-      <Card className="bg-gradient-to-r from-amber-50 to-orange-50 border-amber-200">
+      <Card className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-amber-500/30">
         <CardContent className="p-4">
           <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0">
-              <Award className="h-5 w-5 text-amber-600" />
+            <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center flex-shrink-0">
+              <Award className="h-5 w-5 text-amber-400" />
             </div>
             <div>
-              <h4 className="font-semibold text-amber-700 text-sm mb-1">
+              <h4 className="font-semibold text-amber-300 text-sm mb-1">
                 Family Office Insight
               </h4>
-              <p className="text-sm text-gray-600 leading-relaxed">
+              <p className="text-sm text-slate-300 leading-relaxed">
                 {foInsight}
               </p>
             </div>
@@ -316,44 +316,44 @@ export function WhatIfAnalysis({
       </Card>
 
       {/* Key Learning Card */}
-      <Card className="bg-white border-gray-200 shadow-sm">
+      <Card className="bg-slate-800/50 border-slate-700">
         <CardContent className="p-4">
-          <h4 className="font-semibold text-gray-900 text-sm mb-3 flex items-center gap-2">
-            <Star className="h-4 w-4 text-amber-500" />
+          <h4 className="font-semibold text-white text-sm mb-3 flex items-center gap-2">
+            <Star className="h-4 w-4 text-amber-400" />
             Key Takeaways for Your Investment Journey
           </h4>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <div className="p-3 bg-emerald-50 rounded-lg border border-emerald-200">
+            <div className="p-3 bg-emerald-500/10 rounded-lg border border-emerald-500/30">
               <div className="flex items-center gap-2 mb-1">
-                <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-                <span className="text-xs font-medium text-emerald-700">Best Performer</span>
+                <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                <span className="text-xs font-medium text-emerald-300">Best Performer</span>
               </div>
-              <p className="text-sm text-gray-900 font-medium">{bestOption.name}</p>
-              <p className="text-xs text-gray-500">{bestOption.actualReturn >= 0 ? "+" : ""}{bestOption.actualReturn}% return</p>
+              <p className="text-sm text-white font-medium">{bestOption.name}</p>
+              <p className="text-xs text-slate-400">{bestOption.actualReturn >= 0 ? "+" : ""}{bestOption.actualReturn}% return</p>
             </div>
-            <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+            <div className="p-3 bg-slate-700/50 rounded-lg border border-slate-600">
               <div className="flex items-center gap-2 mb-1">
-                <BarChart3 className="h-4 w-4 text-gray-500" />
-                <span className="text-xs font-medium text-gray-600">Return Spread</span>
+                <BarChart3 className="h-4 w-4 text-slate-400" />
+                <span className="text-xs font-medium text-slate-300">Return Spread</span>
               </div>
-              <p className="text-sm text-gray-900 font-medium">{returnSpread.toFixed(0)}% difference</p>
-              <p className="text-xs text-gray-500">Between best & worst</p>
+              <p className="text-sm text-white font-medium">{returnSpread.toFixed(0)}% difference</p>
+              <p className="text-xs text-slate-400">Between best & worst</p>
             </div>
-            <div className="p-3 bg-red-50 rounded-lg border border-red-200">
+            <div className="p-3 bg-red-500/10 rounded-lg border border-red-500/30">
               <div className="flex items-center gap-2 mb-1">
-                <AlertTriangle className="h-4 w-4 text-red-600" />
-                <span className="text-xs font-medium text-red-700">Highest Risk</span>
+                <AlertTriangle className="h-4 w-4 text-red-400" />
+                <span className="text-xs font-medium text-red-300">Highest Risk</span>
               </div>
-              <p className="text-sm text-gray-900 font-medium">{worstOption.name}</p>
-              <p className="text-xs text-gray-500">{worstOption.actualReturn >= 0 ? "+" : ""}{worstOption.actualReturn}% return</p>
+              <p className="text-sm text-white font-medium">{worstOption.name}</p>
+              <p className="text-xs text-slate-400">{worstOption.actualReturn >= 0 ? "+" : ""}{worstOption.actualReturn}% return</p>
             </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Progress indicator for exploration XP */}
-      <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
-        <Sparkles className="h-3 w-3 text-amber-500" />
+      <div className="flex items-center justify-center gap-2 text-xs text-slate-400">
+        <Sparkles className="h-3 w-3 text-amber-400" />
         <span>Insights explored: {viewedInsights.size}/{options.length}</span>
         <Progress value={(viewedInsights.size / options.length) * 100} className="w-20 h-1.5" />
       </div>

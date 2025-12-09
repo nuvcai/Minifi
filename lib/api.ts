@@ -1,12 +1,4 @@
-/**
- * ╔══════════════════════════════════════════════════════════════════════════════╗
- * ║   MiniFi API Client (MVP - Hackathon Edition)                                ║
- * ║   ✨ Vibe-coded by Tick.AI for AWS AI Hackathon 2025 ✨                      ║
- * ║   Copyright (c) 2025 NUVC.AI. All Rights Reserved. NO COMMERCIAL USE.       ║
- * ╚══════════════════════════════════════════════════════════════════════════════╝
- */
-
-// API service for MiniFi / Legacy Guardians
+// API service for Legacy Guardians
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export interface PriceData {

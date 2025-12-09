@@ -563,7 +563,7 @@ function StageDetailModal({
               )}
               {req.totalXp && (
                 <RequirementRow
-                  label="Total XP"
+                  label="Total 🪙 iii"
                   current={stats.totalXp}
                   required={req.totalXp}
                 />
@@ -600,7 +600,7 @@ function StageDetailModal({
             </h4>
             <div className="flex items-center gap-2 mb-2">
               <Sparkles className="h-4 w-4 text-amber-400" />
-              <span className="text-amber-200 font-bold">+{stage.rewards.xpBonus} XP</span>
+              <span className="text-amber-200 font-bold">+{stage.rewards.xpBonus} 🪙</span>
             </div>
             <ul className="space-y-1">
               {stage.rewards.unlocks.map((unlock, i) => (
@@ -625,7 +625,7 @@ function StageDetailModal({
               className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
             >
               <Trophy className="h-4 w-4 mr-2" />
-              Claim {stage.rewards.title} (+{stage.rewards.xpBonus} XP)
+              Claim {stage.rewards.title} (+{stage.rewards.xpBonus} 🪙)
             </Button>
           )}
           

@@ -10,7 +10,7 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { 
-  Play, ChevronRight, ArrowRight, BookOpen, Target, 
+  Play, ChevronRight, ArrowRight, BookOpen, 
   Shield, Sparkles, Users, Clock, Award,
   GraduationCap, Lightbulb, Building2, History,
   Menu, X, Trophy, HelpCircle
@@ -173,15 +173,22 @@ export default function HomePage() {
         {/* Navigation */}
         <nav className={`w-full max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 transition-all duration-1000 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
+            <Link href="/" className="flex items-center gap-2">
               <Image
-                src="/minifi-header-logo.png"
-                alt="Mini.Fi"
-                width={120}
+                src="/minifi-icon.svg"
+                alt="Mini.Fi Icon"
+                width={40}
                 height={40}
-                className="h-8 sm:h-10 w-auto"
+                className="h-8 w-8 sm:h-10 sm:w-10"
               />
-            </div>
+              <Image
+                src="/minifi-logo.svg"
+                alt="Mini.Fi"
+                width={100}
+                height={32}
+                className="h-6 sm:h-8 w-auto hidden sm:block"
+              />
+            </Link>
             
             {/* Desktop Navigation */}
             <div className="hidden sm:flex items-center gap-6">
@@ -271,32 +278,47 @@ export default function HomePage() {
           )}
         </nav>
 
-        {/* Hero Section - Mission First */}
-        <main className="w-full max-w-7xl mx-auto px-4 sm:px-6">
-          <div className={`max-w-5xl mx-auto pt-16 pb-20 text-center transition-all duration-1000 delay-100 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+        {/* Hero Section - Mobile First, CTA Above Fold */}
+        <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 pb-24 sm:pb-0">
+          <div className={`max-w-5xl mx-auto pt-8 sm:pt-16 pb-12 sm:pb-20 text-center transition-all duration-1000 delay-100 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+            
+            {/* Mobile-First: CTA FIRST (visible immediately) */}
+            <div className="sm:hidden mb-8">
+              <Link href="/timeline" className="block">
+                <button className="w-full flex items-center justify-center gap-3 px-6 py-5 rounded-2xl bg-gradient-to-r from-indigo-500 via-violet-500 to-purple-500 text-white font-bold text-lg shadow-2xl shadow-violet-500/30 active:scale-[0.98] transition-transform touch-manipulation">
+                  <Play className="h-6 w-6" />
+                  Play Free Now
+                  <ChevronRight className="h-5 w-5" />
+                </button>
+              </Link>
+              <p className="mt-3 text-white/60 text-xs flex items-center justify-center gap-2">
+                <Shield className="h-4 w-4 text-emerald-400" />
+                No sign-up • 100% free • 5 min to start
+              </p>
+            </div>
             
             {/* Mission Statement - HERO FOCUS */}
-            <div className="relative mb-12">
+            <div className="relative mb-6 sm:mb-12">
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="w-full max-w-3xl h-px bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent" />
               </div>
-              <div className="relative inline-flex items-center gap-3 px-6 py-3 rounded-full bg-red-500/10 border border-red-500/30">
+              <div className="relative inline-flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-2 sm:py-3 rounded-full bg-red-500/10 border border-red-500/30">
                 <span className="w-2 h-2 rounded-full bg-red-400 animate-pulse" />
-                <span className="text-sm font-medium text-red-300/90">The Problem We're Solving</span>
+                <span className="text-xs sm:text-sm font-medium text-red-300/90">The Problem We're Solving</span>
               </div>
             </div>
 
-            {/* The Big Mission Quote */}
-            <div className="relative mb-10 sm:mb-16">
+            {/* The Big Mission Quote - Responsive sizing */}
+            <div className="relative mb-6 sm:mb-16">
               <div className="absolute -inset-4 bg-gradient-to-r from-indigo-500/5 via-violet-500/5 to-purple-500/5 rounded-3xl blur-xl" />
               <blockquote className="relative">
-                <p className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight tracking-tight">
+                <p className="text-xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight tracking-tight">
                   <span className="text-white/90">"</span>
                   <span className="bg-gradient-to-r from-amber-300 via-orange-300 to-red-300 bg-clip-text text-transparent">70%</span>
-                  <span className="text-white/80"> of Australian teens have </span>
-                  <span className="text-white/90">no financial education.</span>
+                  <span className="text-white/80"> of teens lack </span>
+                  <span className="text-white/90">financial education.</span>
                 </p>
-                <p className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mt-3 sm:mt-4 tracking-tight">
+                <p className="text-xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mt-2 sm:mt-4 tracking-tight">
                   <span className="bg-gradient-to-r from-indigo-400 via-violet-400 to-purple-400 bg-clip-text text-transparent">
                     We're changing that.
                   </span>
@@ -305,15 +327,20 @@ export default function HomePage() {
               </blockquote>
             </div>
 
-            {/* Tagline */}
-            <p className="text-base sm:text-lg md:text-xl text-white/70 max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed px-2">
-              Not just another finance app. Mini.Fi brings <span className="text-white font-medium">250 years of wealth wisdom</span> from 
-              history's greatest investors and <span className="text-white font-medium">Family Office strategies</span> — 
-              all through an immersive game experience.
+            {/* Tagline - Shorter on mobile */}
+            <p className="text-sm sm:text-lg md:text-xl text-white/70 max-w-2xl mx-auto mb-6 sm:mb-10 leading-relaxed px-2">
+              <span className="hidden sm:inline">Not just another finance app. Mini.Fi brings</span>
+              <span className="sm:hidden">Learn</span>
+              <span className="text-white font-medium"> 250 years of wealth wisdom</span>
+              <span className="hidden sm:inline"> from history's greatest investors and</span>
+              <span className="sm:hidden"> through</span>
+              <span className="text-white font-medium"> Family Office strategies</span>
+              <span className="hidden sm:inline"> — all through an immersive game experience.</span>
+              <span className="sm:hidden"> in a fun game.</span>
             </p>
 
-            {/* CTA Buttons - Mobile optimized */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-12 sm:mb-20 px-4 sm:px-0">
+            {/* CTA Buttons - Desktop only (mobile CTA is above) */}
+            <div className="hidden sm:flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-12 sm:mb-20 px-4 sm:px-0">
               <Link href="/timeline" className="w-full sm:w-auto">
                 <button className="group w-full sm:w-auto flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-8 py-4 rounded-2xl bg-gradient-to-r from-indigo-500 via-violet-500 to-purple-500 text-white font-semibold text-base sm:text-lg shadow-2xl shadow-violet-500/20 hover:shadow-violet-500/40 hover:scale-[1.02] transition-all duration-300 touch-manipulation active:scale-[0.98]">
                   <Play className="h-5 w-5" />
@@ -327,8 +354,28 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Quick Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+            {/* Quick Stats - Horizontal scroll on mobile */}
+            <div className="sm:hidden overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide">
+              <div className="flex gap-3 w-max">
+                {stats.map((stat, index) => (
+                  <div 
+                    key={index}
+                    className={`flex-shrink-0 w-36 p-4 rounded-2xl bg-white/[0.03] border border-white/10 transition-all duration-500 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
+                  >
+                    <div className="text-2xl font-bold bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent mb-1">
+                      {stat.value}
+                    </div>
+                    <div className="text-xs text-white/70 leading-tight">
+                      {stat.label}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <p className="text-[10px] text-white/40 text-center mt-2">← Swipe to see more →</p>
+            </div>
+            
+            {/* Quick Stats - Grid on desktop */}
+            <div className="hidden sm:grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
               {stats.map((stat, index) => (
                 <div 
                   key={index}
@@ -474,26 +521,70 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Mobile: Horizontal Scrollable Coaches */}
+            <div className="sm:hidden overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide">
+              <div className="flex gap-4 w-max">
                 {aiCoaches.map((coach, index) => (
-                <div 
+                  <div 
                     key={coach.id}
                     onClick={() => setSelectedCoachIndex(index)}
-                  className={`relative p-6 rounded-3xl cursor-pointer transition-all duration-500 ${
+                    className={`relative flex-shrink-0 w-40 p-4 rounded-2xl cursor-pointer transition-all duration-300 touch-manipulation active:scale-[0.98] ${
                       index === selectedCoachIndex 
-                      ? 'bg-gradient-to-br from-indigo-500/25 via-violet-500/15 to-transparent border-2 border-indigo-500/50 scale-[1.02] shadow-lg shadow-indigo-500/10'
-                      : 'bg-white/[0.03] border border-white/10 hover:bg-white/[0.06] hover:border-white/20'
+                        ? 'bg-gradient-to-br from-indigo-500/25 via-violet-500/15 to-transparent border-2 border-indigo-500/50 shadow-lg shadow-indigo-500/20'
+                        : 'bg-white/[0.03] border border-white/10'
                     }`}
                   >
+                    <div className="flex flex-col items-center text-center">
+                      <div className={`relative mb-3 ${index === selectedCoachIndex ? 'scale-110' : ''} transition-transform duration-300`}>
+                        <Image
+                          src={coach.avatar}
+                          alt={coach.name}
+                          width={64}
+                          height={64}
+                          className="rounded-full"
+                        />
+                        {index === selectedCoachIndex && (
+                          <div className="absolute inset-0 rounded-full ring-2 ring-indigo-400 ring-offset-2 ring-offset-[#050507]" />
+                        )}
+                      </div>
+                      <h3 className="font-semibold text-white text-sm mb-0.5">{coach.name}</h3>
+                      <p className="text-xs text-indigo-400 font-medium mb-2">{coach.personality}</p>
+                      <span className={`text-[10px] font-medium px-2 py-1 rounded-full ${
+                        coach.riskTolerance === 'conservative' ? 'bg-blue-500/25 text-blue-300' :
+                        coach.riskTolerance === 'moderate' ? 'bg-green-500/25 text-green-300' :
+                        coach.riskTolerance === 'aggressive' ? 'bg-orange-500/25 text-orange-300' :
+                        'bg-red-500/25 text-red-300'
+                      }`}>
+                        {coach.riskTolerance.charAt(0).toUpperCase() + coach.riskTolerance.slice(1)}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <p className="text-[10px] text-white/40 text-center mt-2">← Swipe to select coach →</p>
+            </div>
+
+            {/* Desktop: Grid Layout */}
+            <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {aiCoaches.map((coach, index) => (
+                <div 
+                  key={coach.id}
+                  onClick={() => setSelectedCoachIndex(index)}
+                  className={`relative p-6 rounded-3xl cursor-pointer transition-all duration-500 ${
+                    index === selectedCoachIndex 
+                      ? 'bg-gradient-to-br from-indigo-500/25 via-violet-500/15 to-transparent border-2 border-indigo-500/50 scale-[1.02] shadow-lg shadow-indigo-500/10'
+                      : 'bg-white/[0.03] border border-white/10 hover:bg-white/[0.06] hover:border-white/20'
+                  }`}
+                >
                   <div className="flex flex-col items-center text-center">
                     <div className={`relative mb-4 ${index === selectedCoachIndex ? 'scale-110' : ''} transition-transform duration-500`}>
-                    <Image
-                      src={coach.avatar}
-                      alt={coach.name}
+                      <Image
+                        src={coach.avatar}
+                        alt={coach.name}
                         width={80}
                         height={80}
-                      className="rounded-full"
-                    />
+                        className="rounded-full"
+                      />
                       {index === selectedCoachIndex && (
                         <div className="absolute inset-0 rounded-full ring-2 ring-indigo-400 ring-offset-2 ring-offset-[#050507]" />
                       )}
@@ -662,7 +753,7 @@ export default function HomePage() {
               </h2>
               <p className="text-lg text-white/70 max-w-2xl mx-auto">
                 Join weekly league competitions and climb through 5 tiers from Bronze to Diamond.
-                Earn XP, get promoted, and prove you're the best!
+                Earn 🪙 iii, get promoted, and prove you're the best!
               </p>
             </div>
 
@@ -692,8 +783,8 @@ export default function HomePage() {
                 <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center mb-4">
                   <span className="text-2xl">📈</span>
                 </div>
-                <h4 className="font-bold text-white mb-2">Earn XP</h4>
-                <p className="text-white/70 text-sm">Complete missions, maintain streaks, and learn from history to earn XP points.</p>
+                <h4 className="font-bold text-white mb-2">Earn 🪙 iii</h4>
+                <p className="text-white/70 text-sm">Complete missions, maintain streaks, and learn from history to earn iii tokens.</p>
               </div>
               <div className="p-6 rounded-2xl bg-white/[0.03] border border-white/10">
                 <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center mb-4">
@@ -810,6 +901,17 @@ export default function HomePage() {
 
         </main>
 
+        {/* Sticky Mobile CTA - Always visible while scrolling */}
+        <div className="sm:hidden fixed bottom-0 left-0 right-0 z-50 p-4 bg-gradient-to-t from-[#050507] via-[#050507]/95 to-transparent pt-8">
+          <Link href="/timeline">
+            <button className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-gradient-to-r from-indigo-500 via-violet-500 to-purple-500 text-white font-bold text-base shadow-2xl shadow-violet-500/40 active:scale-[0.98] transition-transform touch-manipulation">
+              <Play className="h-5 w-5" />
+              Start Playing Free
+              <ChevronRight className="h-5 w-5" />
+            </button>
+          </Link>
+        </div>
+
         {/* Footer */}
         <footer className="w-full border-t border-white/10 bg-black/40">
           <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-12">
@@ -817,7 +919,7 @@ export default function HomePage() {
               <div>
                 <div className="flex items-center gap-3 mb-4">
                   <Image
-                    src="/favicon.png"
+                    src="/favicon.svg"
                     alt="Mini.Fi"
                     width={32}
                     height={32}

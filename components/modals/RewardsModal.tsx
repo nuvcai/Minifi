@@ -153,7 +153,7 @@ export function RewardsModal({
                   </div>
                 </div>
                 <p className="text-xs text-amber-600 text-center font-medium">
-                  {nextMilestone.xp - playerXP} XP to {nextMilestone.label}
+                  {nextMilestone.xp - playerXP} 🪙 to {nextMilestone.label}
                 </p>
               </div>
             </div>
@@ -186,8 +186,8 @@ export function RewardsModal({
                     Real Rewards Incoming! 🎁
                   </h3>
                   <p className="text-sm text-gray-600 max-w-sm mx-auto">
-                    Trade your XP for real gift cards, subscriptions, and exclusive experiences. 
-                    Keep stacking that XP!
+                    Trade your 🪙 iii for real gift cards, subscriptions, and exclusive experiences. 
+                    Keep stacking that iii!
                   </p>
                 </div>
 
@@ -222,7 +222,7 @@ export function RewardsModal({
               {[
                 { icon: <Trophy className="h-4 w-4 text-amber-500" />, text: "Complete missions", bg: "bg-amber-50 border-amber-200" },
                 { icon: <Zap className="h-4 w-4 text-orange-500" />, text: "Daily streaks", bg: "bg-orange-50 border-orange-200" },
-                { icon: <Star className="h-4 w-4 text-violet-500" />, text: "Earn XP badges", bg: "bg-violet-50 border-violet-200" },
+                { icon: <Star className="h-4 w-4 text-violet-500" />, text: "Earn iii badges", bg: "bg-violet-50 border-violet-200" },
                 { icon: <TrendingUp className="h-4 w-4 text-emerald-500" />, text: "Level up faster", bg: "bg-emerald-50 border-emerald-200" },
               ].map((item, i) => (
                 <div key={i} className={`flex items-center gap-2 p-2.5 rounded-xl border ${item.bg}`}>
@@ -240,7 +240,7 @@ export function RewardsModal({
           >
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
             <Sparkles className="h-5 w-5 mr-2" />
-            Keep Earning XP!
+            Keep Earning 🪙!
           </Button>
         </div>
       </DialogContent>

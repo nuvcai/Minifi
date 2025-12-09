@@ -215,7 +215,7 @@ export function CompetitionCard({ unlocked, onStartCompetition }: CompetitionCar
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-amber-100 to-orange-100 border border-amber-300 shadow-inner">
                 <Star className="h-4 w-4 text-amber-500 animate-spin" style={{ animationDuration: '3s' }} />
-                <span className="text-sm font-bold text-amber-700">Unlimited XP! ⭐</span>
+                <span className="text-sm font-bold text-amber-700">Unlimited 🪙 iii! ⭐</span>
               </div>
               <Button
                 className={`font-bold bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 hover:from-amber-600 hover:via-orange-600 hover:to-red-600 text-white shadow-xl shadow-amber-300/50 transition-all duration-300 ${

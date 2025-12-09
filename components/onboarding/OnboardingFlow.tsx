@@ -24,21 +24,39 @@ import {
   GraduationCap,
   Wallet,
   Brain,
-  Heart
+  Heart,
+  Mail,
+  Gift,
+  Save,
+  Crown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import { aiCoaches, AICoach } from "@/components/data/coaches";
 import type { RiskPersonality, LearningStyle } from "@/components/data/personalizedCoaching";
+
+// III Token config for display
+const III_CONFIG = {
+  symbol: 'iii',
+  emoji: '✦',
+};
+
+// Welcome bonus amounts
+const WELCOME_III_BONUS = 100;
 
 // =============================================================================
 // TYPES
 // =============================================================================
 
 export interface OnboardingData {
+  // Step 0: Adventure Identity (NEW - Save State Encouragement)
+  adventureName: string;       // User's chosen adventure/explorer name
+  email: string;               // For save state and newsletter
+  
   // Step 1: Basic Info
-  ageRange: "12-14" | "15-16" | "17-18";
+  ageRange: "12-14" | "15-16" | "17-18" | "19-24" | "25+";
   country: string;
   
   // Step 2: Financial Background
@@ -65,6 +83,9 @@ export interface OnboardingData {
   // Metadata
   completedAt: Date;
   source: string;
+  
+  // Starting III bonus
+  welcomeIIIBonus: number;     // Bonus iii for completing onboarding
 }
 
 interface OnboardingFlowProps {
@@ -180,6 +201,8 @@ function recommendCoach(personality: RiskPersonality): AICoach {
 export function OnboardingFlow({ onComplete, onSkip, source = "app" }: OnboardingFlowProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [data, setData] = useState<Partial<OnboardingData>>({
+    adventureName: "",
+    email: "",
     ageRange: "15-16",
     country: "AU",
     hasPartTimeJob: false,
@@ -190,13 +213,20 @@ export function OnboardingFlow({ onComplete, onSkip, source = "app" }: Onboardin
     preferredSessionLength: "medium",
     termsAccepted: false,
     marketingConsent: false,
-    source
+    source,
+    welcomeIIIBonus: WELCOME_III_BONUS,
   });
   
   const [currentRiskQuestion, setCurrentRiskQuestion] = useState(0);
+  const [emailError, setEmailError] = useState("");
 
-  const totalSteps = 5;
+  const totalSteps = 6; // Added new adventure identity step
   const progress = ((currentStep + 1) / totalSteps) * 100;
+  
+  // Simple email validation
+  const isValidEmail = (email: string): boolean => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
 
   // Handlers
   const updateData = useCallback((updates: Partial<OnboardingData>) => {
@@ -237,7 +267,8 @@ export function OnboardingFlow({ onComplete, onSkip, source = "app" }: Onboardin
   const handleComplete = useCallback(() => {
     const completeData: OnboardingData = {
       ...data as OnboardingData,
-      completedAt: new Date()
+      completedAt: new Date(),
+      welcomeIIIBonus: WELCOME_III_BONUS,
     };
     onComplete(completeData);
   }, [data, onComplete]);
@@ -246,34 +277,135 @@ export function OnboardingFlow({ onComplete, onSkip, source = "app" }: Onboardin
   // STEP RENDERS
   // ==========================================================================
 
-  // Step 0: Welcome & Age
-  const renderWelcome = () => (
+  // Step 0: Adventure Identity - Name & Email for Save State
+  const renderAdventureIdentity = () => (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       className="text-center space-y-6"
     >
-      <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 mb-4">
-        <Sparkles className="h-10 w-10 text-white" />
+      {/* Welcome Banner with III Bonus */}
+      <div className="relative p-6 rounded-2xl bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 overflow-hidden">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-24 h-24 bg-yellow-400/20 rounded-full blur-2xl" />
+        
+        <div className="relative">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/20 backdrop-blur mb-4">
+            <Crown className="h-8 w-8 text-yellow-300" />
+          </div>
+          <h2 className="text-2xl font-bold text-white mb-2">
+            Begin Your Wealth Journey! 🚀
+          </h2>
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur">
+            <Gift className="h-4 w-4 text-yellow-300" />
+            <span className="text-white font-semibold">
+              Earn +{WELCOME_III_BONUS} {III_CONFIG.emoji} bonus for completing setup!
+            </span>
+          </div>
+        </div>
       </div>
       
-      <h2 className="text-2xl font-bold text-white">
-        Let's Personalize Your Journey! 🎯
-      </h2>
-      <p className="text-slate-400 max-w-md mx-auto">
-        Answer a few quick questions so your AI coach can give you the best advice.
-        This takes about 2 minutes.
-      </p>
+      {/* Adventure Name Input */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-center gap-2">
+          <User className="h-5 w-5 text-emerald-400" />
+          <p className="text-sm text-slate-300 font-medium">Choose Your Adventure Name</p>
+        </div>
+        <Input
+          type="text"
+          placeholder="Enter your explorer name..."
+          value={data.adventureName || ""}
+          onChange={(e) => updateData({ adventureName: e.target.value })}
+          className="w-full max-w-sm mx-auto bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 text-center text-lg py-6 rounded-xl focus:border-emerald-500 focus:ring-emerald-500/20"
+          maxLength={20}
+        />
+        <p className="text-xs text-slate-500">This will appear on leaderboards and badges!</p>
+      </div>
+      
+      {/* Email Input */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-center gap-2">
+          <Mail className="h-5 w-5 text-emerald-400" />
+          <p className="text-sm text-slate-300 font-medium">Save Your Progress</p>
+        </div>
+        <Input
+          type="email"
+          placeholder="your@email.com"
+          value={data.email || ""}
+          onChange={(e) => {
+            updateData({ email: e.target.value });
+            setEmailError("");
+          }}
+          className={`w-full max-w-sm mx-auto bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 text-center py-6 rounded-xl focus:ring-emerald-500/20 ${
+            emailError ? "border-red-500 focus:border-red-500" : "focus:border-emerald-500"
+          }`}
+        />
+        {emailError && (
+          <p className="text-xs text-red-400">{emailError}</p>
+        )}
+        <div className="flex items-center justify-center gap-2 text-xs text-slate-500">
+          <Save className="h-3 w-3" />
+          <span>Your {III_CONFIG.symbol} tokens and progress will be saved!</span>
+        </div>
+      </div>
+
+      <div className="flex gap-3 justify-center pt-4">
+        <Button
+          variant="ghost"
+          onClick={onSkip}
+          className="text-slate-400"
+        >
+          Skip for now
+        </Button>
+        <Button
+          onClick={() => {
+            if (data.email && !isValidEmail(data.email)) {
+              setEmailError("Please enter a valid email address");
+              return;
+            }
+            if (!data.adventureName?.trim()) {
+              updateData({ adventureName: `Explorer${Math.floor(Math.random() * 9999)}` });
+            }
+            nextStep();
+          }}
+          className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600"
+        >
+          Continue <ChevronRight className="h-4 w-4 ml-1" />
+        </Button>
+      </div>
+    </motion.div>
+  );
+
+  // Step 1: Age Selection
+  const renderAgeSelection = () => (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      className="text-center space-y-6"
+    >
+      <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 mb-4">
+        <Sparkles className="h-8 w-8 text-white" />
+      </div>
+      
+      <div>
+        <h2 className="text-xl font-bold text-white">
+          {data.adventureName ? `Welcome, ${data.adventureName}! 👋` : "Let's Get Started! 🎯"}
+        </h2>
+        <p className="text-slate-400 text-sm mt-2">
+          We'll personalize your learning experience based on your age
+        </p>
+      </div>
       
       <div className="space-y-4 pt-4">
         <p className="text-sm text-slate-300 font-medium">How old are you?</p>
-        <div className="flex gap-3 justify-center">
-          {(["12-14", "15-16", "17-18"] as const).map((age) => (
+        <div className="flex flex-wrap gap-3 justify-center">
+          {(["12-14", "15-16", "17-18", "19-24", "25+"] as const).map((age) => (
             <button
               key={age}
               onClick={() => updateData({ ageRange: age })}
-              className={`px-6 py-3 rounded-xl border-2 transition-all ${
+              className={`px-5 py-3 rounded-xl border-2 transition-all ${
                 data.ageRange === age
                   ? "border-emerald-500 bg-emerald-500/20 text-emerald-400"
                   : "border-slate-700 bg-slate-800/50 text-slate-300 hover:border-slate-600"
@@ -286,12 +418,8 @@ export function OnboardingFlow({ onComplete, onSkip, source = "app" }: Onboardin
       </div>
 
       <div className="flex gap-3 justify-center pt-6">
-        <Button
-          variant="ghost"
-          onClick={onSkip}
-          className="text-slate-400"
-        >
-          Skip for now
+        <Button variant="ghost" onClick={prevStep} className="text-slate-400">
+          <ChevronLeft className="h-4 w-4 mr-1" /> Back
         </Button>
         <Button
           onClick={nextStep}
@@ -629,6 +757,25 @@ export function OnboardingFlow({ onComplete, onSkip, source = "app" }: Onboardin
           </label>
         </div>
 
+        {/* III Welcome Bonus */}
+        <div className="p-4 rounded-xl bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-500/30">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-emerald-500/20 rounded-lg">
+                <Gift className="h-5 w-5 text-emerald-400" />
+              </div>
+              <div>
+                <p className="font-semibold text-white">Welcome Bonus Ready!</p>
+                <p className="text-xs text-slate-400">Complete setup to claim</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <span className="text-2xl font-black text-emerald-400">+{WELCOME_III_BONUS}</span>
+              <span className="text-emerald-400 ml-1">{III_CONFIG.emoji}</span>
+            </div>
+          </div>
+        </div>
+
         <div className="flex gap-3 justify-center pt-4">
           <Button variant="ghost" onClick={prevStep} className="text-slate-400">
             <ChevronLeft className="h-4 w-4 mr-1" /> Back
@@ -639,7 +786,7 @@ export function OnboardingFlow({ onComplete, onSkip, source = "app" }: Onboardin
             className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600"
           >
             <Sparkles className="h-4 w-4 mr-2" />
-            Start My Journey!
+            Claim +{WELCOME_III_BONUS} {III_CONFIG.emoji} & Start!
           </Button>
         </div>
       </motion.div>
@@ -651,11 +798,12 @@ export function OnboardingFlow({ onComplete, onSkip, source = "app" }: Onboardin
   // ==========================================================================
 
   const steps = [
-    renderWelcome,
-    renderBackground,
-    renderRiskAssessment,
-    renderLearningStyle,
-    renderCoachAndConsent
+    renderAdventureIdentity,   // Step 0: Name & Email
+    renderAgeSelection,        // Step 1: Age
+    renderBackground,          // Step 2: Financial Background
+    renderRiskAssessment,      // Step 3: Risk Profile
+    renderLearningStyle,       // Step 4: Learning Style
+    renderCoachAndConsent      // Step 5: Coach & Consent
   ];
 
   return (

@@ -24,7 +24,7 @@ export function ShareButton({
   contentType,
   data,
   referralCode,
-  baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://minifi.app',
+  baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://minifi.games',
   onShare,
   variant = 'button',
   platforms = ['twitter', 'whatsapp', 'linkedin', 'copy_link'],
@@ -157,7 +157,7 @@ export function ShareButton({
             <div className="px-4 pb-4">
               <div className="bg-yellow-500/20 text-yellow-300 px-3 py-2 rounded-lg text-sm flex items-center gap-2">
                 <span>⭐</span>
-                <span>Earn +50 XP when you share!</span>
+                <span>Earn +50 🪙 when you share!</span>
               </div>
             </div>
           </div>

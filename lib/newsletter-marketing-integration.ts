@@ -304,7 +304,7 @@ export function generatePersonalizedContent(
       ctaUrl: "https://minifi.app/timeline"
     },
     churned: {
-      subject: `🎁 ${subscriber.firstName}, here's a bonus XP offer just for you`,
+      subject: `🎁 ${subscriber.firstName}, here's a bonus 🪙 iii offer just for you`,
       cta: "Claim Your Bonus",
       ctaUrl: "https://minifi.app/timeline?bonus=comeback"
     },

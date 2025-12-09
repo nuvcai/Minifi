@@ -109,7 +109,7 @@ export function SummaryModal({
     {
       id: "xp",
       icon: <Trophy className="h-8 w-8 text-yellow-500" />,
-      title: "Total XP",
+      title: "Total 🪙 iii",
       value: playerXP,
     },
     {
@@ -279,12 +279,12 @@ export function SummaryModal({
             </CardContent>
           </Card>
 
-          <div className="flex gap-3">
-            <Button onClick={onClose} className="flex-1 font-medium">
+          <div className="flex flex-col gap-3">
+            <Button onClick={onClose} className="w-full min-h-[48px] font-medium bg-gradient-to-r from-[#9898f2] to-[#7070c0] hover:from-[#8585e0] hover:to-[#6060b0] text-white">
               <Trophy className="h-4 w-4 mr-2" />
               Save Learning Results
             </Button>
-            <Button variant="outline" onClick={onRestart}>
+            <Button variant="outline" onClick={onRestart} className="w-full min-h-[48px]">
               Restart Game
             </Button>
           </div>

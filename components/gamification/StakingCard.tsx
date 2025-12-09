@@ -173,7 +173,7 @@ export function StakingCard({
                         <span className="text-lg">{pool?.emoji}</span>
                         <div>
                           <p className="text-sm font-medium text-gray-900">{pool?.name}</p>
-                          <p className="text-xs text-gray-500">{stake.amount.toLocaleString()} XP</p>
+                          <p className="text-xs text-gray-500">{stake.amount.toLocaleString()} 🪙</p>
                         </div>
                       </div>
                       <div className="text-right">
@@ -228,7 +228,7 @@ export function StakingCard({
           className="w-full bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white font-bold shadow-lg shadow-violet-200"
         >
           <Coins className="h-4 w-4 mr-2" />
-          Stake XP to Earn More
+          Stake 🪙 to Earn More
           <ChevronRight className="h-4 w-4 ml-1" />
         </Button>
 
@@ -252,7 +252,7 @@ export function StakingCard({
               </span>
             </DialogTitle>
             <DialogDescription>
-              Lock your XP to earn passive rewards. Higher locks = higher APY!
+              Lock your 🪙 iii to earn passive rewards. Higher locks = higher APY!
             </DialogDescription>
           </DialogHeader>
 
@@ -338,7 +338,7 @@ export function StakingCard({
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <p className="text-sm font-semibold text-gray-700">Amount to Stake</p>
-                  <p className="text-sm text-gray-500">Available: {currentXP.toLocaleString()} XP</p>
+                  <p className="text-sm text-gray-500">Available: {currentXP.toLocaleString()} 🪙</p>
                 </div>
                 
                 <div className="p-4 rounded-xl bg-white border border-gray-200">

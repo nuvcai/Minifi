@@ -10,12 +10,20 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import { ArrowLeft, Loader2, RefreshCw, AlertCircle, TrendingUp, TrendingDown, Activity, BarChart3, Shield, Target, Zap } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import CompetitionResults from "@/components/competition-results";
 import { api, handleApiError } from "@/lib/api";
+
+// Lazy load components that use client-only features
+const CompetitionResults = dynamic(
+  () => import("@/components/competition-results"),
+  { ssr: false }
+);
+
+// Lazy load recharts to avoid SSR issues
 import {
   LineChart,
   Line,
@@ -153,10 +161,10 @@ function ResultsContent() {
 
   if (loading || !resultsData) {
     return (
-      <div className="flex items-center justify-center pt-32">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="h-10 w-10 animate-spin text-amber-500 mx-auto mb-4" />
-          <p className="text-gray-500 font-medium">Loading results...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading results...</p>
         </div>
       </div>
     );
@@ -409,7 +417,7 @@ export default function ResultsPage() {
             
             <div className="flex items-center gap-2">
               <Image
-                src="/minifi-header-logo.png"
+                src="/minifi-logo.svg"
                 alt="Mini.Fi"
                 width={100}
                 height={36}
@@ -424,21 +432,10 @@ export default function ResultsPage() {
           </div>
         </div>
       </nav>
-
-      <div className="relative">
-        <Suspense
-          fallback={
-            <div className="flex items-center justify-center pt-32">
-              <div className="text-center">
-                <Loader2 className="h-10 w-10 animate-spin text-amber-500 mx-auto mb-4" />
-                <p className="text-gray-500 font-medium">Loading...</p>
-              </div>
-            </div>
-          }
-        >
-          <ResultsContent />
-        </Suspense>
-      </div>
+      
+      <Suspense fallback={<div className="flex items-center justify-center min-h-[400px]"><Loader2 className="h-8 w-8 animate-spin text-amber-500" /></div>}>
+        <ResultsContent />
+      </Suspense>
     </div>
   );
 }

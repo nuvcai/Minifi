@@ -520,7 +520,7 @@ export const missionData: Record<number, MissionData> = {
         description: "Bet big on artificial intelligence companies",
         risk: "High",
         expectedReturn: "20-40%",
-        actualReturn: 0,
+        actualReturn: 35, // Simulated: AI stocks have been strong in 2024-2025
         investmentInsight: "AI is the hottest thing since the internet! 🤖 Nvidia, Microsoft, Google - they're all racing to dominate. But are prices already too high?",
         assetClass: "equities" as AssetClass,
         timeHorizon: "long" as TimeHorizon,
@@ -538,7 +538,7 @@ export const missionData: Record<number, MissionData> = {
         description: "Invest in solar, wind, and clean energy",
         risk: "High",
         expectedReturn: "15-30%",
-        actualReturn: 0,
+        actualReturn: -15, // Simulated: Green energy struggled with high rates in 2024
         investmentInsight: "The world is going green! 🌱 Governments are spending big on clean energy. But high interest rates make these projects more expensive.",
         assetClass: "equities" as AssetClass,
         timeHorizon: "long" as TimeHorizon,
@@ -556,7 +556,7 @@ export const missionData: Record<number, MissionData> = {
         description: "Get bonds that adjust for inflation",
         risk: "Low",
         expectedReturn: "5-8%",
-        actualReturn: 0,
+        actualReturn: 8, // Simulated: TIPS performed as expected with inflation
         investmentInsight: "With prices going up everywhere, these bonds protect your buying power 💪 Not exciting, but you won't lose money to inflation!",
         assetClass: "fixed_income" as AssetClass,
         timeHorizon: "medium" as TimeHorizon,
@@ -574,7 +574,7 @@ export const missionData: Record<number, MissionData> = {
         description: "Invest in oil, gold, and food",
         risk: "Medium",
         expectedReturn: "10-20%",
-        actualReturn: 0,
+        actualReturn: 18, // Simulated: Gold hit all-time highs in 2024
         investmentInsight: "Real stuff like oil, gold, and food usually does well when inflation is high 🛢️ Global supply chain issues and conflicts can push prices up.",
         assetClass: "commodities" as AssetClass,
         timeHorizon: "medium" as TimeHorizon,
@@ -594,7 +594,7 @@ export const missionData: Record<number, MissionData> = {
       "yield-yoda": "High inflation? Real assets protect you 🛡️",
     },
     outcome:
-      "This is happening RIGHT NOW! 🎬 Your investment choices will shape your future wealth. There's no crystal ball - make your best call!",
+      "🎬 LIVE SCENARIO: Based on 2024-2025 market trends, AI stocks surged 35% as companies raced to deploy AI. Green energy struggled (-15%) with high interest rates. TIPS delivered steady 8% protection. Gold hit all-time highs pushing commodities up 18%. The lesson? Even in YOUR era, diversification wins!",
     wealthLesson: "🎓 WEALTH LESSON: You are living through YOUR generation's transformative moment! AI is this era's Industrial Revolution, Internet, and smartphone combined. Every generation has a defining technology - AI and robotics are YOURS.",
     foWisdom: "🏛️ FAMILY OFFICE WISDOM: The smartest FOs are allocating 15-30% to AI-related investments while maintaining diversification. They're buying the 'picks and shovels' (NVIDIA, cloud providers) AND promising AI applications. But they NEVER go all-in on any single bet.",
     historicalOpportunity: "💡 THE OPPORTUNITY: You're witnessing the early stages of the AI revolution - like being in 1995 for the internet or 2007 for smartphones. The companies that will dominate 2035 are being built RIGHT NOW. Understanding AI gives you an edge most investors don't have!",

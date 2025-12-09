@@ -18,6 +18,33 @@ export * from './missions';
 // Events - Financial timeline events
 export * from './events';
 
+// Chapters - Unified chapter/era/progression data (NEW)
+// Note: Selective exports to avoid conflicts with wealthWisdom
+export {
+  type Chapter,
+  type LevelMeta,
+  type WealthPillar as ChapterWealthPillar,
+  type GenerationalOpportunity,
+  type AssetClass as ChapterAssetClass,
+  type Strategy,
+  type InnovationCycle,
+  type MasteryLevel,
+  chapters,
+  levelMeta,
+  wealthPillars as chapterWealthPillars,
+  generationalOpportunities,
+  assetClasses as chapterAssetClasses,
+  strategies,
+  innovationCycles,
+  masteryLevels,
+  getMasteryLevel,
+  getNextMasteryLevel,
+  getPillarMastery,
+  getAssetMastery,
+  getStrategyMastery,
+  calculateOverallProgress,
+} from './chapters';
+
 // Rewards - Gamification reward system
 export * from './rewards';
 

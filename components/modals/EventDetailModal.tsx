@@ -14,6 +14,7 @@ import { Trophy, BookOpen, Play, Target } from "lucide-react";
 import { FinancialEvent } from "@/components/data/events";
 import { AICoach } from "@/components/data/coaches";
 import { Badge } from "@/components/ui/badge";
+import { III_CONFIG } from "@/hooks/useIII";
 
 interface EventDetailModalProps {
   event: FinancialEvent | null;
@@ -61,8 +62,8 @@ export function EventDetailModal({
           <div className="grid grid-cols-2 gap-4">
             <DataCard
               icon={<Trophy className="h-8 w-8 text-accent" />}
-              title="Reward XP"
-              value={`${event.reward} XP`}
+              title={`Reward ${III_CONFIG.symbol}`}
+              value={`${event.reward} ${III_CONFIG.symbol}`}
             />
             <DataCard
               icon={<BookOpen className="h-8 w-8 text-secondary" />}
@@ -126,12 +127,12 @@ export function EventDetailModal({
             </CardContent>
           </Card>
 
-          <div className="flex gap-3">
-            <Button onClick={onStartMission} className="flex-1 font-medium">
+          <div className="flex flex-col gap-3">
+            <Button onClick={onStartMission} className="w-full min-h-[48px] font-medium bg-gradient-to-r from-[#9898f2] to-[#7070c0] hover:from-[#8585e0] hover:to-[#6060b0] text-white">
               <Play className="h-4 w-4 mr-2" />
               Let&apos;s Go! 🚀
             </Button>
-            <Button variant="outline" onClick={onClose}>
+            <Button variant="outline" onClick={onClose} className="w-full min-h-[48px]">
               Maybe Later
             </Button>
           </div>

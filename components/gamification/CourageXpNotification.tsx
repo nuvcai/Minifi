@@ -1,13 +1,14 @@
 /**
- * CourageXpNotification - Animated notification for courage/effort XP rewards
+ * CourageXpNotification - Animated notification for courage/effort iii rewards
  * 
- * Shows celebratory feedback when users earn XP for trying, regardless of outcome.
+ * Shows celebratory feedback when users earn iii tokens for trying, regardless of outcome.
  */
 
 "use client";
 
 import React, { useState, useEffect } from "react";
 import { Zap, Sparkles, Trophy, Heart, Star } from "lucide-react";
+import { III_CONFIG } from "@/hooks/useIII";
 
 interface CourageXpNotificationProps {
   xp: number;
@@ -103,11 +104,11 @@ export function CourageXpNotification({
 
             {/* Content */}
             <div className="text-center pt-2">
-              {/* XP Amount */}
+              {/* iii Amount */}
               <div className="flex items-center justify-center gap-2 mb-2">
                 <Star className="h-5 w-5 text-amber-500 animate-pulse" />
                 <span className="text-4xl font-black bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
-                  +{xp} XP
+                  +{xp} {III_CONFIG.symbol}
                 </span>
                 <Star className="h-5 w-5 text-amber-500 animate-pulse" />
               </div>
@@ -186,7 +187,7 @@ export function MiniCourageXp({ xp, className = "" }: MiniCourageXpProps) {
       `}
     >
       <Zap className="h-3 w-3" />
-      +{xp} Courage XP
+      +{xp} Courage {III_CONFIG.symbol}
     </div>
   );
 }

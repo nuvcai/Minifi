@@ -1,24 +1,15 @@
 /**
- * CoachSidebar - Enhanced coach selection
- * Interactive cards with animations and status indicators
+ * CoachSidebar — Enhanced with Personality Differentiation
+ * 
+ * Shows unique visual identity, catchphrases, and personality for each coach
  */
 
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { AICoach } from "@/components/data/coaches";
-import { 
-  MessageCircle, 
-  Star, 
-  Sparkles, 
-  Check, 
-  ChevronRight,
-  Brain,
-  Zap,
-  Heart,
-} from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { AICoach, getCoachGreeting, getCoachCatchphrase } from "@/components/data/coaches";
+import { Check, ChevronDown, Shield, Building2, Rocket, Coins, Sparkles } from "lucide-react";
 
 interface CoachSidebarProps {
   coaches: AICoach[];
@@ -26,11 +17,36 @@ interface CoachSidebarProps {
   onCoachSelect: (coach: AICoach) => void;
 }
 
-const coachSpecialties: Record<string, { icon: React.ReactNode; specialty: string; color: string }> = {
-  sage: { icon: <Brain className="h-3 w-3" />, specialty: "Deep Analysis", color: "from-blue-500 to-indigo-500" },
-  mentor: { icon: <Heart className="h-3 w-3" />, specialty: "Patient Teaching", color: "from-rose-500 to-pink-500" },
-  strategist: { icon: <Zap className="h-3 w-3" />, specialty: "Quick Decisions", color: "from-amber-500 to-orange-500" },
-  analyst: { icon: <Star className="h-3 w-3" />, specialty: "Data Expert", color: "from-emerald-500 to-teal-500" },
+// Coach-specific icon mapping
+const coachIcons: Record<string, React.ReactNode> = {
+  "steady-sam": <Shield className="h-3 w-3" />,
+  "growth-guru": <Building2 className="h-3 w-3" />,
+  "adventure-alex": <Rocket className="h-3 w-3" />,
+  "yield-yoda": <Coins className="h-3 w-3" />,
+};
+
+// Risk colors with enhanced visual distinction
+const riskColors = {
+  conservative: "bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-500/30",
+  moderate: "bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/30",
+  aggressive: "bg-orange-100 dark:bg-orange-500/20 text-orange-700 dark:text-orange-300 border border-orange-200 dark:border-orange-500/30",
+  very_aggressive: "bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-500/30",
+};
+
+// Coach-specific gradient backgrounds
+const coachGradients: Record<string, string> = {
+  "steady-sam": "from-blue-50 to-cyan-50 dark:from-blue-500/10 dark:to-cyan-500/10",
+  "growth-guru": "from-emerald-50 to-teal-50 dark:from-emerald-500/10 dark:to-teal-500/10",
+  "adventure-alex": "from-purple-50 to-violet-50 dark:from-purple-500/10 dark:to-violet-500/10",
+  "yield-yoda": "from-amber-50 to-yellow-50 dark:from-amber-500/10 dark:to-yellow-500/10",
+};
+
+// Coach-specific border colors
+const coachBorders: Record<string, string> = {
+  "steady-sam": "border-blue-300 dark:border-blue-500/40",
+  "growth-guru": "border-emerald-300 dark:border-emerald-500/40",
+  "adventure-alex": "border-purple-300 dark:border-purple-500/40",
+  "yield-yoda": "border-amber-300 dark:border-amber-500/40",
 };
 
 export function CoachSidebar({
@@ -38,196 +54,161 @@ export function CoachSidebar({
   selectedCoach,
   onCoachSelect,
 }: CoachSidebarProps) {
-  const [hoveredCoach, setHoveredCoach] = useState<string | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [currentCatchphrase, setCurrentCatchphrase] = useState("");
+  const [isAnimating, setIsAnimating] = useState(false);
 
-  const getCoachSpecialty = (coachId: string) => {
-    return coachSpecialties[coachId] || coachSpecialties.mentor;
-  };
+  // Rotate catchphrase for selected coach
+  useEffect(() => {
+    setCurrentCatchphrase(getCoachCatchphrase(selectedCoach));
+    setIsAnimating(true);
+    const timer = setTimeout(() => setIsAnimating(false), 500);
+    return () => clearTimeout(timer);
+  }, [selectedCoach]);
+
+  // Auto-rotate catchphrase every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIsAnimating(true);
+      setTimeout(() => {
+        setCurrentCatchphrase(getCoachCatchphrase(selectedCoach));
+        setIsAnimating(false);
+      }, 300);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [selectedCoach]);
+
+  const selectedGradient = coachGradients[selectedCoach.id] || coachGradients["steady-sam"];
+  const selectedBorder = coachBorders[selectedCoach.id] || coachBorders["steady-sam"];
 
   return (
-    <div className="p-4 sm:p-5 rounded-2xl bg-white shadow-xl shadow-indigo-100/50 border border-indigo-100 overflow-hidden">
-      {/* Header - Clickable on mobile to expand/collapse */}
-      <button 
-        className="w-full flex items-center gap-2 mb-4 sm:mb-5 lg:cursor-default"
-        onClick={() => setIsExpanded(!isExpanded)}
-      >
-        <div className="p-2 rounded-xl bg-gradient-to-br from-indigo-100 to-violet-100">
-          <MessageCircle className="h-5 w-5 text-indigo-600" />
+    <div className="rounded-2xl bg-white dark:bg-[#1A1A1A] border border-black/[0.04] dark:border-white/[0.06] shadow-[0_2px_8px_rgba(0,0,0,0.04)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3)] overflow-hidden">
+      {/* Header */}
+      <div className="p-4 border-b border-black/[0.04] dark:border-white/[0.06]">
+        <div className="flex items-center gap-2">
+          <Sparkles className="h-4 w-4 text-violet-500" />
+          <h3 className="font-semibold text-gray-900 dark:text-white text-sm">Your AI Coach</h3>
         </div>
-        <div className="text-left flex-1">
-          <h3 className="font-bold text-gray-900 text-sm sm:text-base">Your AI Coach</h3>
-          <p className="text-xs text-gray-500">Choose your guide</p>
-        </div>
-        <Sparkles className="h-4 w-4 text-amber-400" />
-        {/* Mobile expand indicator */}
-        <ChevronRight className={`h-4 w-4 text-gray-400 lg:hidden transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
-      </button>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Each coach has a unique investment style</p>
+      </div>
       
-      {/* Selected Coach Preview - Always visible, compact on mobile */}
-      <div className="relative mb-4 sm:mb-5 p-3 sm:p-4 rounded-2xl bg-gradient-to-br from-indigo-50 via-white to-violet-50 border-2 border-indigo-200 shadow-lg">
-        {/* Background glow */}
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-violet-500/5 rounded-2xl" />
-        
-        <div className="relative flex items-center gap-3 sm:gap-4">
-          {/* Avatar with ring */}
-          <div className="relative flex-shrink-0">
-            <div className="absolute -inset-1 bg-gradient-to-br from-indigo-400 to-violet-500 rounded-full blur opacity-50" />
-            <Image
-              src={selectedCoach.avatar}
-              alt={selectedCoach.name}
-              width={64}
-              height={64}
-              className="relative rounded-full ring-4 ring-white shadow-xl w-12 h-12 sm:w-16 sm:h-16"
-            />
-            {/* Online indicator */}
-            <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 sm:w-5 sm:h-5 bg-emerald-400 rounded-full border-2 sm:border-3 border-white shadow-lg flex items-center justify-center">
-              <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full" />
-            </div>
-          </div>
-          
-          <div className="flex-1 min-w-0">
-            <p className="font-bold text-gray-900 text-base sm:text-lg truncate">{selectedCoach.name}</p>
-            <p className="text-xs sm:text-sm text-indigo-600 font-medium truncate">{selectedCoach.personality}</p>
-            
-            {/* Specialty badge */}
-            <div className="flex items-center gap-2 mt-1.5 sm:mt-2">
-              <Badge 
-                className={`bg-gradient-to-r ${getCoachSpecialty(selectedCoach.id).color} text-white border-0 text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5`}
-              >
-                {getCoachSpecialty(selectedCoach.id).icon}
-                <span className="ml-1">{getCoachSpecialty(selectedCoach.id).specialty}</span>
-              </Badge>
-            </div>
+      {/* Selected Coach - Enhanced display */}
+      <button 
+        onClick={() => setIsExpanded(!isExpanded)}
+        className={`w-full p-4 flex items-center gap-3 transition-all lg:cursor-default bg-gradient-to-r ${selectedGradient}`}
+      >
+        <div className="relative flex-shrink-0">
+          <div className={`absolute -inset-1 rounded-full bg-gradient-to-r ${selectedCoach.visualIdentity?.bgGradient || 'from-violet-500 to-purple-500'} opacity-30 blur-sm`} />
+          <Image
+            src={selectedCoach.avatar}
+            alt={selectedCoach.name}
+            width={52}
+            height={52}
+            className={`relative rounded-full ring-2 ${selectedBorder} ring-offset-2 ring-offset-white dark:ring-offset-[#1A1A1A]`}
+          />
+          <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 bg-emerald-500 rounded-full border-2 border-white dark:border-[#1A1A1A] flex items-center justify-center">
+            {coachIcons[selectedCoach.id] || <Check className="h-2.5 w-2.5 text-white" />}
           </div>
         </div>
         
-        {/* Quick message preview - hidden on mobile by default */}
-        <div className={`mt-3 sm:mt-4 p-2.5 sm:p-3 rounded-xl bg-white/80 border border-indigo-100 ${isExpanded ? 'block' : 'hidden sm:block'}`}>
-          <p className="text-[11px] sm:text-xs text-gray-600 italic">
-            &ldquo;Ready to help you master investing! Let&apos;s learn together! 🚀&rdquo;
+        <div className="flex-1 text-left min-w-0">
+          <div className="flex items-center gap-2">
+            <p className="font-bold text-gray-900 dark:text-white truncate">{selectedCoach.name}</p>
+            <span className="text-lg">{selectedCoach.speechStyle?.emoji || "🎯"}</span>
+          </div>
+          <p className="text-sm text-gray-600 dark:text-gray-300 truncate font-medium">{selectedCoach.personality}</p>
+          {/* Animated catchphrase */}
+          <p className={`text-xs text-gray-500 dark:text-gray-400 mt-1 italic transition-opacity duration-300 ${isAnimating ? 'opacity-0' : 'opacity-100'}`}>
+            "{currentCatchphrase}"
           </p>
         </div>
-      </div>
-
-      {/* Coach List - Collapsible on mobile */}
-      <div className={`space-y-2 ${isExpanded ? 'block' : 'hidden'} lg:block`}>
-        <p className="text-xs text-gray-500 font-medium px-1 mb-3">Available Coaches</p>
         
-        {coaches.map((coach) => {
-          const isSelected = selectedCoach.id === coach.id;
-          const isHovered = hoveredCoach === coach.id;
-          const specialty = getCoachSpecialty(coach.id);
-          
-          return (
-            <button
-              key={coach.id}
-              onClick={() => onCoachSelect(coach)}
-              onMouseEnter={() => setHoveredCoach(coach.id)}
-              onMouseLeave={() => setHoveredCoach(null)}
-              className={`w-full p-3 rounded-xl transition-all duration-300 text-left relative overflow-hidden group ${
-                isSelected
-                  ? "bg-gradient-to-r from-indigo-50 to-violet-50 border-2 border-indigo-300 shadow-lg scale-[1.02]"
-                  : "hover:bg-gray-50 border-2 border-transparent hover:border-gray-200 hover:shadow-md"
-              }`}
-            >
-              {/* Selection indicator */}
-              {isSelected && (
-                <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-indigo-500 to-violet-500 rounded-r" />
-              )}
-              
-              {/* Hover glow effect */}
-              {isHovered && !isSelected && (
-                <div className="absolute inset-0 bg-gradient-to-r from-gray-100/50 to-transparent" />
-              )}
-              
-              <div className="relative flex items-center gap-3">
-                {/* Coach Avatar */}
-                <div className="relative">
-                  <Image
-                    src={coach.avatar}
-                    alt={coach.name}
-                    width={44}
-                    height={44}
-                    className={`rounded-full transition-all duration-300 ${
-                      isSelected 
-                        ? "ring-2 ring-indigo-400 shadow-lg" 
-                        : isHovered 
-                          ? "ring-2 ring-gray-300" 
-                          : "opacity-80"
-                    }`}
-                  />
-                  {/* Online dot */}
-                  <div className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white transition-colors ${
-                    isSelected ? "bg-emerald-400" : "bg-gray-300"
-                  }`} />
-                </div>
+        <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform lg:hidden ${isExpanded ? 'rotate-180' : ''}`} />
+      </button>
+      
+      {/* Coach Grid - Enhanced with personality indicators */}
+      <div className={`p-4 pt-3 ${isExpanded ? 'block' : 'hidden lg:block'}`}>
+        <div className="grid grid-cols-2 gap-2">
+          {coaches.map((coach) => {
+            const isSelected = selectedCoach.id === coach.id;
+            const coachGradient = coachGradients[coach.id] || coachGradients["steady-sam"];
+            const coachBorder = coachBorders[coach.id] || coachBorders["steady-sam"];
+            const riskKey = coach.riskTolerance.replace('-', '_') as keyof typeof riskColors;
+            
+            return (
+              <button
+                key={coach.id}
+                onClick={() => onCoachSelect(coach)}
+                className={`relative p-3 rounded-xl transition-all duration-300 ${
+                  isSelected 
+                    ? `bg-gradient-to-br ${coachGradient} border-2 ${coachBorder} shadow-lg scale-[1.02]` 
+                    : 'bg-gray-50 dark:bg-white/[0.02] border border-gray-100 dark:border-white/[0.04] hover:border-gray-200 dark:hover:border-white/[0.08] hover:scale-[1.01]'
+                }`}
+              >
+                {isSelected && (
+                  <div className={`absolute top-2 right-2 w-5 h-5 rounded-full flex items-center justify-center bg-gradient-to-r ${coach.visualIdentity?.bgGradient || 'from-violet-500 to-purple-500'}`}>
+                    <Check className="h-3 w-3 text-white" strokeWidth={3} />
+                  </div>
+                )}
                 
-                {/* Coach Info */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <p className={`text-sm font-semibold transition-colors ${
-                      isSelected ? "text-gray-900" : "text-gray-600 group-hover:text-gray-800"
+                <div className="flex flex-col items-center text-center">
+                  {/* Coach avatar with glow */}
+                  <div className="relative mb-2">
+                    {isSelected && (
+                      <div className={`absolute -inset-1 rounded-full bg-gradient-to-r ${coach.visualIdentity?.bgGradient || 'from-violet-500 to-purple-500'} opacity-40 blur-sm animate-pulse`} />
+                    )}
+                    <Image
+                      src={coach.avatar}
+                      alt={coach.name}
+                      width={44}
+                      height={44}
+                      className={`relative rounded-full transition-all ${isSelected ? `ring-2 ${coachBorder}` : ''}`}
+                    />
+                  </div>
+                  
+                  {/* Coach name with emoji */}
+                  <div className="flex items-center gap-1 mb-1">
+                    <p className={`font-semibold text-xs truncate ${
+                      isSelected ? 'text-gray-900 dark:text-white' : 'text-gray-600 dark:text-gray-400'
                     }`}>
                       {coach.name}
                     </p>
-                    {isSelected && (
-                      <Badge className="bg-emerald-100 text-emerald-700 border-0 text-[9px] px-1.5 py-0">
-                        Active
-                      </Badge>
-                    )}
+                    <span className="text-sm">{coach.speechStyle?.emoji || "🎯"}</span>
                   </div>
-                  <p className={`text-xs truncate transition-colors ${
-                    isSelected ? "text-indigo-600" : "text-gray-500"
+                  
+                  {/* Personality tag */}
+                  <p className={`text-[9px] font-medium mb-1.5 ${
+                    isSelected ? 'text-gray-700 dark:text-gray-200' : 'text-gray-500 dark:text-gray-500'
                   }`}>
                     {coach.personality}
                   </p>
                   
-                  {/* Specialty on hover */}
-                  {(isHovered || isSelected) && (
-                    <div className="flex items-center gap-1 mt-1.5">
-                      <div className={`p-0.5 rounded bg-gradient-to-r ${specialty.color}`}>
-                        <div className="text-white">{specialty.icon}</div>
-                      </div>
-                      <span className="text-[10px] text-gray-500">{specialty.specialty}</span>
-                    </div>
-                  )}
+                  {/* Risk tolerance badge with icon */}
+                  <span className={`flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                    riskColors[riskKey] || riskColors.moderate
+                  }`}>
+                    {coachIcons[coach.id]}
+                    {coach.riskTolerance.replace('_', ' ')}
+                  </span>
                 </div>
-                
-                {/* Selection indicator */}
-                <div className={`flex items-center justify-center w-6 h-6 rounded-full transition-all ${
-                  isSelected 
-                    ? "bg-gradient-to-r from-indigo-500 to-violet-500 text-white" 
-                    : "bg-gray-100 text-gray-400 group-hover:bg-gray-200"
-                }`}>
-                  {isSelected ? (
-                    <Check className="h-3.5 w-3.5" />
-                  ) : (
-                    <ChevronRight className="h-3.5 w-3.5" />
-                  )}
-                </div>
-              </div>
-            </button>
-          );
-        })}
-      </div>
-      
-      {/* Footer tip - Also collapsible on mobile */}
-      <div className={`mt-4 sm:mt-5 p-2.5 sm:p-3 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 ${isExpanded ? 'block' : 'hidden'} lg:block`}>
-        <div className="flex items-center gap-2">
-          <Star className="h-4 w-4 text-amber-500 flex-shrink-0" />
-          <p className="text-[11px] sm:text-xs text-amber-700">
-            Each coach has a unique teaching style. Try them all!
+              </button>
+            );
+          })}
+        </div>
+        
+        {/* Teaching style indicator */}
+        <div className="mt-3 pt-3 border-t border-gray-100 dark:border-white/[0.06]">
+          <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <span className="font-medium">Teaching style:</span>
+            <span className={`px-2 py-0.5 rounded-full bg-gradient-to-r ${selectedGradient} font-medium text-gray-700 dark:text-gray-200`}>
+              {selectedCoach.teachingStyle?.approach || "balanced"}
+            </span>
+          </div>
+          <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1 italic">
+            💡 {selectedCoach.teachingStyle?.uniqueInsight || "Every investment tells a story"}
           </p>
         </div>
       </div>
-      
-      {/* Mobile: Show expand hint when collapsed */}
-      {!isExpanded && (
-        <p className="lg:hidden text-[10px] text-center text-gray-400 mt-2">
-          Tap to see all coaches
-        </p>
-      )}
     </div>
   );
 }

@@ -237,7 +237,7 @@ export const emailTemplates = {
         </div>
         <div>
           <span style="color: #10b981; font-weight: bold;">3.</span>
-          <strong>Earn XP & Rewards</strong><br>
+          <strong>Earn 🪙 iii & Rewards</strong><br>
           <span style="color: #94a3b8; font-size: 14px;">Complete missions to level up and earn real rewards!</span>
         </div>
       </div>
@@ -337,7 +337,7 @@ export const emailTemplates = {
     </p>
     
     <div style="background: #0f172a; border-radius: 12px; padding: 20px; margin: 30px 0; text-align: center;">
-      <p style="margin: 0 0 10px; color: #94a3b8;">Use this code for bonus XP:</p>
+      <p style="margin: 0 0 10px; color: #94a3b8;">Use this code for bonus 🪙 iii:</p>
       <div style="font-size: 24px; font-weight: bold; color: #10b981; letter-spacing: 2px;">${referralCode}</div>
     </div>
     

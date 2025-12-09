@@ -522,6 +522,249 @@ CREATE POLICY "Anyone can save snapshots" ON portfolio_snapshots
   WITH CHECK (true);
 
 -- =============================================================================
+-- PLAYER_REWARDS TABLE - III Token balance and progression
+-- =============================================================================
+
+CREATE TABLE IF NOT EXISTS player_rewards (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  user_id UUID REFERENCES user_profiles(id) ON DELETE CASCADE,
+  email TEXT,
+  session_id TEXT,
+  adventure_name TEXT,
+  
+  -- III Token Balance
+  total_iii INTEGER DEFAULT 0,
+  weekly_iii INTEGER DEFAULT 0,
+  staked_iii INTEGER DEFAULT 0,
+  lifetime_iii INTEGER DEFAULT 0,
+  
+  -- Badge Stats
+  total_badges_earned INTEGER DEFAULT 0,
+  
+  -- Progress Tracking
+  investments_made INTEGER DEFAULT 0,
+  high_risk_investments INTEGER DEFAULT 0,
+  extreme_risk_investments INTEGER DEFAULT 0,
+  losses_experienced INTEGER DEFAULT 0,
+  investments_after_loss INTEGER DEFAULT 0,
+  consecutive_losses INTEGER DEFAULT 0,
+  profit_after_consecutive_losses INTEGER DEFAULT 0,
+  crises_navigated INTEGER DEFAULT 0,
+  bubbles_survived INTEGER DEFAULT 0,
+  drawdowns_held INTEGER DEFAULT 0,
+  reflections_completed INTEGER DEFAULT 0,
+  rational_decisions INTEGER DEFAULT 0,
+  missions_completed INTEGER DEFAULT 0,
+  perfect_quizzes INTEGER DEFAULT 0,
+  theses_written INTEGER DEFAULT 0,
+  risk_previews_viewed INTEGER DEFAULT 0,
+  coach_advice_viewed INTEGER DEFAULT 0,
+  
+  -- Exploration (stored as arrays for Sets)
+  asset_classes_tried TEXT[] DEFAULT '{}',
+  risk_levels_tried TEXT[] DEFAULT '{}',
+  coaches_used TEXT[] DEFAULT '{}',
+  
+  -- Timestamps
+  week_start_date DATE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Indexes for player_rewards
+CREATE INDEX IF NOT EXISTS idx_rewards_user ON player_rewards(user_id);
+CREATE INDEX IF NOT EXISTS idx_rewards_email ON player_rewards(email);
+CREATE INDEX IF NOT EXISTS idx_rewards_session ON player_rewards(session_id);
+CREATE INDEX IF NOT EXISTS idx_rewards_total_iii ON player_rewards(total_iii DESC);
+
+-- Enable Row Level Security
+ALTER TABLE player_rewards ENABLE ROW LEVEL SECURITY;
+
+-- Policies for player_rewards
+DROP POLICY IF EXISTS "Service role full access" ON player_rewards;
+CREATE POLICY "Service role full access" ON player_rewards
+  FOR ALL
+  TO service_role
+  USING (true)
+  WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Users can manage their rewards" ON player_rewards;
+CREATE POLICY "Users can manage their rewards" ON player_rewards
+  FOR ALL
+  TO anon
+  WITH CHECK (true);
+
+-- =============================================================================
+-- EARNED_BADGES TABLE - Track which badges each player has earned
+-- =============================================================================
+
+CREATE TABLE IF NOT EXISTS earned_badges (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  user_id UUID REFERENCES user_profiles(id) ON DELETE CASCADE,
+  email TEXT,
+  session_id TEXT,
+  
+  -- Badge info
+  badge_id TEXT NOT NULL,
+  badge_name TEXT NOT NULL,
+  badge_emoji TEXT,
+  badge_category TEXT NOT NULL CHECK (badge_category IN (
+    'crisis_wisdom', 'effort', 'streak', 'mastery', 'exploration', 'resilience', 'generational'
+  )),
+  badge_tier TEXT NOT NULL CHECK (badge_tier IN (
+    'bronze', 'silver', 'gold', 'platinum', 'diamond'
+  )),
+  
+  -- Reward given
+  iii_awarded INTEGER DEFAULT 0,
+  
+  -- Wisdom unlocked (if any)
+  wisdom_unlocked TEXT,
+  fo_wisdom TEXT,
+  
+  -- Timestamps
+  earned_at TIMESTAMPTZ DEFAULT NOW(),
+  
+  -- Unique constraint: one badge per user
+  UNIQUE(session_id, badge_id)
+);
+
+-- Indexes for earned_badges
+CREATE INDEX IF NOT EXISTS idx_badges_user ON earned_badges(user_id);
+CREATE INDEX IF NOT EXISTS idx_badges_session ON earned_badges(session_id);
+CREATE INDEX IF NOT EXISTS idx_badges_badge_id ON earned_badges(badge_id);
+CREATE INDEX IF NOT EXISTS idx_badges_category ON earned_badges(badge_category);
+CREATE INDEX IF NOT EXISTS idx_badges_tier ON earned_badges(badge_tier);
+CREATE INDEX IF NOT EXISTS idx_badges_earned_at ON earned_badges(earned_at DESC);
+
+-- Enable Row Level Security
+ALTER TABLE earned_badges ENABLE ROW LEVEL SECURITY;
+
+-- Policies for earned_badges
+DROP POLICY IF EXISTS "Service role full access" ON earned_badges;
+CREATE POLICY "Service role full access" ON earned_badges
+  FOR ALL
+  TO service_role
+  USING (true)
+  WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Users can earn badges" ON earned_badges;
+CREATE POLICY "Users can earn badges" ON earned_badges
+  FOR ALL
+  TO anon
+  WITH CHECK (true);
+
+-- =============================================================================
+-- III_TRANSACTIONS TABLE - Log all III token transactions
+-- =============================================================================
+
+CREATE TABLE IF NOT EXISTS iii_transactions (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  user_id UUID REFERENCES user_profiles(id) ON DELETE CASCADE,
+  email TEXT,
+  session_id TEXT,
+  
+  -- Transaction details
+  transaction_type TEXT NOT NULL CHECK (transaction_type IN (
+    'badge_earned', 'mission_complete', 'streak_bonus', 'reflection_bonus',
+    'courage_bonus', 'exploration_bonus', 'staking_reward', 'welcome_bonus',
+    'stake', 'unstake', 'spend', 'refund'
+  )),
+  amount INTEGER NOT NULL, -- Positive for earn, negative for spend
+  balance_after INTEGER NOT NULL,
+  
+  -- Reference (e.g., badge_id, mission_id, etc.)
+  reference_type TEXT,
+  reference_id TEXT,
+  
+  -- Description
+  description TEXT,
+  
+  -- Timestamps
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Indexes for iii_transactions
+CREATE INDEX IF NOT EXISTS idx_iii_trans_user ON iii_transactions(user_id);
+CREATE INDEX IF NOT EXISTS idx_iii_trans_session ON iii_transactions(session_id);
+CREATE INDEX IF NOT EXISTS idx_iii_trans_type ON iii_transactions(transaction_type);
+CREATE INDEX IF NOT EXISTS idx_iii_trans_created ON iii_transactions(created_at DESC);
+
+-- Enable Row Level Security
+ALTER TABLE iii_transactions ENABLE ROW LEVEL SECURITY;
+
+-- Policies for iii_transactions
+DROP POLICY IF EXISTS "Service role full access" ON iii_transactions;
+CREATE POLICY "Service role full access" ON iii_transactions
+  FOR ALL
+  TO service_role
+  USING (true)
+  WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Users can log transactions" ON iii_transactions;
+CREATE POLICY "Users can log transactions" ON iii_transactions
+  FOR INSERT
+  TO anon
+  WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Users can view their transactions" ON iii_transactions;
+CREATE POLICY "Users can view their transactions" ON iii_transactions
+  FOR SELECT
+  TO anon
+  USING (true);
+
+-- =============================================================================
+-- CRISIS_REFLECTIONS TABLE - Store post-loss reflections for wisdom learning
+-- =============================================================================
+
+CREATE TABLE IF NOT EXISTS crisis_reflections (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  user_id UUID REFERENCES user_profiles(id) ON DELETE CASCADE,
+  email TEXT,
+  session_id TEXT,
+  
+  -- Crisis context
+  mission_id TEXT,
+  crisis_type TEXT,
+  loss_percentage DECIMAL(10, 4),
+  asset_class TEXT,
+  
+  -- Reflection content
+  selected_lessons TEXT[] DEFAULT '{}',
+  custom_reflection TEXT,
+  reflection_quality TEXT CHECK (reflection_quality IN ('quick', 'detailed', 'thoughtful')),
+  
+  -- Rewards given
+  iii_awarded INTEGER DEFAULT 0,
+  wisdom_points INTEGER DEFAULT 0,
+  
+  -- Timestamps
+  reflected_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Indexes for crisis_reflections
+CREATE INDEX IF NOT EXISTS idx_reflections_user ON crisis_reflections(user_id);
+CREATE INDEX IF NOT EXISTS idx_reflections_session ON crisis_reflections(session_id);
+CREATE INDEX IF NOT EXISTS idx_reflections_mission ON crisis_reflections(mission_id);
+
+-- Enable Row Level Security
+ALTER TABLE crisis_reflections ENABLE ROW LEVEL SECURITY;
+
+-- Policies for crisis_reflections
+DROP POLICY IF EXISTS "Service role full access" ON crisis_reflections;
+CREATE POLICY "Service role full access" ON crisis_reflections
+  FOR ALL
+  TO service_role
+  USING (true)
+  WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Users can manage reflections" ON crisis_reflections;
+CREATE POLICY "Users can manage reflections" ON crisis_reflections
+  FOR ALL
+  TO anon
+  WITH CHECK (true);
+
+-- =============================================================================
 -- VIEWS - Useful aggregate views
 -- =============================================================================
 
@@ -655,5 +898,15 @@ GRANT SELECT, INSERT ON portfolio_snapshots TO anon;
 GRANT SELECT ON lead_stats TO service_role;
 GRANT SELECT ON feedback_stats TO service_role;
 GRANT SELECT ON lead_sources TO service_role;
+
+-- Rewards tables
+GRANT ALL ON player_rewards TO service_role;
+GRANT ALL ON earned_badges TO service_role;
+GRANT ALL ON iii_transactions TO service_role;
+GRANT ALL ON crisis_reflections TO service_role;
+GRANT SELECT, INSERT, UPDATE ON player_rewards TO anon;
+GRANT SELECT, INSERT ON earned_badges TO anon;
+GRANT SELECT, INSERT ON iii_transactions TO anon;
+GRANT SELECT, INSERT ON crisis_reflections TO anon;
 
 

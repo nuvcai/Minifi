@@ -1,6 +1,8 @@
 /**
- * GameHeader - Enhanced game navigation
- * Dynamic stats display with animations
+ * GameHeader — Apple-inspired Navigation
+ * 
+ * Clean, minimal, functional
+ * No overwhelming visual elements
  */
 
 "use client";
@@ -9,18 +11,22 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { 
-  Gift, 
-  Star, 
   Menu,
   X,
-  Trophy,
   Mail,
   LogIn,
   LogOut,
   Check,
+  User,
+  Trophy,
+  Sun,
+  Moon,
+  ChevronRight,
+  Sparkles,
 } from "lucide-react";
+import { useTheme } from "next-themes";
 import { levelTitles } from "@/components/gamification/LevelUpCelebration";
-import { LeagueBadge, SeasonEndCelebration, type SeasonEndResult } from "@/components/gamification";
+import { SeasonEndCelebration } from "@/components/gamification";
 import { useLeague } from "@/hooks/useLeague";
 import {
   Dialog,
@@ -33,41 +39,40 @@ import { Button } from "@/components/ui/button";
 interface GameHeaderProps {
   playerLevel: number;
   playerXP: number;
-  totalScore: number;
+  totalScore?: number;
+  weeklyXP?: number;
   onRewardsClick?: () => void;
 }
 
 export function GameHeader({
   playerLevel,
   playerXP,
-  totalScore,
-  onRewardsClick,
+  weeklyXP = 0,
 }: GameHeaderProps) {
   const xpToNextLevel = 1000;
   const xpInLevel = playerXP % xpToNextLevel;
   const xpProgress = (xpInLevel / xpToNextLevel) * 100;
   const levelInfo = levelTitles[playerLevel] || levelTitles[1];
   
-  const [animatedXP, setAnimatedXP] = useState(0);
-  const [animatedScore, setAnimatedScore] = useState(0);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [mounted, setMounted] = useState(false);
   
-  // League system hook
+  const { theme, setTheme } = useTheme();
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  
   const { 
     league, 
     userRank, 
-    zone, 
-    timeRemaining, 
-    xpToNextRank, 
-    xpLead,
-    standings,
+    zone,
     seasonEndResult,
     showSeasonEnd,
     dismissSeasonEnd,
   } = useLeague();
   
-  // Auth state
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [showSignInModal, setShowSignInModal] = useState(false);
   const [signInEmail, setSignInEmail] = useState("");
@@ -75,7 +80,6 @@ export function GameHeader({
   const [signInError, setSignInError] = useState("");
   const [signInSuccess, setSignInSuccess] = useState(false);
 
-  // Load user email on mount
   useEffect(() => {
     const savedEmail = localStorage.getItem('minifi_user_email');
     if (savedEmail) {
@@ -83,7 +87,6 @@ export function GameHeader({
     }
   }, []);
 
-  // Handle sign in
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!signInEmail || isSigningIn) return;
@@ -109,50 +112,24 @@ export function GameHeader({
           setShowSignInModal(false);
           setSignInSuccess(false);
           setSignInEmail("");
-          // Reload to sync progress
           window.location.reload();
         }, 1500);
       } else {
         setSignInError("No saved progress found. Start playing to save your progress!");
       }
-    } catch (error) {
+    } catch {
       setSignInError("Unable to sign in. Please try again.");
     }
     
     setIsSigningIn(false);
   };
 
-  // Handle sign out
   const handleSignOut = () => {
     setUserEmail(null);
     localStorage.removeItem('minifi_user_email');
     setShowMobileMenu(false);
   };
 
-  // Animate numbers on mount and when they change
-  useEffect(() => {
-    const duration = 1000;
-    const steps = 30;
-    const xpStep = (playerXP - animatedXP) / steps;
-    const scoreStep = (totalScore - animatedScore) / steps;
-    
-    let currentStep = 0;
-    const interval = setInterval(() => {
-      currentStep++;
-      if (currentStep >= steps) {
-        setAnimatedXP(playerXP);
-        setAnimatedScore(totalScore);
-        clearInterval(interval);
-      } else {
-        setAnimatedXP(prev => Math.round(prev + xpStep));
-        setAnimatedScore(prev => Math.round(prev + scoreStep));
-      }
-    }, duration / steps);
-    
-    return () => clearInterval(interval);
-  }, [playerXP, totalScore]);
-
-  // Handle scroll
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
@@ -162,37 +139,65 @@ export function GameHeader({
   }, []);
 
   return (
-    <header className={`sticky top-0 z-50 w-full transition-all duration-300 ${
+    <header className={`sticky top-0 z-50 w-full transition-all duration-200 ${
       isScrolled 
-        ? 'bg-white/95 backdrop-blur-xl shadow-lg shadow-indigo-100/50 border-b border-indigo-100'
-        : 'bg-white/80 backdrop-blur-xl border-b border-gray-100'
+        ? 'bg-white/80 dark:bg-[#121212]/80 backdrop-blur-xl border-b border-black/[0.04] dark:border-white/[0.06] shadow-sm'
+        : 'bg-white/60 dark:bg-transparent backdrop-blur-xl border-b border-black/[0.02] dark:border-white/[0.04]'
     }`}>
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-3">
         <div className="flex items-center justify-between">
           
           {/* Logo */}
-          <Link href="/" className="flex items-center group">
+          <Link href="/" className="flex items-center">
             <Image
-              src="/minifi-header-logo.png"
+              src="/minifi-logo.svg"
               alt="Mini.Fi"
-              width={120}
-              height={44}
-              className="h-11 w-auto group-hover:scale-105 transition-transform"
+              width={100}
+              height={36}
+              className="h-8 w-auto"
             />
           </Link>
           
-          {/* Desktop Stats */}
-          <div className="hidden md:flex items-center gap-3">
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center gap-2">
             
-            {/* Sign In / User Status */}
+            {/* Nav Links */}
+            <nav className="flex items-center mr-4">
+              <Link 
+                href="/leaderboard" 
+                className="px-3 py-2 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-colors flex items-center gap-1.5"
+              >
+                <Trophy className="h-4 w-4" />
+                <span>Leaderboard</span>
+              </Link>
+              <Link 
+                href="/profile" 
+                className="px-3 py-2 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-colors flex items-center gap-1.5"
+              >
+                <User className="h-4 w-4" />
+                <span>Profile</span>
+              </Link>
+            </nav>
+            
+            {/* Theme Toggle */}
+            {mounted && (
+              <button
+                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                className="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-colors"
+                title={theme === "dark" ? "Light mode" : "Dark mode"}
+              >
+                {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              </button>
+            )}
+            
+            {/* User Status */}
             {userEmail ? (
-              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-50 border border-emerald-200">
-                <Check className="h-4 w-4 text-emerald-500" />
-                <span className="text-xs text-emerald-700 font-medium truncate max-w-[100px]">{userEmail}</span>
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-white/[0.06]">
+                <Check className="h-3.5 w-3.5 text-emerald-500" />
+                <span className="text-xs text-gray-600 dark:text-gray-300 font-medium truncate max-w-[100px]">{userEmail}</span>
                 <button
                   onClick={handleSignOut}
-                  className="p-1 rounded-md hover:bg-emerald-100 text-emerald-500 transition-colors"
-                  title="Sign Out"
+                  className="p-1 rounded hover:bg-black/[0.04] dark:hover:bg-white/[0.06] text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
                 >
                   <LogOut className="h-3.5 w-3.5" />
                 </button>
@@ -200,167 +205,205 @@ export function GameHeader({
             ) : (
               <button
                 onClick={() => setShowSignInModal(true)}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-50 to-violet-50 border border-indigo-200 text-indigo-600 hover:shadow-lg hover:shadow-indigo-100 hover:scale-105 hover:border-indigo-300 transition-all group"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-colors"
               >
                 <LogIn className="h-4 w-4" />
-                <span className="text-sm font-medium">Sign In</span>
+                <span>Sign In</span>
               </button>
             )}
             
-            {/* Rewards Button - Coming Soon */}
-            {onRewardsClick && (
-              <button
-                onClick={onRewardsClick}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-gray-50 to-slate-100 border-2 border-gray-200 text-gray-500 hover:shadow-lg hover:shadow-gray-100 hover:scale-105 hover:border-gray-300 transition-all group relative"
-              >
-                <Gift className="h-5 w-5 group-hover:animate-bounce text-gray-400" />
-                <span className="text-sm font-bold">Rewards</span>
-                <span className="absolute -top-2 -right-2 px-1.5 py-0.5 text-[10px] font-bold bg-indigo-500 text-white rounded-full">Soon</span>
-              </button>
-            )}
-            
-            {/* Level & XP Display */}
-            <div className="flex items-center gap-3 px-4 py-2 rounded-2xl bg-gradient-to-r from-slate-50 to-indigo-50 shadow-lg shadow-indigo-100/50 border border-indigo-100">
-              {/* Animated Level Badge */}
-              <div className="relative group cursor-pointer">
-                <div className={`absolute inset-0 bg-gradient-to-br ${levelInfo.color} rounded-xl blur opacity-50 group-hover:opacity-75 transition-opacity`} />
-                <div className={`relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br ${levelInfo.color} shadow-lg`}>
-                  <span className="text-sm font-black text-white">{playerLevel}</span>
+            {/* Stats Pill */}
+            <div className="flex items-center gap-3 px-4 py-2 rounded-full bg-gray-100 dark:bg-white/[0.06] border border-black/[0.04] dark:border-white/[0.06]">
+              {/* Level */}
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-violet-500 flex items-center justify-center text-white text-sm font-bold">
+                  {playerLevel}
                 </div>
-                {/* Tooltip */}
-                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                  {levelInfo.title}
+                <div className="hidden lg:block">
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Level</p>
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white">{levelInfo.title}</p>
                 </div>
               </div>
               
-              {/* XP Stats */}
-              <div>
-                <div className="flex items-center gap-1.5">
-                  <Star className="h-4 w-4 text-amber-500" />
-                  <span className="text-base font-black text-gray-900">
-                    {animatedXP.toLocaleString()}
-                  </span>
-                  <span className="text-xs text-gray-500 font-medium">XP</span>
-                </div>
-                {/* Animated Progress bar */}
-                <div className="relative w-24 h-2 mt-1 bg-gray-200 rounded-full overflow-hidden">
-                  <div
-                    className="absolute inset-y-0 left-0 bg-gradient-to-r from-indigo-500 via-violet-500 to-purple-500 rounded-full transition-all duration-500"
-                    style={{ width: `${xpProgress}%` }}
-                  >
-                    {/* Shimmer effect */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer" />
+              {/* Divider */}
+              <div className="w-px h-6 bg-gray-200 dark:bg-white/10" />
+              
+              {/* iii Tokens */}
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-amber-500" />
+                <div>
+                  <p className="text-sm font-bold text-gray-900 dark:text-white">
+                    {playerXP.toLocaleString()}
+                    <span className="text-xs text-amber-500 ml-0.5">iii</span>
+                  </p>
+                  {/* Progress bar */}
+                  <div className="w-16 h-1 mt-0.5 rounded-full bg-gray-200 dark:bg-white/10 overflow-hidden">
+                    <div 
+                      className="h-full rounded-full bg-violet-500 transition-all duration-500"
+                      style={{ width: `${xpProgress}%` }}
+                    />
                   </div>
                 </div>
               </div>
+              
+              {/* League Badge */}
+              {league && (
+                <>
+                  <div className="w-px h-6 bg-gray-200 dark:bg-white/10" />
+                  <Link 
+                    href="/leaderboard"
+                    className="flex items-center gap-1.5 hover:opacity-80 transition-opacity"
+                  >
+                    <span className="text-lg">{league.emoji}</span>
+                    <div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">#{userRank}</p>
+                      <p className="text-xs font-medium text-gray-700 dark:text-gray-300">{league.name}</p>
+                    </div>
+                  </Link>
+                </>
+              )}
             </div>
-            
-            {/* Score Display */}
-            <div className="flex items-center gap-3 px-4 py-2 rounded-2xl bg-gradient-to-r from-violet-50 to-purple-50 shadow-lg shadow-violet-100/50 border border-violet-100">
-              <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 shadow-lg">
-                <Trophy className="h-5 w-5 text-white" />
-              </div>
-              <div>
-                <p className="text-[10px] text-gray-500 uppercase tracking-wider font-medium">Score</p>
-                <p className="text-base font-black text-violet-600">
-                  {animatedScore.toLocaleString()}
-                </p>
-              </div>
-            </div>
-            
-            {/* League Badge */}
-            {league && (
-              <LeagueBadge
-                league={league}
-                rank={userRank}
-                zone={zone}
-                weeklyXp={standings?.current_user?.weekly_xp || 0}
-                timeRemaining={timeRemaining}
-                xpToNextRank={xpToNextRank}
-                xpLead={xpLead}
-                compact={true}
-              />
-            )}
           </div>
           
-          {/* Mobile Stats & Menu */}
+          {/* Mobile */}
           <div className="flex md:hidden items-center gap-2">
-            {/* Compact Level Badge */}
-            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-xl bg-gradient-to-r from-slate-50 to-indigo-50 border border-indigo-100`}>
-              <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${levelInfo.color} flex items-center justify-center shadow`}>
-                <span className="text-xs font-black text-white">{playerLevel}</span>
+            {/* Compact Stats */}
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-white/[0.06]">
+              <div className="w-6 h-6 rounded bg-violet-500 flex items-center justify-center text-white text-xs font-bold">
+                {playerLevel}
               </div>
               <div className="flex items-center gap-1">
-                <Star className="h-3 w-3 text-amber-500" />
-                <span className="text-xs font-bold text-gray-900">{(playerXP / 1000).toFixed(1)}k</span>
+                <Sparkles className="h-3 w-3 text-amber-500" />
+                <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                  {(playerXP / 1000).toFixed(1)}k
+                </span>
               </div>
+              {league && (
+                <span className="text-sm">{league.emoji}</span>
+              )}
             </div>
             
-            {/* Mobile Menu Button */}
             <button
               onClick={() => setShowMobileMenu(!showMobileMenu)}
-              className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors"
+              className="p-2 rounded-lg hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-colors"
             >
               {showMobileMenu ? (
-                <X className="h-5 w-5 text-gray-600" />
+                <X className="h-5 w-5 text-gray-600 dark:text-gray-400" />
               ) : (
-                <Menu className="h-5 w-5 text-gray-600" />
+                <Menu className="h-5 w-5 text-gray-600 dark:text-gray-400" />
               )}
             </button>
           </div>
         </div>
         
-        {/* Mobile Dropdown Menu */}
+        {/* Mobile Menu */}
         {showMobileMenu && (
-          <div className="md:hidden mt-3 p-4 rounded-2xl bg-white border border-gray-200 shadow-xl animate-in slide-in-from-top-2 duration-200">
-            {/* Stats Grid */}
-            <div className="grid grid-cols-2 gap-3 mb-4">
-              <div className="p-3 rounded-xl bg-gradient-to-br from-indigo-50 to-violet-50 border border-indigo-100">
-                <div className="flex items-center gap-2 mb-1">
-                  <Star className="h-4 w-4 text-amber-500" />
-                  <span className="text-xs text-gray-500">XP</span>
-                </div>
-                <p className="text-lg font-black text-gray-900">{playerXP.toLocaleString()}</p>
-                <div className="w-full h-1.5 mt-1 bg-gray-200 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full"
-                    style={{ width: `${xpProgress}%` }}
-                  />
-                </div>
-              </div>
-              
-              <div className="p-3 rounded-xl bg-gradient-to-br from-violet-50 to-purple-50 border border-violet-100">
-                <div className="flex items-center gap-2 mb-1">
-                  <Trophy className="h-4 w-4 text-violet-500" />
-                  <span className="text-xs text-gray-500">Score</span>
-                </div>
-                <p className="text-lg font-black text-violet-600">{totalScore.toLocaleString()}</p>
-              </div>
-            </div>
-            
-            {/* Level Info */}
-            <div className="p-3 rounded-xl bg-gradient-to-r from-slate-50 to-gray-50 border border-gray-200 mb-4">
-              <div className="flex items-center gap-3">
-                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${levelInfo.color} flex items-center justify-center shadow-lg`}>
-                  {levelInfo.icon}
+          <div className="md:hidden mt-3 p-4 rounded-2xl bg-white dark:bg-[#1A1A1A] border border-black/[0.04] dark:border-white/[0.06] shadow-lg animate-slide-up">
+            {/* Stats Card */}
+            <div className="p-4 rounded-xl bg-gray-50 dark:bg-white/[0.04] mb-4">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-12 h-12 rounded-xl bg-violet-500 flex items-center justify-center text-white text-lg font-bold">
+                  {playerLevel}
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">Current Level</p>
-                  <p className="font-bold text-gray-900">Level {playerLevel} - {levelInfo.title}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Level {playerLevel}</p>
+                  <p className="font-semibold text-gray-900 dark:text-white">{levelInfo.title}</p>
                 </div>
+              </div>
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-1.5">
+                  <Sparkles className="h-4 w-4 text-amber-500" />
+                  <span className="font-bold text-gray-900 dark:text-white">{playerXP.toLocaleString()} iii</span>
+                </div>
+                <span className="text-xs text-gray-500 dark:text-gray-400">{Math.round(xpProgress)}% to next</span>
+              </div>
+              <div className="h-1.5 rounded-full bg-gray-200 dark:bg-white/10 overflow-hidden">
+                <div 
+                  className="h-full rounded-full bg-violet-500"
+                  style={{ width: `${xpProgress}%` }}
+                />
               </div>
             </div>
             
-            {/* Sign In / User Status - Mobile */}
+            {/* League */}
+            {league && (
+              <Link 
+                href="/leaderboard"
+                onClick={() => setShowMobileMenu(false)}
+                className="flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-white/[0.04] mb-2 transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">{league.emoji}</span>
+                  <div>
+                    <p className="font-medium text-gray-900 dark:text-white">{league.name} League</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      Rank #{userRank} • {zone === 'promotion' ? '↑ Promotion' : zone === 'danger' ? '↓ Danger' : '✓ Safe'}
+                    </p>
+                  </div>
+                </div>
+                <ChevronRight className="h-4 w-4 text-gray-400" />
+              </Link>
+            )}
+            
+            {/* Nav Links */}
+            <div className="space-y-1 mb-4">
+              <Link 
+                href="/leaderboard" 
+                onClick={() => setShowMobileMenu(false)}
+                className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-white/[0.04] transition-colors"
+              >
+                <Trophy className="h-5 w-5 text-amber-500" />
+                <span className="font-medium text-gray-900 dark:text-white">Leaderboard</span>
+              </Link>
+              <Link 
+                href="/profile" 
+                onClick={() => setShowMobileMenu(false)}
+                className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-white/[0.04] transition-colors"
+              >
+                <User className="h-5 w-5 text-emerald-500" />
+                <span className="font-medium text-gray-900 dark:text-white">Profile</span>
+              </Link>
+            </div>
+            
+            {/* Theme Toggle */}
+            {mounted && (
+              <div className="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-white/[0.04] mb-4">
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Appearance</span>
+                <div className="flex items-center gap-1 p-1 rounded-lg bg-white dark:bg-white/[0.06]">
+                  <button
+                    onClick={() => setTheme("light")}
+                    className={`p-1.5 rounded-md transition-colors ${
+                      theme === "light" 
+                        ? "bg-gray-100 dark:bg-white/10 text-gray-900 dark:text-white" 
+                        : "text-gray-400"
+                    }`}
+                  >
+                    <Sun className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => setTheme("dark")}
+                    className={`p-1.5 rounded-md transition-colors ${
+                      theme === "dark" 
+                        ? "bg-gray-100 dark:bg-white/10 text-gray-900 dark:text-white" 
+                        : "text-gray-400"
+                    }`}
+                  >
+                    <Moon className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            )}
+            
+            {/* User */}
             {userEmail ? (
-              <div className="flex items-center justify-between p-3 rounded-xl bg-emerald-50 border border-emerald-200 mb-3">
+              <div className="flex items-center justify-between p-3 rounded-xl bg-emerald-50 dark:bg-emerald-500/10">
                 <div className="flex items-center gap-2">
                   <Check className="h-4 w-4 text-emerald-500" />
-                  <span className="text-sm text-emerald-700 font-medium">{userEmail}</span>
+                  <span className="text-sm text-emerald-700 dark:text-emerald-400 font-medium">{userEmail}</span>
                 </div>
                 <button
                   onClick={handleSignOut}
-                  className="px-3 py-1.5 rounded-lg bg-emerald-100 text-emerald-600 text-sm font-medium hover:bg-emerald-200 transition-colors"
+                  className="text-sm text-emerald-600 dark:text-emerald-400 font-medium"
                 >
                   Sign Out
                 </button>
@@ -371,25 +414,10 @@ export function GameHeader({
                   setShowSignInModal(true);
                   setShowMobileMenu(false);
                 }}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 text-white font-bold shadow-lg hover:shadow-xl transition-all mb-3"
+                className="w-full flex items-center justify-center gap-2 p-3 rounded-xl bg-violet-500 text-white font-medium"
               >
-                <LogIn className="h-5 w-5" />
-                <span>Sign In to Save Progress</span>
-              </button>
-            )}
-            
-            {/* Rewards Button - Coming Soon */}
-            {onRewardsClick && (
-              <button
-                onClick={() => {
-                  onRewardsClick();
-                  setShowMobileMenu(false);
-                }}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-gray-200 to-slate-300 text-gray-600 font-bold shadow-lg hover:shadow-xl transition-all relative"
-              >
-                <Gift className="h-5 w-5" />
-                <span>Rewards</span>
-                <span className="px-2 py-0.5 text-xs font-bold bg-indigo-500 text-white rounded-full ml-1">Coming Soon</span>
+                <LogIn className="h-4 w-4" />
+                Sign In to Save Progress
               </button>
             )}
           </div>
@@ -405,73 +433,58 @@ export function GameHeader({
           setSignInSuccess(false);
         }
       }}>
-        <DialogContent className="sm:max-w-md bg-gradient-to-br from-indigo-50 via-white to-violet-50 border-2 border-indigo-200">
+        <DialogContent className="sm:max-w-md bg-white dark:bg-[#1A1A1A] border border-black/[0.06] dark:border-white/[0.08]">
           <DialogHeader>
-            <DialogTitle className="text-center">
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <Mail className="h-6 w-6 text-indigo-500" />
-                <span className="text-2xl font-black bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">
-                  Welcome Back!
-                </span>
-              </div>
+            <DialogTitle className="text-center text-xl font-semibold text-gray-900 dark:text-white">
+              Welcome Back
             </DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-4">
+          <div className="space-y-4 pt-2">
             {signInSuccess ? (
               <div className="text-center py-6">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-emerald-100 flex items-center justify-center">
-                  <Check className="h-8 w-8 text-emerald-600" />
+                <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center">
+                  <Check className="h-6 w-6 text-emerald-500" />
                 </div>
-                <p className="text-lg font-bold text-emerald-700">Signed In!</p>
-                <p className="text-sm text-gray-500">Loading your progress...</p>
+                <p className="font-semibold text-gray-900 dark:text-white">Signed In!</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Loading your progress...</p>
               </div>
             ) : (
               <>
-                <p className="text-center text-gray-600">
-                  Sign in with your email to retrieve your saved streak and XP progress.
+                <p className="text-center text-sm text-gray-500 dark:text-gray-400">
+                  Enter your email to retrieve your saved progress.
                 </p>
 
                 {signInError && (
-                  <div className="p-3 rounded-xl bg-red-50 border border-red-200">
-                    <p className="text-red-600 text-sm text-center">{signInError}</p>
+                  <div className="p-3 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20">
+                    <p className="text-red-600 dark:text-red-400 text-sm text-center">{signInError}</p>
                   </div>
                 )}
 
-                <form onSubmit={handleSignIn} className="space-y-4">
+                <form onSubmit={handleSignIn} className="space-y-3">
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                     <input
                       type="email"
                       value={signInEmail}
                       onChange={(e) => setSignInEmail(e.target.value)}
-                      placeholder="Enter your email"
+                      placeholder="your@email.com"
                       required
                       disabled={isSigningIn}
-                      className="w-full pl-11 pr-4 py-3 rounded-xl bg-white border-2 border-gray-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 text-gray-900 placeholder-gray-400 outline-none transition-all disabled:opacity-50"
+                      className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-50 dark:bg-white/[0.04] border border-gray-200 dark:border-white/10 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 text-gray-900 dark:text-white placeholder-gray-400 outline-none transition-all disabled:opacity-50"
                     />
                   </div>
                   <Button
                     type="submit"
                     disabled={isSigningIn || !signInEmail}
-                    className="w-full py-3 bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-600 hover:to-violet-600 text-white font-bold text-lg shadow-lg shadow-indigo-200 disabled:opacity-50"
+                    className="w-full py-2.5 bg-violet-500 hover:bg-violet-600 text-white font-medium disabled:opacity-50"
                   >
-                    {isSigningIn ? (
-                      <span className="flex items-center gap-2">
-                        <span className="animate-spin">⏳</span>
-                        Signing In...
-                      </span>
-                    ) : (
-                      <>
-                        <LogIn className="h-5 w-5 mr-2" />
-                        Sign In
-                      </>
-                    )}
+                    {isSigningIn ? "Signing In..." : "Sign In"}
                   </Button>
                 </form>
 
-                <p className="text-xs text-gray-500 text-center">
-                  New here? Just start playing and save your progress anytime!
+                <p className="text-xs text-gray-400 dark:text-gray-500 text-center">
+                  New here? Just start playing — your progress saves automatically!
                 </p>
               </>
             )}
@@ -479,14 +492,11 @@ export function GameHeader({
         </DialogContent>
       </Dialog>
       
-      {/* Season End Celebration Modal */}
       <SeasonEndCelebration
         open={showSeasonEnd}
         onClose={dismissSeasonEnd}
         result={seasonEndResult}
-        onContinue={() => {
-          dismissSeasonEnd();
-        }}
+        onContinue={dismissSeasonEnd}
       />
     </header>
   );

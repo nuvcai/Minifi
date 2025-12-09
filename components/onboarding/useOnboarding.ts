@@ -19,7 +19,9 @@ const STORAGE_KEYS = {
   ONBOARDING_COMPLETED: 'lg_onboarding_completed',
   ONBOARDING_DATA: 'lg_onboarding_data',
   SELECTED_COACH: 'lg_selected_coach',
-  USER_PROFILE: 'lg_user_profile'
+  USER_PROFILE: 'lg_user_profile',
+  ADVENTURE_NAME: 'lg_adventure_name',
+  USER_EMAIL: 'lg_user_email',
 } as const;
 
 // =============================================================================
@@ -32,6 +34,14 @@ export interface OnboardingState {
   selectedCoach: AICoach | null;
 }
 
+export interface UserProfile {
+  adventureName: string;
+  email: string;
+  ageRange: string;
+  riskPersonality: string;
+  level: number;
+}
+
 export interface UseOnboardingReturn {
   // State
   isOnboardingCompleted: boolean;
@@ -39,12 +49,17 @@ export interface UseOnboardingReturn {
   selectedCoach: AICoach | null;
   showOnboarding: boolean;
   
+  // User Profile
+  adventureName: string;
+  userEmail: string;
+  
   // Actions
-  completeOnboarding: (data: OnboardingData) => Promise<void>;
+  completeOnboarding: (data: OnboardingData) => Promise<{ iiiBonus: number }>;
   skipOnboarding: () => void;
   resetOnboarding: () => void;
   triggerOnboarding: () => void;
   updateSelectedCoach: (coach: AICoach) => void;
+  updateAdventureName: (name: string) => void;
 }
 
 // =============================================================================
@@ -57,6 +72,8 @@ export function useOnboarding(): UseOnboardingReturn {
   const [selectedCoach, setSelectedCoach] = useState<AICoach | null>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false);
+  const [adventureName, setAdventureName] = useState("");
+  const [userEmail, setUserEmail] = useState("");
 
   // Load from localStorage on mount
   useEffect(() => {
@@ -66,15 +83,33 @@ export function useOnboarding(): UseOnboardingReturn {
       const completed = localStorage.getItem(STORAGE_KEYS.ONBOARDING_COMPLETED);
       const savedData = localStorage.getItem(STORAGE_KEYS.ONBOARDING_DATA);
       const savedCoach = localStorage.getItem(STORAGE_KEYS.SELECTED_COACH);
+      const savedName = localStorage.getItem(STORAGE_KEYS.ADVENTURE_NAME);
+      const savedEmail = localStorage.getItem(STORAGE_KEYS.USER_EMAIL);
       
       setIsOnboardingCompleted(completed === 'true');
       
       if (savedData) {
-        setOnboardingData(JSON.parse(savedData));
+        const parsedData = JSON.parse(savedData);
+        setOnboardingData(parsedData);
+        // Also load name/email from data if not separately stored
+        if (parsedData.adventureName && !savedName) {
+          setAdventureName(parsedData.adventureName);
+        }
+        if (parsedData.email && !savedEmail) {
+          setUserEmail(parsedData.email);
+        }
       }
       
       if (savedCoach) {
         setSelectedCoach(JSON.parse(savedCoach));
+      }
+      
+      if (savedName) {
+        setAdventureName(savedName);
+      }
+      
+      if (savedEmail) {
+        setUserEmail(savedEmail);
       }
       
       // Show onboarding if not completed
@@ -87,11 +122,22 @@ export function useOnboarding(): UseOnboardingReturn {
   }, []);
 
   // Complete onboarding
-  const completeOnboarding = useCallback(async (data: OnboardingData) => {
+  const completeOnboarding = useCallback(async (data: OnboardingData): Promise<{ iiiBonus: number }> => {
     try {
       // Save to localStorage
       localStorage.setItem(STORAGE_KEYS.ONBOARDING_COMPLETED, 'true');
       localStorage.setItem(STORAGE_KEYS.ONBOARDING_DATA, JSON.stringify(data));
+      
+      // Save adventure name and email separately for easy access
+      if (data.adventureName) {
+        localStorage.setItem(STORAGE_KEYS.ADVENTURE_NAME, data.adventureName);
+        setAdventureName(data.adventureName);
+      }
+      
+      if (data.email) {
+        localStorage.setItem(STORAGE_KEYS.USER_EMAIL, data.email);
+        setUserEmail(data.email);
+      }
       
       if (data.selectedCoach) {
         localStorage.setItem(STORAGE_KEYS.SELECTED_COACH, JSON.stringify(data.selectedCoach));
@@ -104,6 +150,10 @@ export function useOnboarding(): UseOnboardingReturn {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
+            // NEW: Adventure identity
+            adventureName: data.adventureName,
+            email: data.email,
+            
             // Core profile data
             ageRange: data.ageRange,
             country: data.country,
@@ -128,6 +178,9 @@ export function useOnboarding(): UseOnboardingReturn {
             // Consent
             termsAccepted: data.termsAccepted,
             marketingConsent: data.marketingConsent,
+            
+            // III Bonus
+            welcomeIIIBonus: data.welcomeIIIBonus,
             
             // Metadata
             completedAt: data.completedAt?.toISOString(),
@@ -154,6 +207,9 @@ export function useOnboarding(): UseOnboardingReturn {
       setIsOnboardingCompleted(true);
       setOnboardingData(data);
       setShowOnboarding(false);
+      
+      // Return the III bonus to be credited
+      return { iiiBonus: data.welcomeIIIBonus || 100 };
 
     } catch (error) {
       console.error('Failed to complete onboarding:', error);
@@ -196,16 +252,36 @@ export function useOnboarding(): UseOnboardingReturn {
     }
   }, [onboardingData]);
 
+  // Update adventure name
+  const updateAdventureName = useCallback((name: string) => {
+    localStorage.setItem(STORAGE_KEYS.ADVENTURE_NAME, name);
+    setAdventureName(name);
+    
+    // Update onboarding data if exists
+    if (onboardingData) {
+      const updated = { ...onboardingData, adventureName: name };
+      localStorage.setItem(STORAGE_KEYS.ONBOARDING_DATA, JSON.stringify(updated));
+      setOnboardingData(updated);
+    }
+  }, [onboardingData]);
+
   return {
     isOnboardingCompleted,
     onboardingData,
     selectedCoach,
     showOnboarding: isHydrated ? showOnboarding : false,
+    
+    // User profile
+    adventureName,
+    userEmail,
+    
+    // Actions
     completeOnboarding,
     skipOnboarding,
     resetOnboarding,
     triggerOnboarding,
-    updateSelectedCoach
+    updateSelectedCoach,
+    updateAdventureName,
   };
 }
 

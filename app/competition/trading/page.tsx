@@ -1,25 +1,23 @@
-/**
- * Mini.Fi Trading Dashboard
- * Light, fun design
- * © 2025 NUVC.AI. All Rights Reserved.
- */
-
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import { ArrowLeft, Loader2 } from "lucide-react";
-import TradingDashboard from "@/components/trading-dashboard";
+
+// Lazy load to avoid SSR issues with client-only components
+const TradingDashboard = dynamic(
+  () => import("@/components/trading-dashboard"),
+  { ssr: false }
+);
 
 function TradingContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [competitionConfig, setCompetitionConfig] = useState<{
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     portfolio: any;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     coach: any;
   } | null>(null);
 
@@ -37,11 +35,11 @@ function TradingContent() {
         router.push("/competition");
       }
     } else {
+      // Redirect to competition setup if no config
       router.push("/competition");
     }
   }, [searchParams, router]);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleEndCompetition = (results: any) => {
     if (results && typeof results.finalValue === "number" && typeof results.totalReturn === "number") {
       // Store full results in sessionStorage for the results page
@@ -65,18 +63,21 @@ function TradingContent() {
       // Navigate with basic params as fallback
       const finalValue = results.finalValue;
       const totalReturn = results.totalReturn;
-      router.push(`/competition/results?finalValue=${finalValue}&totalReturn=${totalReturn}`);
+      router.push(
+        `/competition/results?finalValue=${finalValue}&totalReturn=${totalReturn}`
+      );
     } else {
+      // Go back to competition setup
       router.push("/competition");
     }
   };
 
   if (!competitionConfig) {
     return (
-      <div className="flex items-center justify-center pt-32">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="h-10 w-10 animate-spin text-emerald-500 mx-auto mb-4" />
-          <p className="text-gray-500 font-medium">Loading competition...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading competition...</p>
         </div>
       </div>
     );
@@ -111,7 +112,7 @@ export default function TradingPage() {
             
             <div className="flex items-center gap-2">
               <Image
-                src="/minifi-header-logo.png"
+                src="/minifi-logo.svg"
                 alt="Mini.Fi"
                 width={100}
                 height={36}
@@ -126,21 +127,10 @@ export default function TradingPage() {
           </div>
         </div>
       </nav>
-
-      <div className="relative">
-        <Suspense
-          fallback={
-            <div className="flex items-center justify-center pt-32">
-              <div className="text-center">
-                <Loader2 className="h-10 w-10 animate-spin text-emerald-500 mx-auto mb-4" />
-                <p className="text-gray-500 font-medium">Loading...</p>
-              </div>
-            </div>
-          }
-        >
-          <TradingContent />
-        </Suspense>
-      </div>
+      
+      <Suspense fallback={<div className="flex items-center justify-center min-h-[400px]"><Loader2 className="h-8 w-8 animate-spin text-emerald-500" /></div>}>
+        <TradingContent />
+      </Suspense>
     </div>
   );
 }

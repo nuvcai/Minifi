@@ -1,23 +1,17 @@
-/**
- * Mini.Fi - Root Layout
- * © 2025 NUVC.AI. All Rights Reserved.
- */
-
 import type React from "react";
 import type { Metadata, Viewport } from "next";
 import { Outfit, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { MobileBottomNav, MobileNavSpacer } from "@/components/shared/MobileBottomNav";
+import { ThemeProvider } from "@/components/theme-provider";
 
-// Outfit - Modern geometric sans for headings
 const outfit = Outfit({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-outfit",
-  weight: ["400", "500", "600", "700", "800"],
+  weight: ["400", "500", "600", "700", "800", "900"],
 });
 
-// Plus Jakarta Sans - Clean sans for body
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
   display: "swap",
@@ -34,11 +28,11 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Mini.Fi - Learn to Invest Through Play",
-  description: "A free game that teaches teens about investing through time-travel adventures. Built by NUVC.AI for the AWS AI Hackathon 2025.",
+  title: "NUVC Financial Literacy App",
+  description: "Empowering Australian teens with AI-powered investment education through gamified learning",
   icons: {
-    icon: '/favicon.png',
-    apple: '/favicon.png',
+    icon: '/favicon.svg',
+    apple: '/favicon.svg',
   },
   authors: [{ name: "NUVC.AI", url: "https://nuvc.ai" }],
   creator: "NUVC.AI",
@@ -59,15 +53,18 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${outfit.variable} ${plusJakarta.variable} antialiased`}
+      suppressHydrationWarning
     >
       <body 
-        className="font-sans min-h-screen bg-[#0a0a0f] text-white" 
+        className="font-sans min-h-screen bg-background text-foreground" 
         suppressHydrationWarning={true}
       >
-        {children}
-        {/* Mobile bottom navigation - hidden on desktop */}
-        <MobileBottomNav />
-        <MobileNavSpacer />
+        <ThemeProvider>
+          {children}
+          {/* Mobile bottom navigation - hidden on desktop */}
+          <MobileBottomNav />
+          <MobileNavSpacer />
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -354,7 +354,7 @@ export interface UserProfile {
   email?: string;
   display_name?: string;
   session_id?: string;
-  age_range?: '12-14' | '15-16' | '17-18';
+  age_range?: '12-14' | '15-16' | '17-18' | '19-24' | '25+';
   country?: string;
   has_part_time_job?: boolean;
   has_savings_goal?: boolean;
@@ -620,6 +620,403 @@ export const activityService = {
         });
     } catch (error) {
       logger.error('Activity tracking error', error);
+    }
+  }
+};
+
+// =============================================================================
+// REWARDS SERVICE - Dual Rewards (Badges + III Tokens)
+// =============================================================================
+
+export interface PlayerRewards {
+  id?: string;
+  user_id?: string;
+  email?: string;
+  session_id?: string;
+  adventure_name?: string;
+  total_iii: number;
+  weekly_iii: number;
+  staked_iii: number;
+  lifetime_iii: number;
+  total_badges_earned: number;
+  investments_made: number;
+  high_risk_investments: number;
+  extreme_risk_investments: number;
+  losses_experienced: number;
+  investments_after_loss: number;
+  consecutive_losses: number;
+  profit_after_consecutive_losses: number;
+  crises_navigated: number;
+  bubbles_survived: number;
+  drawdowns_held: number;
+  reflections_completed: number;
+  rational_decisions: number;
+  missions_completed: number;
+  perfect_quizzes: number;
+  theses_written: number;
+  risk_previews_viewed: number;
+  coach_advice_viewed: number;
+  asset_classes_tried: string[];
+  risk_levels_tried: string[];
+  coaches_used: string[];
+  week_start_date?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface EarnedBadge {
+  id?: string;
+  user_id?: string;
+  email?: string;
+  session_id?: string;
+  badge_id: string;
+  badge_name: string;
+  badge_emoji?: string;
+  badge_category: string;
+  badge_tier: string;
+  iii_awarded: number;
+  wisdom_unlocked?: string;
+  fo_wisdom?: string;
+  earned_at?: string;
+}
+
+export interface IIITransaction {
+  id?: string;
+  user_id?: string;
+  email?: string;
+  session_id?: string;
+  transaction_type: string;
+  amount: number;
+  balance_after: number;
+  reference_type?: string;
+  reference_id?: string;
+  description?: string;
+  created_at?: string;
+}
+
+export const rewardsService = {
+  /**
+   * Get or create player rewards record
+   */
+  async getOrCreateRewards(sessionId: string, email?: string): Promise<PlayerRewards | null> {
+    if (!isSupabaseConfigured()) {
+      return {
+        total_iii: 0,
+        weekly_iii: 0,
+        staked_iii: 0,
+        lifetime_iii: 0,
+        total_badges_earned: 0,
+        investments_made: 0,
+        high_risk_investments: 0,
+        extreme_risk_investments: 0,
+        losses_experienced: 0,
+        investments_after_loss: 0,
+        consecutive_losses: 0,
+        profit_after_consecutive_losses: 0,
+        crises_navigated: 0,
+        bubbles_survived: 0,
+        drawdowns_held: 0,
+        reflections_completed: 0,
+        rational_decisions: 0,
+        missions_completed: 0,
+        perfect_quizzes: 0,
+        theses_written: 0,
+        risk_previews_viewed: 0,
+        coach_advice_viewed: 0,
+        asset_classes_tried: [],
+        risk_levels_tried: [],
+        coaches_used: [],
+      };
+    }
+
+    try {
+      // Try to find existing
+      const { data: existing, error: findError } = await supabaseAdmin
+        .from('player_rewards')
+        .select('*')
+        .eq('session_id', sessionId)
+        .single();
+
+      if (existing) return existing;
+
+      // Create new
+      const { data: newRecord, error: createError } = await supabaseAdmin
+        .from('player_rewards')
+        .insert({
+          session_id: sessionId,
+          email: email || null,
+          total_iii: 0,
+          weekly_iii: 0,
+          staked_iii: 0,
+          lifetime_iii: 0,
+          total_badges_earned: 0,
+        })
+        .select()
+        .single();
+
+      if (createError) throw createError;
+      return newRecord;
+
+    } catch (error) {
+      logger.error('Get or create rewards error', error);
+      return null;
+    }
+  },
+
+  /**
+   * Award a badge and III tokens
+   */
+  async awardBadge(badge: {
+    sessionId: string;
+    email?: string;
+    badgeId: string;
+    badgeName: string;
+    badgeEmoji?: string;
+    badgeCategory: string;
+    badgeTier: string;
+    iiiReward: number;
+    wisdomUnlocked?: string;
+    foWisdom?: string;
+  }): Promise<{ success: boolean; alreadyEarned?: boolean; newBalance?: number }> {
+    if (!isSupabaseConfigured()) {
+      return { success: true, newBalance: 0 };
+    }
+
+    try {
+      // Check if already earned
+      const { data: existing } = await supabaseAdmin
+        .from('earned_badges')
+        .select('id')
+        .eq('session_id', badge.sessionId)
+        .eq('badge_id', badge.badgeId)
+        .single();
+
+      if (existing) {
+        return { success: false, alreadyEarned: true };
+      }
+
+      // Award badge
+      await supabaseAdmin.from('earned_badges').insert({
+        session_id: badge.sessionId,
+        email: badge.email,
+        badge_id: badge.badgeId,
+        badge_name: badge.badgeName,
+        badge_emoji: badge.badgeEmoji,
+        badge_category: badge.badgeCategory,
+        badge_tier: badge.badgeTier,
+        iii_awarded: badge.iiiReward,
+        wisdom_unlocked: badge.wisdomUnlocked,
+        fo_wisdom: badge.foWisdom,
+      });
+
+      // Update III balance
+      const rewards = await this.getOrCreateRewards(badge.sessionId, badge.email);
+      if (!rewards) return { success: false };
+
+      const newTotal = (rewards.total_iii || 0) + badge.iiiReward;
+
+      await supabaseAdmin
+        .from('player_rewards')
+        .update({
+          total_iii: newTotal,
+          weekly_iii: (rewards.weekly_iii || 0) + badge.iiiReward,
+          lifetime_iii: (rewards.lifetime_iii || 0) + badge.iiiReward,
+          total_badges_earned: (rewards.total_badges_earned || 0) + 1,
+        })
+        .eq('session_id', badge.sessionId);
+
+      // Log transaction
+      await supabaseAdmin.from('iii_transactions').insert({
+        session_id: badge.sessionId,
+        email: badge.email,
+        transaction_type: 'badge_earned',
+        amount: badge.iiiReward,
+        balance_after: newTotal,
+        reference_type: 'badge',
+        reference_id: badge.badgeId,
+        description: `Earned "${badge.badgeName}" badge`,
+      });
+
+      return { success: true, newBalance: newTotal };
+
+    } catch (error) {
+      logger.error('Award badge error', error);
+      return { success: false };
+    }
+  },
+
+  /**
+   * Add III tokens
+   */
+  async addIII(params: {
+    sessionId: string;
+    email?: string;
+    amount: number;
+    transactionType: string;
+    description?: string;
+    referenceType?: string;
+    referenceId?: string;
+  }): Promise<{ success: boolean; newBalance?: number }> {
+    if (!isSupabaseConfigured()) {
+      return { success: true, newBalance: params.amount };
+    }
+
+    try {
+      const rewards = await this.getOrCreateRewards(params.sessionId, params.email);
+      if (!rewards) return { success: false };
+
+      const newTotal = Math.max(0, (rewards.total_iii || 0) + params.amount);
+
+      await supabaseAdmin
+        .from('player_rewards')
+        .update({
+          total_iii: newTotal,
+          weekly_iii: params.amount > 0 
+            ? (rewards.weekly_iii || 0) + params.amount 
+            : rewards.weekly_iii,
+          lifetime_iii: params.amount > 0 
+            ? (rewards.lifetime_iii || 0) + params.amount 
+            : rewards.lifetime_iii,
+        })
+        .eq('session_id', params.sessionId);
+
+      await supabaseAdmin.from('iii_transactions').insert({
+        session_id: params.sessionId,
+        email: params.email,
+        transaction_type: params.transactionType,
+        amount: params.amount,
+        balance_after: newTotal,
+        reference_type: params.referenceType,
+        reference_id: params.referenceId,
+        description: params.description,
+      });
+
+      return { success: true, newBalance: newTotal };
+
+    } catch (error) {
+      logger.error('Add III error', error);
+      return { success: false };
+    }
+  },
+
+  /**
+   * Get earned badges for a player
+   */
+  async getEarnedBadges(sessionId: string): Promise<EarnedBadge[]> {
+    if (!isSupabaseConfigured()) return [];
+
+    try {
+      const { data, error } = await supabaseAdmin
+        .from('earned_badges')
+        .select('*')
+        .eq('session_id', sessionId)
+        .order('earned_at', { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+
+    } catch (error) {
+      logger.error('Get earned badges error', error);
+      return [];
+    }
+  },
+
+  /**
+   * Get recent III transactions
+   */
+  async getTransactions(sessionId: string, limit: number = 20): Promise<IIITransaction[]> {
+    if (!isSupabaseConfigured()) return [];
+
+    try {
+      const { data, error } = await supabaseAdmin
+        .from('iii_transactions')
+        .select('*')
+        .eq('session_id', sessionId)
+        .order('created_at', { ascending: false })
+        .limit(limit);
+
+      if (error) throw error;
+      return data || [];
+
+    } catch (error) {
+      logger.error('Get transactions error', error);
+      return [];
+    }
+  },
+
+  /**
+   * Sync rewards from localStorage to database
+   */
+  async syncFromLocalStorage(sessionId: string, data: {
+    email?: string;
+    adventureName?: string;
+    totalIII: number;
+    weeklyIII: number;
+    stakedIII: number;
+    earnedBadgeIds: string[];
+    progress: Partial<PlayerRewards>;
+  }): Promise<{ success: boolean }> {
+    if (!isSupabaseConfigured()) return { success: true };
+
+    try {
+      const rewards = await this.getOrCreateRewards(sessionId, data.email);
+      if (!rewards) return { success: false };
+
+      const updateData: Partial<PlayerRewards> = {
+        total_iii: data.totalIII,
+        weekly_iii: data.weeklyIII,
+        staked_iii: data.stakedIII,
+        lifetime_iii: Math.max(rewards.lifetime_iii || 0, data.totalIII),
+        total_badges_earned: data.earnedBadgeIds.length,
+        ...data.progress,
+      };
+
+      if (data.email) updateData.email = data.email;
+      if (data.adventureName) updateData.adventure_name = data.adventureName;
+
+      await supabaseAdmin
+        .from('player_rewards')
+        .update(updateData)
+        .eq('session_id', sessionId);
+
+      return { success: true };
+
+    } catch (error) {
+      logger.error('Sync rewards error', error);
+      return { success: false };
+    }
+  },
+
+  /**
+   * Get leaderboard by III tokens
+   */
+  async getLeaderboard(limit: number = 50): Promise<Array<{
+    adventure_name: string;
+    total_iii: number;
+    weekly_iii: number;
+    total_badges_earned: number;
+    rank: number;
+  }>> {
+    if (!isSupabaseConfigured()) return [];
+
+    try {
+      const { data, error } = await supabaseAdmin
+        .from('player_rewards')
+        .select('adventure_name, total_iii, weekly_iii, total_badges_earned')
+        .not('adventure_name', 'is', null)
+        .order('total_iii', { ascending: false })
+        .limit(limit);
+
+      if (error) throw error;
+      
+      return (data || []).map((row, index) => ({
+        ...row,
+        rank: index + 1,
+      }));
+
+    } catch (error) {
+      logger.error('Get leaderboard error', error);
+      return [];
     }
   }
 };

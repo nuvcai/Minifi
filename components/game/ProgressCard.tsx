@@ -189,7 +189,7 @@ export function ProgressCard({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5 text-xs text-slate-500">
                   <Zap className="h-3 w-3 text-violet-400" />
-                  <span>{xpNeeded.toLocaleString()} XP to Level {playerLevel + 1}</span>
+                  <span>{xpNeeded.toLocaleString()} 🪙 to Level {playerLevel + 1}</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-xs">
                   <Flame className="h-3 w-3 text-orange-400" />

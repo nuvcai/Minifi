@@ -323,8 +323,8 @@ export function RewardsStore({
               <div>
                 <p className="font-semibold text-blue-800 text-sm">How Points Work</p>
                 <ul className="text-xs text-blue-700 mt-1 space-y-1">
-                  <li>• Earn points when you complete missions (10% of XP)</li>
-                  <li>• Bonus points for daily streaks and saving XP</li>
+                  <li>• Earn points when you complete missions (10% of 🪙 iii)</li>
+                  <li>• Bonus points for daily streaks and saving iii</li>
                   <li>• 100 points = $1 in rewards value</li>
                   <li>• Higher tiers earn points faster!</li>
                 </ul>

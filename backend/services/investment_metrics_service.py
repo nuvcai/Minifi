@@ -142,140 +142,45 @@ class InvestmentMetricsService:
 
     def _get_historical_ticker(self, ticker: str, event_year: int) -> str:
         """
-        Get the appropriate ticker for historical periods when some assets didn't exist.
-        Maps modern ETFs/assets to appropriate proxies for historical periods.
+        Get the appropriate ticker for historical periods when some assets didn't exist
         """
         # Historical asset mapping for different periods
-        # Key: Modern ticker -> Value: Dict of year -> appropriate proxy
         historical_mapping = {
-            # ================================================================
-            # GOLD & COMMODITIES
-            # ================================================================
-            "GLD": {  # Gold ETF - created 2004
-                1990: "^GSPC",  # Use S&P 500 as stable proxy (Gold ETF didn't exist)
-                1997: "^GSPC",  # Use S&P 500 as proxy
-                2000: "^GSPC",  # Use S&P 500 as proxy
-                2008: "GLD",    # GLD ETF available
-                2020: "GLD",    # GLD ETF
-                2025: "GLD",    # GLD ETF
+            "GLD": {  # Gold ETF - use different proxies for different periods
+                # S&P 500 as stable proxy (Gold data unreliable in 1990)
+                1990: "^GSPC",
+                2000: "^GSPC",  # S&P 500 as stable proxy
+                2008: "GLD",   # GLD ETF (created 2004)
+                2020: "GLD",   # GLD ETF
+                2025: "GLD",   # GLD ETF
             },
-            "DJP": {  # Bloomberg Commodity Index - created 2006
-                1990: "^GSPC",  # Use S&P 500 as proxy
-                1997: "^GSPC",  # Use S&P 500 as proxy
-                2000: "^GSPC",  # Use S&P 500 as proxy
-                2008: "DJP",    # Available from 2006
-                2020: "DJP",    # DJP
-                2025: "DJP",    # DJP
-            },
-            
-            # ================================================================
-            # CRYPTOCURRENCY
-            # ================================================================
-            "BTC-USD": {  # Bitcoin - launched 2009, data from ~2014
-                1990: "^IXIC",  # NASDAQ as tech proxy
-                1997: "^IXIC",  # NASDAQ as tech proxy
-                2000: "^IXIC",  # NASDAQ as tech proxy
-                2008: "^IXIC",  # NASDAQ as tech proxy
-                2020: "BTC-USD",  # Bitcoin available
+            "BTC-USD": {  # Bitcoin - use different proxies
+                1990: "^GSPC",  # S&P 500 as tech proxy (Bitcoin didn't exist)
+                2000: "^GSPC",  # S&P 500 as tech proxy
+                2008: "^GSPC",  # S&P 500 as tech proxy
+                2020: "BTC-USD",  # Bitcoin (available since 2014)
                 2025: "BTC-USD",  # Bitcoin
             },
-            "ETH-USD": {  # Ethereum - launched 2015, data from ~2017
-                1990: "^IXIC",  # NASDAQ as tech proxy
-                1997: "^IXIC",  # NASDAQ as tech proxy
-                2000: "^IXIC",  # NASDAQ as tech proxy
-                2008: "^IXIC",  # NASDAQ as tech proxy
-                2020: "ETH-USD",  # Ethereum available
+            "ETH-USD": {  # Ethereum - use different proxies
+                1990: "^GSPC",  # S&P 500 as tech proxy (Ethereum didn't exist)
+                2000: "^GSPC",  # S&P 500 as tech proxy
+                2008: "^GSPC",  # S&P 500 as tech proxy
+                2020: "ETH-USD",  # Ethereum (available since 2017)
                 2025: "ETH-USD",  # Ethereum
             },
-            
-            # ================================================================
-            # CURRENCY
-            # ================================================================
-            "UUP": {  # US Dollar ETF - created 2007
-                1990: "^TYX",  # 30-year Treasury as safe asset proxy
-                1997: "^TYX",  # 30-year Treasury as safe asset proxy
-                2000: "^TYX",  # 30-year Treasury as safe asset proxy
-                2008: "UUP",   # UUP ETF available
-                2020: "UUP",   # UUP ETF
-                2025: "UUP",   # UUP ETF
-            },
-            "^IRX": {  # 3-month Treasury Bill rate
-                1990: "^TYX",  # Use 30-year Treasury as proxy
-                1997: "^TYX",  # Use 30-year Treasury as proxy
-                2000: "^IRX",  # Available
-                2008: "^IRX",  # Available
-                2020: "^IRX",  # Available
-                2025: "^IRX",  # Available
-            },
-            
-            # ================================================================
-            # SECTOR ETFs
-            # ================================================================
-            "XLF": {  # Financial Select Sector SPDR - created 1998
-                1990: "^GSPC",  # Use S&P 500 as proxy
-                1997: "^GSPC",  # Use S&P 500 as proxy
-                2000: "XLF",    # XLF available from 1998
-                2008: "XLF",    # XLF
-                2020: "XLF",    # XLF
-                2025: "XLF",    # XLF
-            },
-            "JETS": {  # US Global Jets ETF - created 2015
-                1990: "^GSPC",  # Use S&P 500 as proxy
-                1997: "^GSPC",  # Use S&P 500 as proxy
-                2000: "^GSPC",  # Use S&P 500 as proxy
-                2008: "^GSPC",  # Use S&P 500 as proxy
-                2020: "JETS",   # JETS available
-                2025: "JETS",   # JETS
-            },
-            "ICLN": {  # iShares Global Clean Energy - created 2008
-                1990: "^GSPC",  # Use S&P 500 as proxy
-                1997: "^GSPC",  # Use S&P 500 as proxy
-                2000: "^GSPC",  # Use S&P 500 as proxy
-                2008: "ICLN",   # ICLN available
-                2020: "ICLN",   # ICLN
-                2025: "ICLN",   # ICLN
-            },
-            
-            # ================================================================
-            # BOND ETFs
-            # ================================================================
-            "TIP": {  # iShares TIPS Bond ETF - created 2003
-                1990: "^TYX",  # Use 30-year Treasury as proxy
-                1997: "^TYX",  # Use 30-year Treasury as proxy
-                2000: "^TYX",  # Use 30-year Treasury as proxy
-                2008: "TIP",   # TIP available
-                2020: "TIP",   # TIP
-                2025: "TIP",   # TIP
-            },
-            
-            # ================================================================
-            # REAL ESTATE
-            # ================================================================
-            "VNQ": {  # Vanguard Real Estate ETF - created 2004
-                1990: "^GSPC",  # Use S&P 500 as proxy
-                1997: "^GSPC",  # Use S&P 500 as proxy
-                2000: "^GSPC",  # Use S&P 500 as proxy
-                2008: "VNQ",    # VNQ available
-                2020: "VNQ",    # VNQ
-                2025: "VNQ",    # VNQ
-            },
+            "UUP": {  # US Dollar ETF - use different proxies
+                # S&P 500 as currency proxy (USD data unreliable)
+                1990: "^GSPC",
+                2000: "^GSPC",  # S&P 500 as currency proxy
+                2008: "UUP",     # UUP ETF (created 2007)
+                2020: "UUP",     # UUP ETF
+                2025: "UUP",     # UUP ETF
+            }
         }
 
         # Return the appropriate ticker for the event year, or original if not in mapping
         if ticker in historical_mapping:
-            year_mapping = historical_mapping[ticker]
-            # Find the closest year if exact match not found
-            if event_year in year_mapping:
-                return year_mapping[event_year]
-            else:
-                # Find the closest available year
-                available_years = sorted(year_mapping.keys())
-                for year in available_years:
-                    if event_year <= year:
-                        return year_mapping[year]
-                # If event_year is after all mapped years, use the latest
-                return year_mapping[available_years[-1]]
-        
+            return historical_mapping[ticker].get(event_year, ticker)
         return ticker
 
     async def calculate_historical_performance(
@@ -284,28 +189,23 @@ class InvestmentMetricsService:
         event_year: int
     ) -> Dict[str, Any]:
         """
-        Calculate performance for a specific historical event period.
-        Maps event years to actual historical date ranges for real market data.
+        Calculate performance for a specific historical event period
         """
-        # Define event periods based on historical events in the game
-        # Each period represents a significant financial event for educational purposes
+        # Define event periods based on historical events
         event_periods = {
-            1990: ("1990-01-01", "1990-12-31"),  # Japanese asset bubble burst
-            1997: ("1997-01-01", "1997-12-31"),  # Asian Financial Crisis
-            2000: ("2000-01-01", "2000-12-31"),  # Dot-com bubble burst
-            2008: ("2008-01-01", "2008-12-31"),  # Global Financial Crisis
+            1990: ("1990-01-01", "1990-12-31"),  # Japanese asset bubble
+            2000: ("2000-01-01", "2000-12-31"),  # Dot-com bubble
+            2008: ("2008-01-01", "2008-12-31"),  # Financial crisis
             2020: ("2020-01-01", "2020-12-31"),  # COVID-19 pandemic
-            2025: ("2024-01-01", "2024-12-31"),  # Current challenges (using 2024 data)
+            # Current challenges (using recent data)
+            2025: ("2023-01-01", "2023-12-31"),
         }
 
         start_date, end_date = event_periods.get(
-            event_year, ("2023-01-01", "2023-12-31"))  # Default to recent data
+            event_year, ("1990-01-01", "1990-12-31"))
 
-        # Get the appropriate historical ticker (proxy for assets that didn't exist)
+        # Get the appropriate historical ticker
         historical_ticker = self._get_historical_ticker(ticker, event_year)
-        
-        print(f"📊 Historical Performance Request: {ticker} -> {historical_ticker} for year {event_year}")
-        print(f"📅 Date range: {start_date} to {end_date}")
 
         return await self.calculate_investment_metrics(
             ticker=historical_ticker,

@@ -40,7 +40,7 @@ const difficultyConfig: Record<Difficulty, {
     gradientTo: "to-teal-500",
     icon: <Target className="h-3.5 w-3.5" />,
     description: "Perfect for learning the basics!",
-    xpMultiplier: "1x XP",
+    xpMultiplier: "1x 🪙",
     emoji: "🌱",
   },
   intermediate: {
@@ -53,7 +53,7 @@ const difficultyConfig: Record<Difficulty, {
     gradientTo: "to-orange-500",
     icon: <Zap className="h-3.5 w-3.5" />,
     description: "Ready for a challenge?",
-    xpMultiplier: "1.5x XP",
+    xpMultiplier: "1.5x 🪙",
     emoji: "⚡",
   },
   advanced: {
@@ -66,7 +66,7 @@ const difficultyConfig: Record<Difficulty, {
     gradientTo: "to-red-500",
     icon: <Flame className="h-3.5 w-3.5" />,
     description: "For experienced investors!",
-    xpMultiplier: "2x XP",
+    xpMultiplier: "2x 🪙",
     emoji: "🔥",
   },
   expert: {
@@ -79,7 +79,7 @@ const difficultyConfig: Record<Difficulty, {
     gradientTo: "to-rose-600",
     icon: <Skull className="h-3.5 w-3.5" />,
     description: "Only the bravest survive! 💀",
-    xpMultiplier: "3x XP",
+    xpMultiplier: "3x 🪙",
     emoji: "☠️",
   },
 };

@@ -235,7 +235,7 @@ export function MilestoneAchievement({
           <div className="bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30 rounded-xl p-4 text-center">
             <div className="flex items-center justify-center gap-2 mb-2">
               <Award className="h-5 w-5 text-amber-400" />
-              <span className="text-2xl font-bold text-amber-400">+{xpAmount} XP</span>
+              <span className="text-2xl font-bold text-amber-400">+{xpAmount} 🪙</span>
             </div>
             {isMilestone && (
               <Badge className="bg-amber-500/30 text-amber-300 border-amber-500/50">

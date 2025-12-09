@@ -15,13 +15,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { TrendingUp, TrendingDown, Brain, BarChart3, GraduationCap, PenLine } from "lucide-react";
+import { TrendingUp, TrendingDown, Brain, BarChart3, GraduationCap, PenLine, Diamond, Zap, Sparkles, Target, Flame } from "lucide-react";
 import { MissionIntro } from "@/components/mission/MissionIntro";
 import { InvestmentDecision } from "@/components/mission/InvestmentDecision";
 import { MissionResult } from "@/components/mission/MissionResult";
 import { InvestmentThesis } from "@/components/mission/InvestmentThesis";
 import { WhatIfAnalysis } from "@/components/mission/WhatIfAnalysis";
 import { KnowledgeQuiz } from "@/components/mission/KnowledgeQuiz";
+import { MissionErrorBoundary } from "@/components/shared/ErrorBoundary";
 import { FinancialEvent } from "@/components/data/events";
 import { AICoach } from "@/components/data/coaches";
 import { MissionData, InvestmentOption } from "@/components/data/missions";
@@ -78,13 +79,6 @@ export function MissionModal({
   const [investmentThesis, setInvestmentThesis] = useState<string>("");
   const [quizCompleted, setQuizCompleted] = useState(false);
 
-  if (!event || !missionData) return null;
-
-  // Get selected option for thesis
-  const selectedOption = selectedInvestment 
-    ? missionData.options.find(o => o.id === selectedInvestment)
-    : null;
-
   // Handle moving from decision to thesis step
   const handleDecisionConfirm = useCallback(() => {
     if (selectedInvestment) {
@@ -125,6 +119,14 @@ export function MissionModal({
     onMissionComplete();
   }, [onMissionComplete]);
 
+  // Early return AFTER all hooks are called
+  if (!event || !missionData) return null;
+
+  // Get selected option for thesis
+  const selectedOption = selectedInvestment 
+    ? missionData.options.find(o => o.id === selectedInvestment)
+    : null;
+
   // Dynamic dialog title based on step
   const getDialogTitle = () => {
     switch (missionStep) {
@@ -133,15 +135,15 @@ export function MissionModal({
       case "decision":
         return "High Conviction Moment";
       case "thesis":
-        return "Investment Thesis 📝";
+        return "Investment Thesis";
       case "result":
         return missionResult?.performance === "loss" 
-          ? "Wisdom Earned 💎" 
-          : "Victory Achieved 🏆";
+          ? "Wisdom Earned" 
+          : "Victory Achieved";
       case "whatif":
-        return "Parallel Universes 🔮";
+        return "Parallel Universes";
       case "quiz":
-        return "Knowledge Check 🎓";
+        return "Knowledge Check";
       default:
         return `${event.year} - ${event.title}`;
     }
@@ -153,7 +155,7 @@ export function MissionModal({
       case "intro":
         return `${event.title} — History is about to test your discipline`;
       case "decision":
-        return "Make bold moves with conviction. Quick failures teach more than slow indecision.";
+        return "Bold moves build bold investors. Quick failures teach more than slow indecision.";
       case "thesis":
         return "Family Office Principle: Document your reasoning before every major decision";
       case "result":
@@ -172,16 +174,60 @@ export function MissionModal({
   // Get icon for current step
   const getStepIcon = () => {
     switch (missionStep) {
+      case "decision":
+        return (
+          <div className="p-2 rounded-xl bg-gradient-to-br from-violet-500 via-purple-500 to-indigo-600 shadow-lg shadow-violet-500/30">
+            <Diamond className="h-5 w-5 text-white" />
+          </div>
+        );
       case "thesis":
-        return <PenLine className="h-5 w-5 sm:h-6 sm:w-6 text-violet-500" />;
+        return (
+          <div className="p-2 rounded-xl bg-gradient-to-br from-violet-500 to-purple-500 shadow-lg shadow-violet-500/30">
+            <PenLine className="h-5 w-5 text-white" />
+          </div>
+        );
       case "whatif":
-        return <BarChart3 className="h-5 w-5 sm:h-6 sm:w-6 text-indigo-500" />;
+        return (
+          <div className="p-2 rounded-xl bg-gradient-to-br from-indigo-500 to-blue-500 shadow-lg shadow-indigo-500/30">
+            <BarChart3 className="h-5 w-5 text-white" />
+          </div>
+        );
       case "quiz":
-        return <GraduationCap className="h-5 w-5 sm:h-6 sm:w-6 text-amber-500" />;
+        return (
+          <div className="p-2 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 shadow-lg shadow-amber-500/30">
+            <GraduationCap className="h-5 w-5 text-white" />
+          </div>
+        );
       case "result":
         return missionResult?.performance === "profit" 
-          ? <TrendingUp className="h-5 w-5 sm:h-6 sm:w-6 text-emerald-500" />
-          : <Brain className="h-5 w-5 sm:h-6 sm:w-6 text-violet-500" />;
+          ? (
+            <div className="p-2 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 shadow-lg shadow-emerald-500/30">
+              <TrendingUp className="h-5 w-5 text-white" />
+            </div>
+          )
+          : (
+            <div className="p-2 rounded-xl bg-gradient-to-br from-violet-500 to-purple-500 shadow-lg shadow-violet-500/30">
+              <Brain className="h-5 w-5 text-white" />
+            </div>
+          );
+      default:
+        return null;
+    }
+  };
+
+  // Get step badge/emoji
+  const getStepBadge = () => {
+    switch (missionStep) {
+      case "decision":
+        return <span className="ml-1">💎</span>;
+      case "thesis":
+        return <span className="ml-1">📝</span>;
+      case "result":
+        return missionResult?.performance === "loss" ? <span className="ml-1">💎</span> : <span className="ml-1">🏆</span>;
+      case "whatif":
+        return <span className="ml-1">🔮</span>;
+      case "quiz":
+        return <span className="ml-1">🎓</span>;
       default:
         return null;
     }
@@ -194,91 +240,97 @@ export function MissionModal({
         className="max-w-4xl max-h-[90vh] overflow-y-auto max-sm:max-w-full max-sm:px-4"
       >
         <DialogHeader className="max-sm:pt-2">
-          <DialogTitle className="font-serif text-xl sm:text-2xl flex items-center gap-2">
+          <DialogTitle className="font-serif text-xl sm:text-2xl flex items-center gap-3">
             {getStepIcon()}
-            {getDialogTitle()}
+            <span className={missionStep === "decision" ? "bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 dark:from-violet-400 dark:via-purple-400 dark:to-indigo-400 bg-clip-text text-transparent" : ""}>
+              {getDialogTitle()}
+            </span>
+            {getStepBadge()}
           </DialogTitle>
-          <DialogDescription className="text-sm sm:text-base">
-            {getDialogDescription()}
+          <DialogDescription className={`text-sm sm:text-base ${missionStep === "decision" ? "flex items-center gap-2" : ""}`}>
+            {missionStep === "decision" && <Zap className="h-4 w-4 text-amber-500 flex-shrink-0" />}
+            <span>{getDialogDescription()}</span>
           </DialogDescription>
         </DialogHeader>
 
-        {/* Step 1: Mission Introduction */}
-        {missionStep === "intro" && (
-          <MissionIntro
-            missionData={missionData}
-            selectedCoach={selectedCoach}
-            onNext={() => onStepChange("decision")}
-            onExit={onClose}
-          />
-        )}
+        <MissionErrorBoundary>
+          {/* Step 1: Mission Introduction */}
+          {missionStep === "intro" && (
+            <MissionIntro
+              missionData={missionData}
+              selectedCoach={selectedCoach}
+              onNext={() => onStepChange("decision")}
+              onExit={onClose}
+            />
+          )}
 
-        {/* Step 2: Investment Decision */}
-        {missionStep === "decision" && (
-          <InvestmentDecision
-            options={missionData.options}
-            selectedInvestment={selectedInvestment}
-            onInvestmentSelect={onInvestmentSelect}
-            onConfirm={handleDecisionConfirm}
-            onBack={() => onStepChange("intro")}
-            selectedCoach={selectedCoach}
-          />
-        )}
+          {/* Step 2: Investment Decision */}
+          {missionStep === "decision" && (
+            <InvestmentDecision
+              options={missionData.options}
+              selectedInvestment={selectedInvestment}
+              onInvestmentSelect={onInvestmentSelect}
+              onConfirm={handleDecisionConfirm}
+              onBack={() => onStepChange("intro")}
+              selectedCoach={selectedCoach}
+            />
+          )}
 
-        {/* Step 3: Investment Thesis (NEW - Forces deliberate thinking) */}
-        {missionStep === "thesis" && selectedOption && (
-          <InvestmentThesis
-            selectedOption={selectedOption}
-            coach={selectedCoach}
-            eventTitle={event.title}
-            eventYear={event.year}
-            onSubmit={handleThesisSubmit}
-            onSkip={handleThesisSkip}
-            onXpEarned={onXpEarned}
-          />
-        )}
+          {/* Step 3: Investment Thesis (NEW - Forces deliberate thinking) */}
+          {missionStep === "thesis" && selectedOption && (
+            <InvestmentThesis
+              selectedOption={selectedOption}
+              coach={selectedCoach}
+              eventTitle={event.title}
+              eventYear={event.year}
+              onSubmit={handleThesisSubmit}
+              onSkip={handleThesisSkip}
+              onXpEarned={onXpEarned}
+            />
+          )}
 
-        {/* Step 4: Mission Results */}
-        {missionStep === "result" && missionResult && (
-          <MissionResult
-            selectedOption={missionResult.option}
-            actualReturn={missionResult.actualReturn}
-            finalAmount={missionResult.finalAmount}
-            performance={missionResult.performance}
-            outcome={missionData.outcome}
-            event={event}
-            simulationResult={simulationResult}
-            playerLevel={playerLevel}
-            completedMissions={completedMissions}
-            selectedCoach={selectedCoach}
-            onComplete={handleResultContinue}
-            onXpEarned={onXpEarned}
-          />
-        )}
+          {/* Step 4: Mission Results */}
+          {missionStep === "result" && missionResult && (
+            <MissionResult
+              selectedOption={missionResult.option}
+              actualReturn={missionResult.actualReturn}
+              finalAmount={missionResult.finalAmount}
+              performance={missionResult.performance}
+              outcome={missionData.outcome}
+              event={event}
+              simulationResult={simulationResult}
+              playerLevel={playerLevel}
+              completedMissions={completedMissions}
+              selectedCoach={selectedCoach}
+              onComplete={handleResultContinue}
+              onXpEarned={onXpEarned}
+            />
+          )}
 
-        {/* Step 5: What-If Analysis (NEW - Shows all possible outcomes) */}
-        {missionStep === "whatif" && missionResult && (
-          <WhatIfAnalysis
-            options={missionData.options}
-            selectedOptionId={missionResult.option.id}
-            initialInvestment={INITIAL_INVESTMENT}
-            onContinue={handleWhatIfContinue}
-            onXpEarned={onXpEarned}
-          />
-        )}
+          {/* Step 5: What-If Analysis (NEW - Shows all possible outcomes) */}
+          {missionStep === "whatif" && missionResult && (
+            <WhatIfAnalysis
+              options={missionData.options}
+              selectedOptionId={missionResult.option.id}
+              initialInvestment={INITIAL_INVESTMENT}
+              onContinue={handleWhatIfContinue}
+              onXpEarned={onXpEarned}
+            />
+          )}
 
-        {/* Step 6: Knowledge Quiz (NEW - Validates understanding) */}
-        {missionStep === "quiz" && missionResult && (
-          <KnowledgeQuiz
-            missionData={missionData}
-            eventYear={event.year}
-            eventTitle={event.title}
-            selectedOption={missionResult.option}
-            actualPerformance={missionResult.performance}
-            onComplete={handleQuizComplete}
-            onXpEarned={onXpEarned}
-          />
-        )}
+          {/* Step 6: Knowledge Quiz (NEW - Validates understanding) */}
+          {missionStep === "quiz" && missionResult && (
+            <KnowledgeQuiz
+              missionData={missionData}
+              eventYear={event.year}
+              eventTitle={event.title}
+              selectedOption={missionResult.option}
+              actualPerformance={missionResult.performance}
+              onComplete={handleQuizComplete}
+              onXpEarned={onXpEarned}
+            />
+          )}
+        </MissionErrorBoundary>
       </DialogContent>
     </Dialog>
   );

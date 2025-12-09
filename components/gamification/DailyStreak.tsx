@@ -23,6 +23,10 @@ import {
   Zap,
 } from "lucide-react";
 import { InlineFloatingXp } from "./FloatingXp";
+import { III_CONFIG } from "@/hooks/useIII";
+
+// Gold coin emoji for iii token display
+const III_DISPLAY = `🪙 ${III_CONFIG.symbol}`;
 
 // Streak milestone rewards
 const streakMilestones: Record<number, { bonus: number; badge?: string; special?: string }> = {
@@ -30,7 +34,7 @@ const streakMilestones: Record<number, { bonus: number; badge?: string; special?
   2: { bonus: 15 },
   3: { bonus: 25, badge: "🔥 3-Day Streak" },
   5: { bonus: 40, badge: "⚡ 5-Day Warrior" },
-  7: { bonus: 75, badge: "🌟 Weekly Champion", special: "Double XP for today!" },
+  7: { bonus: 75, badge: "🌟 Weekly Champion", special: "Double iii for today!" },
   14: { bonus: 150, badge: "💪 Two Week Titan" },
   21: { bonus: 250, badge: "🏆 Three Week Master" },
   30: { bonus: 500, badge: "👑 Monthly Legend", special: "Exclusive reward unlocked!" },
@@ -281,7 +285,7 @@ export function DailyStreak({ onBonusClaimed }: DailyStreakProps) {
                 {streakData.currentStreak === 0
                   ? "Start your streak today!"
                   : nextMilestone
-                    ? `${nextMilestone.day - streakData.currentStreak} days to ${nextMilestone.bonus} XP bonus!`
+                    ? `${nextMilestone.day - streakData.currentStreak} days to +${nextMilestone.bonus} ${III_DISPLAY}!`
                     : "You're a legend! 👑"}
               </p>
             </div>
@@ -295,7 +299,7 @@ export function DailyStreak({ onBonusClaimed }: DailyStreakProps) {
               className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg shadow-amber-200"
             >
               <Gift className="h-4 w-4 mr-1" />
-              +{todayBonus} XP
+              +{todayBonus} 🪙
             </Button>
           )}
           {streakData.todayClaimed && (
@@ -362,9 +366,9 @@ export function DailyStreak({ onBonusClaimed }: DailyStreakProps) {
               <div className="flex items-center justify-between mb-2">
                 <span className="text-gray-600">Today's Bonus:</span>
                 <div className="flex items-center gap-1">
-                  <Sparkles className="h-4 w-4 text-amber-500" />
+                  <span className="text-xl">🪙</span>
                   <span className="text-xl font-bold text-amber-600">
-                    +{todayBonus} XP
+                    +{todayBonus} {III_CONFIG.symbol}
                   </span>
                 </div>
               </div>
@@ -387,7 +391,7 @@ export function DailyStreak({ onBonusClaimed }: DailyStreakProps) {
             {nextMilestone && (
               <div className="text-center text-sm text-gray-500">
                 <Zap className="h-4 w-4 inline mr-1 text-amber-500" />
-                {nextMilestone.day - streakData.currentStreak} more day{nextMilestone.day - streakData.currentStreak !== 1 ? "s" : ""} for {nextMilestone.bonus} XP bonus!
+                {nextMilestone.day - streakData.currentStreak} more day{nextMilestone.day - streakData.currentStreak !== 1 ? "s" : ""} for +{nextMilestone.bonus} 🪙 {III_CONFIG.symbol} bonus!
               </div>
             )}
 
@@ -426,12 +430,12 @@ export function DailyStreak({ onBonusClaimed }: DailyStreakProps) {
                 ) : showFloatingXp ? (
                   <>
                     <Sparkles className="h-4 w-4 mr-2 animate-spin" />
-                    XP Claimed!
+                    🪙 Claimed!
                   </>
                 ) : (
                   <>
                     <Gift className="h-4 w-4 mr-2" />
-                    Claim +{todayBonus} XP
+                    Claim +{todayBonus} 🪙 {III_CONFIG.symbol}
                   </>
                 )}
               </Button>

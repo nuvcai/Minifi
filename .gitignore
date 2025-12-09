@@ -16,10 +16,8 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (keep .env.example for setup reference)
+# env files
 .env*
-!.env.example
-!backend/.env.example
 
 # vercel
 .vercel
@@ -43,11 +41,5 @@ __pycache__/
 # macOS
 .DS_Store
 
-# Log files
-*.log
-backend/*.log
-frontend*.log
-
 # Playwright MCP screenshots
 .playwright-mcp/
-.gitmessage

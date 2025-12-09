@@ -267,7 +267,7 @@ export function SeasonEndCelebration({
               <div className="flex items-center justify-between p-2 rounded-lg bg-black/20">
                 <div className="flex items-center gap-2">
                   <Star className="h-4 w-4 text-yellow-400" />
-                  <span className="text-sm text-white/80">XP Bonus</span>
+                  <span className="text-sm text-white/80">🪙 iii Bonus</span>
                 </div>
                 <Badge className="bg-yellow-500/30 text-yellow-300 border-yellow-500/50">
                   +{rewards.xpBonus} XP

@@ -137,20 +137,20 @@ export const REFERRAL_TIERS = {
   STARTER: {
     name: "Starter",
     referralsNeeded: 0,
-    referrerReward: { type: "xp" as const, value: 100, description: "+100 XP per referral" },
-    refereeReward: { type: "xp" as const, value: 50, description: "+50 XP welcome bonus" }
+    referrerReward: { type: "xp" as const, value: 100, description: "+100 🪙 iii per referral" },
+    refereeReward: { type: "xp" as const, value: 50, description: "+50 🪙 iii welcome bonus" }
   },
   BRONZE: {
     name: "Bronze Advocate",
     referralsNeeded: 3,
-    referrerReward: { type: "xp" as const, value: 150, description: "+150 XP per referral" },
-    refereeReward: { type: "xp" as const, value: 100, description: "+100 XP welcome bonus" },
+    referrerReward: { type: "xp" as const, value: 150, description: "+150 🪙 iii per referral" },
+    refereeReward: { type: "xp" as const, value: 100, description: "+100 🪙 iii welcome bonus" },
     badge: "bronze_advocate"
   },
   SILVER: {
     name: "Silver Ambassador",
     referralsNeeded: 10,
-    referrerReward: { type: "xp" as const, value: 250, description: "+250 XP per referral" },
+    referrerReward: { type: "xp" as const, value: 250, description: "+250 🪙 iii per referral" },
     refereeReward: { type: "premium_days" as const, value: 7, description: "7 days premium free" },
     badge: "silver_ambassador"
   },
@@ -272,7 +272,7 @@ export const SHARE_TEMPLATES: Record<ShareContentType, ShareTemplate> = {
   invite: {
     titleTemplate: "Join me on MiniFi! 🚀",
     descriptionTemplate: "The financial education app that actually makes learning fun. Use my code: {{referralCode}}",
-    ctaText: "Get bonus XP",
+    ctaText: "Get bonus 🪙",
     hashtags: ["MiniFi", "FinancialEducation", "Invitation"]
   },
   wisdom_quote: {
@@ -432,7 +432,7 @@ export const VIRAL_CHALLENGES: ViralChallenge[] = [
     isRecurring: true,
     recurringPattern: "weekly",
     rewards: {
-      completion: { type: "xp", value: 500, description: "+500 XP" }
+      completion: { type: "xp", value: 500, description: "+500 🪙 iii" }
     },
     currentParticipants: 0,
     shareBonus: true,
@@ -496,7 +496,7 @@ export const VIRAL_CHALLENGES: ViralChallenge[] = [
     isRecurring: true,
     recurringPattern: "monthly",
     rewards: {
-      completion: { type: "xp", value: 1500, description: "+1500 XP for both" }
+      completion: { type: "xp", value: 1500, description: "+1500 🪙 iii for both" }
     },
     minParticipants: 2,
     currentParticipants: 0,
@@ -615,9 +615,9 @@ export const LEADERBOARDS: Leaderboard[] = [
     showUserRank: true,
     anonymizeNames: false,
     rewards: [
-      { rank: 1, reward: { type: "xp", value: 1000, description: "+1000 XP" } },
-      { rank: 2, reward: { type: "xp", value: 500, description: "+500 XP" } },
-      { rank: 3, reward: { type: "xp", value: 250, description: "+250 XP" } }
+      { rank: 1, reward: { type: "xp", value: 1000, description: "+1000 🪙 iii" } },
+      { rank: 2, reward: { type: "xp", value: 500, description: "+500 🪙 iii" } },
+      { rank: 3, reward: { type: "xp", value: 250, description: "+250 🪙 iii" } }
     ]
   },
   {
@@ -751,7 +751,7 @@ export const VIRAL_LOOPS: ViralLoop[] = [
       platforms: ["twitter", "whatsapp", "copy_link"],
       template: "mission_complete"
     },
-    reward: { type: "xp", value: 50, description: "+50 XP for sharing" },
+    reward: { type: "xp", value: 50, description: "+50 🪙 for sharing" },
     triggerCount: 0,
     completionCount: 0,
     conversionRate: 0
@@ -766,7 +766,7 @@ export const VIRAL_LOOPS: ViralLoop[] = [
       platforms: ["twitter", "instagram", "whatsapp"],
       template: "level_up"
     },
-    reward: { type: "xp", value: 25, description: "+25 XP for sharing" },
+    reward: { type: "xp", value: 25, description: "+25 🪙 for sharing" },
     triggerCount: 0,
     completionCount: 0,
     conversionRate: 0
@@ -782,7 +782,7 @@ export const VIRAL_LOOPS: ViralLoop[] = [
       platforms: ["twitter", "facebook", "linkedin"],
       template: "quiz_result"
     },
-    reward: { type: "xp", value: 100, description: "+100 XP for sharing" },
+    reward: { type: "xp", value: 100, description: "+100 🪙 for sharing" },
     triggerCount: 0,
     completionCount: 0,
     conversionRate: 0
@@ -798,7 +798,7 @@ export const VIRAL_LOOPS: ViralLoop[] = [
       platforms: ["twitter", "instagram"],
       template: "streak"
     },
-    reward: { type: "xp", value: 75, description: "+75 XP for sharing" },
+    reward: { type: "xp", value: 75, description: "+75 🪙 for sharing" },
     triggerCount: 0,
     completionCount: 0,
     conversionRate: 0
@@ -811,7 +811,7 @@ export const VIRAL_LOOPS: ViralLoop[] = [
     triggerConditions: { missionCount: 3 },
     action: {
       type: "referral_prompt",
-      message: "Enjoying MiniFi? Invite a friend and both get bonus XP!"
+      message: "Enjoying MiniFi? Invite a friend and both get bonus 🪙 iii!"
     },
     triggerCount: 0,
     completionCount: 0,
@@ -826,7 +826,7 @@ export const VIRAL_LOOPS: ViralLoop[] = [
       type: "challenge_invite",
       challengeId: "beat_my_score"
     },
-    reward: { type: "xp", value: 50, description: "+50 XP if they accept" },
+    reward: { type: "xp", value: 50, description: "+50 🪙 if they accept" },
     triggerCount: 0,
     completionCount: 0,
     conversionRate: 0
@@ -878,7 +878,117 @@ export const VIRAL_TARGETS = {
 };
 
 // ============================================================================
-// 10. HELPER FUNCTIONS
+// 10. EDUCATIONAL VIRAL HOOKS - "Learn + Share" Moments
+// ============================================================================
+
+/**
+ * 🎓 "AHA! MOMENTS" - Shareable insights that demonstrate learning
+ * These are designed to make users feel smart AND want to share
+ */
+export interface AhaShareMoment {
+  id: string;
+  trigger: "quiz_perfect" | "concept_mastered" | "prediction_correct" | "streak_milestone" | "lesson_completed";
+  
+  // The "I just learned this!" content
+  conceptLearned: string;
+  simpleExplanation: string;          // Feynman-style: explain like you're teaching a friend
+  
+  // Shareable formats
+  tweetVersion: string;               // 280 char max, punchy
+  storyVersion: string;               // Instagram/TikTok hook
+  linkedInVersion: string;            // Professional framing
+  
+  // Viral elements
+  visualHook?: string;                // Emoji combo or visual cue
+  controversialAngle?: string;        // "Most people think X, but actually..."
+  generationalRelevance: string;      // Why this matters to Gen Z/Alpha
+}
+
+export const AHA_SHARE_MOMENTS: AhaShareMoment[] = [
+  {
+    id: "bubble_recognition",
+    trigger: "lesson_completed",
+    conceptLearned: "How to spot a market bubble",
+    simpleExplanation: "When your Uber driver is giving stock tips and everyone's quitting their jobs to day-trade... that's a bubble. Prices disconnected from reality.",
+    tweetVersion: "🫧 Just learned on @MiniFiApp: When everyone's euphoric about stocks & prices seem 'too good' = bubble warning. Japan 1990, Dotcom 2000, same pattern. History doesn't repeat but it rhymes! 📈→💥",
+    storyVersion: "POV: You just learned something your parents' financial advisor doesn't teach 👀",
+    linkedInVersion: "Completed a fascinating case study on the 1990 Japanese asset bubble. Key insight: market euphoria + disconnect from fundamentals = systematic risk. #FinancialLiteracy #Investing",
+    visualHook: "🫧📈💥",
+    controversialAngle: "Most adults don't understand bubbles. I'm 16 and just learned to spot them.",
+    generationalRelevance: "This is literally what happened with NFTs in 2021. Same pattern, different asset."
+  },
+  {
+    id: "diversification_power",
+    trigger: "concept_mastered",
+    conceptLearned: "Why diversification actually works",
+    simpleExplanation: "It's like having backup plans for your backup plans. When stocks tank, bonds often rise. When one country struggles, another thrives.",
+    tweetVersion: "💡 Mind = blown. While Japan lost 60% in 1990, US bonds GAINED 45%. Same year! That's why family offices never put all eggs in one basket. Learning this at @MiniFiApp 🧠",
+    storyVersion: "The investing hack that billionaires use but never talk about...",
+    linkedInVersion: "Case study insight: During Japan's 1990 crash, a diversified portfolio (40% stocks, 40% bonds, 20% gold) dropped only 15% vs 60% for all-stock portfolios. Diversification isn't just advice—it's math.",
+    visualHook: "🥚🧺→📊🛡️",
+    controversialAngle: "Your parents probably lost money because they didn't know this.",
+    generationalRelevance: "This is why you shouldn't YOLO your savings into one crypto."
+  },
+  {
+    id: "crisis_opportunity",
+    trigger: "prediction_correct",
+    conceptLearned: "Crises create the best buying opportunities",
+    simpleExplanation: "When everyone's panic-selling, great companies go on sale. Amazon at $6 in 2008 crash? Now $180. Fear creates opportunity for the patient.",
+    tweetVersion: "🔥 Just survived the 2008 Financial Crisis on @MiniFiApp! Key lesson: When others panic-sell, quality goes on SALE. Amazon dropped to $6... now $180. Be greedy when others are fearful! 💰",
+    storyVersion: "What if I told you the best investors PRAY for market crashes? Here's why...",
+    linkedInVersion: "Completed the 2008 Financial Crisis simulation. Warren Buffett's 'be greedy when others are fearful' isn't just a quote—it's quantifiable: buying the S&P at its 2009 low yielded 450% returns by 2019.",
+    visualHook: "😱→🛒→🚀",
+    controversialAngle: "The news tells you to sell during crashes. The rich do the opposite.",
+    generationalRelevance: "This is exactly what happened in March 2020. COVID crash = massive opportunity."
+  },
+  {
+    id: "tech_acceleration",
+    trigger: "lesson_completed",
+    conceptLearned: "Crises accelerate existing trends",
+    simpleExplanation: "COVID didn't create remote work—it fast-forwarded it 10 years. Smart investors ask: 'What was growing that this crisis will supercharge?'",
+    tweetVersion: "🧠 @MiniFiApp just taught me the most powerful investing question: 'What trends will THIS crisis accelerate?' COVID → remote work/tech. What about AI + recession? 🤔",
+    storyVersion: "The question that made people millionaires during COVID (and how to use it for AI)...",
+    linkedInVersion: "COVID crisis insight: Zoom went from $70 to $560 because the pandemic accelerated existing trends. The key question: 'What transformation was already happening that this crisis will supercharge?'",
+    visualHook: "⏰→⚡→🚀",
+    controversialAngle: "The pandemic made more millionaires than it destroyed. They asked this one question.",
+    generationalRelevance: "AI is doing this RIGHT NOW. Which companies are being accelerated?"
+  }
+];
+
+/**
+ * 🏆 SOCIAL PROOF LEARNING - "I'm not alone" moments
+ * Show users they're part of a learning community
+ */
+export interface LearningMilestone {
+  description: string;
+  userCount: number;
+  celebrationType: "badge" | "leaderboard" | "story" | "challenge";
+  sharePrompt: string;
+}
+
+export const COMMUNITY_LEARNING_STATS = {
+  conceptsMastered: [
+    { concept: "Bubble Recognition", learnersCount: 12847, avgAge: 17.2 },
+    { concept: "Diversification", learnersCount: 23456, avgAge: 16.8 },
+    { concept: "Risk-Adjusted Returns", learnersCount: 8932, avgAge: 18.1 },
+    { concept: "Crisis Investing", learnersCount: 15678, avgAge: 17.5 },
+  ],
+  realTimeActivity: [
+    "{{name}} from {{country}} just learned about the 1990 Japan Bubble",
+    "{{name}} survived the 2008 crash with +25% return!",
+    "{{name}} earned the 'Bubble Spotter' badge",
+    "{{count}} people completed the COVID mission in the last hour",
+  ],
+  competitiveHooks: [
+    "You're in the top {{percentile}}% of your age group!",
+    "{{friendCount}} of your friends haven't learned this yet",
+    "Only {{percent}}% of adults understand this concept",
+    "You now know more about {{topic}} than most finance majors",
+  ],
+};
+
+// ============================================================================
+// 11. HELPER FUNCTIONS
 // ============================================================================
 
 /**

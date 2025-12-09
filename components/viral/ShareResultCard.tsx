@@ -3,6 +3,8 @@
  * 
  * Encourages users to share their results and earn XP rewards.
  * Implements viral moments defined in marketingMessages.ts
+ * 
+ * Designed for light AND dark themes with Apple-inspired aesthetics.
  */
 
 "use client";
@@ -30,9 +32,13 @@ import {
   Gift,
   Users,
   Clock,
+  Zap,
 } from "lucide-react";
 import { SHARE_REWARDS, calculateShareReward, claimShareReward } from "@/lib/marketing";
 import { InlineFloatingXp } from "@/components/gamification/FloatingXp";
+
+// MiniFi website URL
+const MINIFI_URL = "https://minifi.games";
 
 interface ShareResultCardProps {
   missionTitle: string;
@@ -51,43 +57,55 @@ interface ShareResultCardProps {
 const platformConfig: Record<string, { 
   icon: React.ReactNode; 
   label: string; 
-  color: string;
-  hoverColor: string;
+  lightColor: string;
+  darkColor: string;
+  hoverLight: string;
+  hoverDark: string;
   key: string;
 }> = {
   twitter: { 
     icon: <Twitter className="h-4 w-4" />, 
     label: "X (Twitter)", 
-    color: "bg-black text-white",
-    hoverColor: "hover:bg-gray-800",
+    lightColor: "bg-slate-900 text-white",
+    darkColor: "dark:bg-white dark:text-slate-900",
+    hoverLight: "hover:bg-slate-800",
+    hoverDark: "dark:hover:bg-slate-100",
     key: "twitter"
   },
   whatsapp: { 
     icon: <MessageCircle className="h-4 w-4" />, 
     label: "WhatsApp", 
-    color: "bg-emerald-500 text-white",
-    hoverColor: "hover:bg-emerald-600",
+    lightColor: "bg-emerald-500 text-white",
+    darkColor: "dark:bg-emerald-500 dark:text-white",
+    hoverLight: "hover:bg-emerald-600",
+    hoverDark: "dark:hover:bg-emerald-400",
     key: "whatsapp"
   },
   linkedin: { 
     icon: <Linkedin className="h-4 w-4" />, 
     label: "LinkedIn", 
-    color: "bg-blue-600 text-white",
-    hoverColor: "hover:bg-blue-700",
+    lightColor: "bg-blue-600 text-white",
+    darkColor: "dark:bg-blue-500 dark:text-white",
+    hoverLight: "hover:bg-blue-700",
+    hoverDark: "dark:hover:bg-blue-400",
     key: "linkedin"
   },
   email: { 
     icon: <Mail className="h-4 w-4" />, 
     label: "Email", 
-    color: "bg-violet-500 text-white",
-    hoverColor: "hover:bg-violet-600",
+    lightColor: "bg-violet-500 text-white",
+    darkColor: "dark:bg-violet-500 dark:text-white",
+    hoverLight: "hover:bg-violet-600",
+    hoverDark: "dark:hover:bg-violet-400",
     key: "email"
   },
   copy_link: { 
     icon: <Copy className="h-4 w-4" />, 
     label: "Copy Link", 
-    color: "bg-gray-200 text-gray-800",
-    hoverColor: "hover:bg-gray-300",
+    lightColor: "bg-slate-100 text-slate-800",
+    darkColor: "dark:bg-slate-700 dark:text-slate-200",
+    hoverLight: "hover:bg-slate-200",
+    hoverDark: "dark:hover:bg-slate-600",
     key: "copy_link"
   },
 };
@@ -97,47 +115,88 @@ export function ShareResultCard({
   year,
   performance,
   returnPercent,
-  finalAmount,
+  finalAmount: _finalAmount,
   lessonLearned,
   streakDays = 0,
-  level = 1,
-  totalXp = 0,
+  level: _level = 1,
+  totalXp: _totalXp = 0,
   onShareComplete,
   compact = false,
 }: ShareResultCardProps) {
+  // Note: _level, _totalXp, _finalAmount reserved for enhanced share cards
+  void _level;
+  void _totalXp;
+  void _finalAmount;
   const [showShareModal, setShowShareModal] = useState(false);
   const [sharedPlatform, setSharedPlatform] = useState<string | null>(null);
   const [showXpAnimation, setShowXpAnimation] = useState(false);
   const [earnedXp, setEarnedXp] = useState(0);
   const [copiedLink, setCopiedLink] = useState(false);
 
-  // Generate share text
+  // Generate share text with EDUCATIONAL VIRAL HOOKS
   const generateShareText = (platform: string): string => {
-    const emoji = performance === "profit" ? "📈" : "📚";
-    const resultText = performance === "profit" 
-      ? `gained ${returnPercent.toFixed(1)}%` 
-      : `learned valuable lessons about ${lessonLearned}`;
+    const emoji = performance === "profit" ? "📈" : "🧠";
     
-    const baseText = `${emoji} Just survived the ${year} ${missionTitle} in Mini.Fi! I ${resultText}.`;
+    // Educational framing that makes user look smart
+    const educationalHooks: Record<string, { win: string; learn: string }> = {
+      "1990": {
+        win: `beat Japan's 1990 bubble crash! While most lost 60%, I made ${returnPercent.toFixed(1)}%`,
+        learn: `survived Japan's 1990 bubble crash and learned why 'everyone's buying' is a WARNING sign, not a green light`
+      },
+      "1997": {
+        win: `navigated the 1997 Asian Crisis with a ${returnPercent.toFixed(1)}% return! Global diversification FTW`,
+        learn: `experienced the 1997 Asian Crisis - learned why rich families NEVER concentrate in one region`
+      },
+      "2000": {
+        win: `avoided the Dot-com bust! Made ${returnPercent.toFixed(1)}% when Nasdaq crashed 78%`,
+        learn: `lost money in the Dot-com crash but learned to separate GOOD tech from HYPED tech (hello AI bubble?)`
+      },
+      "2008": {
+        win: `found opportunity in the 2008 crash! ${returnPercent.toFixed(1)}% return while banks collapsed`,
+        learn: `survived 2008 and learned: "Be greedy when others are fearful" - Warren Buffett wasn't kidding`
+      },
+      "2020": {
+        win: `crushed COVID investing! ${returnPercent.toFixed(1)}% return by spotting accelerated trends`,
+        learn: `learned the COVID investor's question: "What was growing that this crisis ACCELERATES?"`
+      },
+      "2025": {
+        win: `made my AI era bet! Time will tell if ${returnPercent.toFixed(1)}% was the right move`,
+        learn: `building my AI era investment thesis - this is OUR generation's defining moment`
+      }
+    };
     
-    const cta = "Learn to invest through history at minifi.app";
-    const hashtags = "#MiniFi #FinancialLiteracy #Investing";
+    const yearKey = year.toString();
+    const hook = educationalHooks[yearKey] || {
+      win: `gained ${returnPercent.toFixed(1)}% during the ${year} ${missionTitle}`,
+      learn: `learned valuable lessons about ${lessonLearned} from the ${missionTitle}`
+    };
+    
+    const resultText = performance === "profit" ? hook.win : hook.learn;
+    
+    // Add "I'm smarter than most adults" angle for virality
+    const flexLine = performance === "profit" 
+      ? "Learning investing through history > watching TikTok traders lose money 📚"
+      : "Every billionaire has losing trades. Difference? They learn from them 💎";
+    
+    const baseText = `${emoji} Just ${resultText}`;
+    
+    const cta = "minifi.games - Learn investing through history (free)";
+    const hashtags = "#MiniFi #FinLit #GenZInvestor";
     
     if (platform === "twitter") {
-      return `${baseText}\n\n${cta}\n\n${hashtags}`;
+      return `${baseText}\n\n${flexLine}\n\n${cta} ${hashtags}`;
     } else if (platform === "linkedin") {
-      return `${baseText}\n\nMini.Fi teaches investing through historical market events - from the 1990 Japanese Bubble to the 2008 Financial Crisis. Every decision is a learning opportunity!\n\n${cta}`;
+      return `${baseText}\n\nMiniFi taught me something most finance courses skip: actual market history. Not theory - what REALLY happened during crashes and how smart money positioned.\n\nEvery generation has wealth-building moments. Understanding history helps you spot yours.\n\n${cta}`;
     } else if (platform === "whatsapp" || platform === "email") {
-      return `${baseText}\n\nYou should try it! ${cta}`;
+      return `${baseText}\n\n${flexLine}\n\nYou should try this - way better than guessing with real money: ${cta}`;
     }
     return baseText;
   };
 
   // Generate share URL
   const getShareUrl = (): string => {
-    const baseUrl = "https://minifi.app";
     const refCode = `share_${Date.now().toString(36)}`;
-    return `${baseUrl}/timeline?ref=${refCode}&utm_source=share&utm_medium=social`;
+    return `${MINIFI_URL}/timeline?ref=${refCode}&utm_source=share&utm_medium=social`;
   };
 
   // Handle share click
@@ -232,18 +291,20 @@ export function ShareResultCard({
   // Compact version - inline buttons
   if (compact) {
     return (
-      <div className="p-4 bg-gradient-to-r from-violet-50 to-indigo-50 rounded-xl border border-violet-200">
+      <div className="p-4 bg-gradient-to-r from-violet-50 to-indigo-50 dark:from-violet-950/50 dark:to-indigo-950/50 rounded-xl border border-violet-200 dark:border-violet-800/50">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Share2 className="h-5 w-5 text-violet-500" />
-            <span className="font-medium text-gray-800">Share & Earn XP</span>
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-indigo-500 flex items-center justify-center">
+              <Share2 className="h-4 w-4 text-white" />
+            </div>
+            <span className="font-medium text-slate-800 dark:text-white">Share & Earn 🪙</span>
           </div>
           <Button
             size="sm"
             onClick={() => setShowShareModal(true)}
-            className="bg-gradient-to-r from-violet-500 to-indigo-500 hover:from-violet-600 hover:to-indigo-600"
+            className="bg-gradient-to-r from-violet-500 to-indigo-500 hover:from-violet-600 hover:to-indigo-600 text-white shadow-md shadow-violet-500/25"
           >
-            <Gift className="h-4 w-4 mr-1" />
+            <Zap className="h-4 w-4 mr-1" />
             Share
           </Button>
         </div>
@@ -257,7 +318,6 @@ export function ShareResultCard({
           sharedPlatform={sharedPlatform}
           showXpAnimation={showXpAnimation}
           earnedXp={earnedXp}
-          copiedLink={copiedLink}
         />
       </div>
     );
@@ -265,51 +325,59 @@ export function ShareResultCard({
 
   // Full card version
   return (
-    <Card className="bg-gradient-to-br from-violet-50 via-white to-indigo-50 border-2 border-violet-200 overflow-hidden">
-      {/* Decorative header */}
-      <div className="h-2 bg-gradient-to-r from-violet-400 via-purple-500 to-indigo-500" />
+    <Card className="relative overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+      {/* Gradient glow effect */}
+      <div className="absolute inset-0 bg-gradient-to-br from-violet-500/5 via-transparent to-indigo-500/5 dark:from-violet-500/10 dark:to-indigo-500/10" />
       
-      <CardHeader className="pb-2">
-        <CardTitle className="flex items-center gap-2 text-lg">
-          <Share2 className="h-5 w-5 text-violet-500" />
-          Share Your Journey
+      {/* Decorative header stripe */}
+      <div className="h-1 bg-gradient-to-r from-violet-500 via-purple-500 to-indigo-500" />
+      
+      <CardHeader className="pb-2 relative">
+        <CardTitle className="flex items-center gap-3 text-lg">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-500 flex items-center justify-center shadow-lg shadow-violet-500/25">
+            <Share2 className="h-5 w-5 text-white" />
+          </div>
+          <div>
+            <span className="text-slate-900 dark:text-white font-semibold">Share Your Journey</span>
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-normal">Earn rewards for spreading knowledge</p>
+          </div>
         </CardTitle>
       </CardHeader>
 
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 relative">
         {/* Incentive message */}
-        <div className="flex items-start gap-3 p-3 bg-white rounded-lg border border-violet-100">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-400 to-indigo-500 flex items-center justify-center flex-shrink-0">
+        <div className="flex items-start gap-3 p-4 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 rounded-xl border border-amber-200/50 dark:border-amber-800/30">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center flex-shrink-0 shadow-lg shadow-amber-500/25">
             <Sparkles className="h-5 w-5 text-white" />
           </div>
           <div>
-            <p className="font-medium text-gray-800">Earn XP for sharing!</p>
-            <p className="text-sm text-gray-600">
-              Help friends learn investing and get rewarded. Every share helps build financial literacy! 🎓
+            <p className="font-semibold text-slate-900 dark:text-white">Earn 🪙 for sharing!</p>
+            <p className="text-sm text-slate-600 dark:text-slate-400">
+              Help friends learn investing and get rewarded. Every share builds financial literacy! 🎓
             </p>
           </div>
         </div>
 
         {/* Share buttons */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+        <div className="grid grid-cols-2 gap-2">
           {Object.entries(platformConfig).slice(0, 4).map(([key, config]) => {
             const reward = getRewardDisplay(key);
             return (
               <Button
                 key={key}
                 onClick={() => handleShare(key)}
-                className={`${config.color} ${config.hoverColor} relative`}
+                className={`relative h-12 ${config.lightColor} ${config.darkColor} ${config.hoverLight} ${config.hoverDark} transition-all shadow-sm`}
                 disabled={!reward.canClaim}
               >
                 {config.icon}
-                <span className="ml-2">{config.label}</span>
+                <span className="ml-2 font-medium">{config.label}</span>
                 {reward.canClaim && (
-                  <Badge className="absolute -top-2 -right-2 bg-amber-400 text-amber-900 text-xs border-0">
+                  <Badge className="absolute -top-2 -right-2 bg-gradient-to-r from-amber-400 to-orange-400 text-amber-900 text-xs border-0 shadow-md">
                     +{reward.xp}
                   </Badge>
                 )}
                 {!reward.canClaim && (
-                  <div className="absolute -top-2 -right-2 flex items-center gap-0.5 bg-gray-600 text-white text-xs px-1.5 py-0.5 rounded-full">
+                  <div className="absolute -top-2 -right-2 flex items-center gap-0.5 bg-slate-600 dark:bg-slate-700 text-white text-xs px-1.5 py-0.5 rounded-full shadow">
                     <Clock className="h-3 w-3" />
                     {reward.cooldown}m
                   </div>
@@ -322,27 +390,29 @@ export function ShareResultCard({
         {/* Copy link option */}
         <Button
           variant="outline"
-          className="w-full"
+          className="w-full h-11 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
           onClick={() => handleShare("copy_link")}
         >
           {copiedLink ? (
             <>
               <CheckCircle className="h-4 w-4 mr-2 text-emerald-500" />
-              Link Copied!
+              <span className="text-emerald-600 dark:text-emerald-400 font-medium">Link Copied!</span>
             </>
           ) : (
             <>
               <Copy className="h-4 w-4 mr-2" />
-              Copy Shareable Link
-              <Badge className="ml-2 bg-amber-100 text-amber-700 border-0">+10 XP</Badge>
+              <span>Copy Shareable Link</span>
+              <Badge className="ml-2 bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300 border-0">+10 🪙</Badge>
             </>
           )}
         </Button>
 
         {/* Referral tease */}
-        <div className="flex items-center justify-center gap-2 pt-2 border-t border-violet-100 text-sm text-violet-600">
-          <Users className="h-4 w-4" />
-          <span>Invite 3 friends to unlock bonus rewards!</span>
+        <div className="flex items-center justify-center gap-2 pt-3 border-t border-slate-100 dark:border-slate-800 text-sm">
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-violet-50 dark:bg-violet-950/50 text-violet-600 dark:text-violet-400">
+            <Users className="h-4 w-4" />
+            <span className="font-medium">Invite 3 friends to unlock bonus rewards!</span>
+          </div>
         </div>
 
         {/* XP Animation */}
@@ -367,7 +437,6 @@ function ShareModal({
   sharedPlatform,
   showXpAnimation,
   earnedXp,
-  copiedLink,
 }: {
   open: boolean;
   onClose: () => void;
@@ -377,22 +446,25 @@ function ShareModal({
   sharedPlatform: string | null;
   showXpAnimation: boolean;
   earnedXp: number;
-  copiedLink: boolean;
 }) {
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-sm">
+      <DialogContent className="max-w-sm bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Share2 className="h-5 w-5 text-violet-500" />
-            Share & Earn XP
+          <DialogTitle className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-500 flex items-center justify-center shadow-lg shadow-violet-500/25">
+              <Share2 className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <span className="text-slate-900 dark:text-white">Share & Earn 🪙</span>
+            </div>
           </DialogTitle>
-          <DialogDescription>
-            Share your progress and earn XP rewards!
+          <DialogDescription className="text-slate-500 dark:text-slate-400">
+            Share your progress and earn rewards!
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-3">
+        <div className="space-y-2 pt-2">
           {Object.entries(platforms).map(([key, config]) => {
             const reward = getRewardDisplay(key);
             const isShared = sharedPlatform === key;
@@ -401,18 +473,18 @@ function ShareModal({
               <Button
                 key={key}
                 onClick={() => handleShare(key)}
-                className={`w-full justify-between ${config.color} ${config.hoverColor}`}
+                className={`w-full h-12 justify-between ${config.lightColor} ${config.darkColor} ${config.hoverLight} ${config.hoverDark} transition-all`}
                 disabled={!reward.canClaim || isShared}
               >
                 <div className="flex items-center gap-2">
                   {config.icon}
-                  <span>{config.label}</span>
+                  <span className="font-medium">{config.label}</span>
                 </div>
                 
                 {isShared && showXpAnimation ? (
-                  <Badge className="bg-emerald-400 text-emerald-900">
+                  <Badge className="bg-emerald-400 text-emerald-900 shadow">
                     <CheckCircle className="h-3 w-3 mr-1" />
-                    +{earnedXp} XP!
+                    +{earnedXp} 🪙
                   </Badge>
                 ) : !reward.canClaim ? (
                   <div className="flex items-center gap-1 text-xs opacity-75">
@@ -420,8 +492,8 @@ function ShareModal({
                     {reward.cooldown}m
                   </div>
                 ) : (
-                  <Badge className="bg-amber-400/80 text-amber-900">
-                    +{reward.xp} XP
+                  <Badge className="bg-gradient-to-r from-amber-400 to-orange-400 text-amber-900 border-0 shadow">
+                    +{reward.xp} 🪙
                   </Badge>
                 )}
               </Button>
@@ -429,9 +501,11 @@ function ShareModal({
           })}
         </div>
 
-        <p className="text-xs text-center text-gray-500 mt-2">
-          💡 Higher rewards for LinkedIn and Email shares!
-        </p>
+        <div className="pt-3 mt-2 border-t border-slate-100 dark:border-slate-800">
+          <p className="text-xs text-center text-slate-500 dark:text-slate-400">
+            💡 Higher rewards for LinkedIn and Email shares!
+          </p>
+        </div>
       </DialogContent>
     </Dialog>
   );

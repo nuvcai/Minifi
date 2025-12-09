@@ -1,16 +1,3 @@
-"""
-╔══════════════════════════════════════════════════════════════════════════════╗
-║   MiniFi AI Coach Service (MVP - Hackathon Edition)                          ║
-║   ✨ Vibe-coded by Tick.AI for AWS AI Hackathon 2025 ✨                       ║
-║                                                                              ║
-║   Copyright (c) 2025 NUVC.AI / Tick.AI. All Rights Reserved.                ║
-║   PROPRIETARY - NO COMMERCIAL USE WITHOUT LICENSE                            ║
-║   Family Office Investment Methodology™ is proprietary to NUVC.AI            ║
-║                                                                              ║
-║   https://nuvc.ai | Built with Amazon Q Developer & Kiro CLI                ║
-╚══════════════════════════════════════════════════════════════════════════════╝
-"""
-
 import os
 from typing import Dict, List, Any
 from openai import AsyncOpenAI

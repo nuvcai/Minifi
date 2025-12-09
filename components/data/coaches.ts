@@ -46,6 +46,39 @@ export interface AICoach {
   historicalHero: string;
   keyLessonForTeens: string;
   favoriteQuote: string;
+  // ENHANCED: Personality differentiation
+  speechStyle: {
+    tone: "calm" | "energetic" | "wise" | "adventurous";
+    emoji: string; // Primary emoji for this coach
+    catchphrases: string[]; // Signature phrases they use
+    greetings: string[]; // How they greet the player
+    encouragements: string[]; // How they encourage
+    warnings: string[]; // How they warn about risk
+  };
+  decisionInfluence: {
+    pushesFor: string[]; // What kind of decisions they encourage
+    warnsAgainst: string[]; // What they caution against
+    signatureMove: string; // Their go-to strategy
+  };
+  emotionalResponses: {
+    onProfit: string[];
+    onLoss: string[];
+    onHighRisk: string[];
+    onSafeChoice: string[];
+  };
+  teachingStyle: {
+    approach: "data-driven" | "story-based" | "action-oriented" | "philosophical";
+    focusAreas: string[];
+    uniqueInsight: string;
+  };
+  visualIdentity: {
+    primaryColor: string;
+    secondaryColor: string;
+    bgGradient: string;
+    borderColor: string;
+    glowColor: string;
+    icon: string; // Lucide icon name
+  };
 }
 
 export const aiCoaches: AICoach[] = [
@@ -73,7 +106,77 @@ export const aiCoaches: AICoach[] = [
     generationalWisdom: "The Rothschild family has maintained wealth for 250+ years by following one rule: Never risk what you can't afford to lose. They survived the French Revolution, World Wars, and every market crash by always keeping reserves.",
     historicalHero: "Jack Bogle - The inventor of index funds who helped everyday people build wealth through simple, low-cost, diversified investing. He proved you don't need to be fancy to be successful.",
     keyLessonForTeens: "🎯 Here's a secret: Most rich people got that way by NOT losing money, not by making risky bets. Every dollar you lose needs to be earned TWICE to get back to where you started. Protect your capital first, grow it second!",
-    favoriteQuote: "\"Rule #1: Never lose money. Rule #2: Never forget Rule #1.\" - Warren Buffett"
+    favoriteQuote: "\"Rule #1: Never lose money. Rule #2: Never forget Rule #1.\" - Warren Buffett",
+    // ENHANCED: Unique personality traits
+    speechStyle: {
+      tone: "calm",
+      emoji: "🛡️",
+      catchphrases: [
+        "Slow and steady wins the race",
+        "Sleep well at night",
+        "Protect before you grow",
+        "Defense wins championships",
+        "Safety first, always"
+      ],
+      greetings: [
+        "Hey there, future wealth guardian! 🛡️",
+        "Welcome back! Ready to build something that lasts?",
+        "Good to see you! Let's protect and grow together.",
+        "Hello, smart investor! Patience is our superpower."
+      ],
+      encouragements: [
+        "That's the smart play! Preservation is key.",
+        "Excellent choice - your future self will thank you!",
+        "Now that's what I call wisdom beyond your years!",
+        "You're thinking like old money. I love it!"
+      ],
+      warnings: [
+        "Hmm, that's riskier than I'd recommend...",
+        "Let's think about the downside here...",
+        "Remember: it takes 100% gain to recover a 50% loss.",
+        "Are you sure? The tortoise beat the hare, you know."
+      ]
+    },
+    decisionInfluence: {
+      pushesFor: ["bonds", "treasury", "gold", "dividend stocks", "cash reserves"],
+      warnsAgainst: ["crypto", "meme stocks", "leverage", "all-in bets"],
+      signatureMove: "The 60/40 Portfolio - balanced, boring, and brilliantly effective"
+    },
+    emotionalResponses: {
+      onProfit: [
+        "See? Patience pays! And you didn't have to stress. 😌",
+        "Steady growth - exactly as planned. This is the way!",
+        "Your portfolio grew AND you slept well. That's winning!"
+      ],
+      onLoss: [
+        "Markets dip, but our diversification limited the damage. That's the plan working!",
+        "A small setback, not a disaster. This is why we stay conservative.",
+        "You're still in the game. That's what matters most. 💪"
+      ],
+      onHighRisk: [
+        "Whoa there! Let's pump the brakes a bit...",
+        "I understand the excitement, but let's think about what could go wrong.",
+        "High risk? That's not really my style, but I'll support you either way."
+      ],
+      onSafeChoice: [
+        "Now THAT'S what I'm talking about! 🎯",
+        "Excellent! You're thinking like a 250-year-old family office!",
+        "Smart, sensible, sustainable. You've got this!"
+      ]
+    },
+    teachingStyle: {
+      approach: "data-driven",
+      focusAreas: ["Risk management", "Capital preservation", "Compound interest", "Defensive allocation"],
+      uniqueInsight: "The wealthiest families focus on NOT losing money first. Growth comes second."
+    },
+    visualIdentity: {
+      primaryColor: "#3B82F6",
+      secondaryColor: "#1E40AF",
+      bgGradient: "from-blue-500 to-blue-700",
+      borderColor: "border-blue-400",
+      glowColor: "shadow-blue-500/30",
+      icon: "Shield"
+    }
   },
   {
     id: "growth-guru",
@@ -99,7 +202,77 @@ export const aiCoaches: AICoach[] = [
     generationalWisdom: "The Yale Endowment, one of the most successful institutional investors, pioneered modern diversification. By spreading across stocks, bonds, real estate, and alternatives, they've averaged 12%+ returns for 30+ years while universities that stayed 'simple' earned far less.",
     historicalHero: "Ray Dalio - Built the world's largest hedge fund by understanding that diversification isn't just about spreading money around - it's about having assets that BEHAVE DIFFERENTLY. His 'All Weather' portfolio is designed to work in any economic environment.",
     keyLessonForTeens: "🎯 Don't put all your eggs in one basket! But here's the real secret: it's not just about HAVING different baskets - it's about having baskets that behave DIFFERENTLY. Stocks and bonds often move opposite each other. That's the magic of true diversification!",
-    favoriteQuote: "\"Don't look for the needle in the haystack. Just buy the haystack!\" - Jack Bogle"
+    favoriteQuote: "\"Don't look for the needle in the haystack. Just buy the haystack!\" - Jack Bogle",
+    // ENHANCED: Unique personality traits
+    speechStyle: {
+      tone: "wise",
+      emoji: "📐",
+      catchphrases: [
+        "Balance is everything",
+        "The haystack, not the needle",
+        "Diversification is the only free lunch",
+        "All weather, all seasons",
+        "Build for generations"
+      ],
+      greetings: [
+        "Welcome, future portfolio architect! 📐",
+        "Ready to build something balanced and beautiful?",
+        "Hey there! Let's design your wealth blueprint.",
+        "Greetings! Time to think like an endowment fund."
+      ],
+      encouragements: [
+        "Now you're thinking like Yale's endowment!",
+        "Beautiful balance - this is portfolio art! 🎨",
+        "You've got the architect mindset. Love it!",
+        "That's the Ray Dalio approach - diversified and smart!"
+      ],
+      warnings: [
+        "That's a bit concentrated for my taste...",
+        "Have you considered adding some counterbalancing assets?",
+        "Interesting, but what happens if that sector crashes?",
+        "Let's think about correlation here..."
+      ]
+    },
+    decisionInfluence: {
+      pushesFor: ["diversified ETFs", "index funds", "balanced allocation", "rebalancing"],
+      warnsAgainst: ["single stock bets", "sector concentration", "timing the market"],
+      signatureMove: "The All-Weather Portfolio - designed to perform in any economic climate"
+    },
+    emotionalResponses: {
+      onProfit: [
+        "The architecture held! Balanced growth, just as designed. 📐",
+        "See how diversification smoothed the ride? That's the magic!",
+        "Growth with stability - the endowment fund way!"
+      ],
+      onLoss: [
+        "Some assets down, others up - that's diversification protecting you.",
+        "The portfolio absorbed the shock. Imagine if we weren't diversified!",
+        "A temporary dip. The structure is sound. Trust the architecture."
+      ],
+      onHighRisk: [
+        "Hmm, that's heavy on one side. Want to balance it out?",
+        "Bold! But consider: what's your hedge if this goes south?",
+        "I respect the conviction, but let's add some counterweights."
+      ],
+      onSafeChoice: [
+        "Solid foundation! Now let's build on top of it.",
+        "Good balance! This is sustainable wealth building.",
+        "You're designing like a pro architect!"
+      ]
+    },
+    teachingStyle: {
+      approach: "philosophical",
+      focusAreas: ["Asset allocation", "Correlation", "Rebalancing", "Long-term thinking"],
+      uniqueInsight: "True diversification means owning assets that BEHAVE differently, not just LOOK different."
+    },
+    visualIdentity: {
+      primaryColor: "#10B981",
+      secondaryColor: "#047857",
+      bgGradient: "from-emerald-500 to-teal-600",
+      borderColor: "border-emerald-400",
+      glowColor: "shadow-emerald-500/30",
+      icon: "Building2"
+    }
   },
   {
     id: "adventure-alex",
@@ -125,7 +298,77 @@ export const aiCoaches: AICoach[] = [
     generationalWisdom: "Early Amazon investors saw 600x returns. Early Google investors saw 60x. Early Tesla investors saw 100x. These weren't 'lucky' gamblers - they recognized that e-commerce, search, and EVs were transformational BEFORE it was obvious. Today's AI is tomorrow's Amazon.",
     historicalHero: "Cathie Wood - The investor who believed in Tesla, Bitcoin, and disruptive innovation when EVERYONE said she was crazy. She had the conviction to bet big on the future and the patience to hold through massive volatility. She teaches that understanding trends beats following crowds.",
     keyLessonForTeens: "🎯 YOUR generation has AI and robotics - just like your parents had the Internet and your grandparents had personal computers. This is YOUR Industrial Revolution moment! The question isn't whether AI will change everything (it will). The question is: will YOU be positioned to benefit?",
-    favoriteQuote: "\"Be fearful when others are greedy, and greedy when others are fearful.\" - Warren Buffett"
+    favoriteQuote: "\"Be fearful when others are greedy, and greedy when others are fearful.\" - Warren Buffett",
+    // ENHANCED: Unique personality traits
+    speechStyle: {
+      tone: "energetic",
+      emoji: "🚀",
+      catchphrases: [
+        "Fortune favors the bold!",
+        "This is YOUR moment!",
+        "The future is NOW",
+        "Disruption creates millionaires",
+        "YOLO... but smart YOLO! 🎯"
+      ],
+      greetings: [
+        "LET'S GOOO! 🚀 Ready to spot the next big thing?",
+        "Welcome, future disruptor! The market won't know what hit it.",
+        "Hey visionary! Ready to think 10 years ahead?",
+        "Yo! Time to find tomorrow's Amazon TODAY!"
+      ],
+      encouragements: [
+        "THAT'S the vision I'm talking about! 🔥",
+        "You're seeing what others are blind to. BOLD!",
+        "Early believers get the biggest rewards!",
+        "This is how generational wealth is created!"
+      ],
+      warnings: [
+        "Safe? Safe is boring. But okay, if that's what you want...",
+        "Hmm, that's pretty conservative for a growth opportunity...",
+        "You sure? The real gains are in the disruptors!",
+        "Playing it safe means missing the moonshots! 🌙"
+      ]
+    },
+    decisionInfluence: {
+      pushesFor: ["tech stocks", "AI companies", "disruptive innovation", "growth stocks", "crypto"],
+      warnsAgainst: ["bonds only", "sitting in cash", "playing it too safe", "missing trends"],
+      signatureMove: "The Conviction Bet - high concentration in tomorrow's winners"
+    },
+    emotionalResponses: {
+      onProfit: [
+        "TO THE MOON! 🚀 This is what believing in the future looks like!",
+        "YESSSS! The conviction paid off! You're a visionary!",
+        "See? While others doubted, we BELIEVED. And won!"
+      ],
+      onLoss: [
+        "Volatility is the price of admission to the moon. 🌙 Stay the course!",
+        "Tesla dropped 70% multiple times and still made 100x. HOLD STRONG!",
+        "Every great investment has scary dips. This is where weak hands sell. Not us!"
+      ],
+      onHighRisk: [
+        "NOW we're talking! This is how fortunes are made! 🔥",
+        "Bold move! I LOVE IT! The future belongs to the brave!",
+        "That's the spirit! No risk, no rocket ships! 🚀"
+      ],
+      onSafeChoice: [
+        "Okay, that's... responsible. I guess. 😅",
+        "Safe harbor while the ships explore? I respect it.",
+        "Not gonna lie, I'd go bigger, but you do you!"
+      ]
+    },
+    teachingStyle: {
+      approach: "action-oriented",
+      focusAreas: ["Trend identification", "First-mover advantage", "Conviction investing", "Innovation cycles"],
+      uniqueInsight: "Every generation has ONE transformative moment. AI is yours. Position yourself NOW."
+    },
+    visualIdentity: {
+      primaryColor: "#8B5CF6",
+      secondaryColor: "#6D28D9",
+      bgGradient: "from-purple-500 to-violet-600",
+      borderColor: "border-purple-400",
+      glowColor: "shadow-purple-500/30",
+      icon: "Rocket"
+    }
   },
   {
     id: "yield-yoda",
@@ -151,7 +394,77 @@ export const aiCoaches: AICoach[] = [
     generationalWisdom: "Warren Buffett made 99% of his $100+ billion wealth AFTER age 50 - not because he was smarter in his 50s, but because compound interest had 50+ years to work its magic. Starting at 11 years old meant his money had DECADES to multiply. Einstein called compound interest the 'eighth wonder of the world.'",
     historicalHero: "Warren Buffett - Started investing at 11 with $114. Never stopped. Never panicked. Let compound interest do the heavy lifting for 80+ years. His secret isn't stock picking - it's TIME and PATIENCE. He's proof that slow and steady wins the race.",
     keyLessonForTeens: "🎯 Here's the most mind-blowing math you'll ever learn: $100/month invested from age 15-25 (just 10 years, then STOP) beats $100/month from 25-65 (40 years!). Why? Because money invested early has more time to compound. Your biggest advantage isn't talent or timing - it's TIME itself!",
-    favoriteQuote: "\"Compound interest is the eighth wonder of the world. He who understands it, earns it; he who doesn't, pays it.\" - Albert Einstein"
+    favoriteQuote: "\"Compound interest is the eighth wonder of the world. He who understands it, earns it; he who doesn't, pays it.\" - Albert Einstein",
+    // ENHANCED: Unique personality traits
+    speechStyle: {
+      tone: "wise",
+      emoji: "💰",
+      catchphrases: [
+        "Time is your greatest asset",
+        "Money making money making money",
+        "The eighth wonder of the world",
+        "Patience, young investor",
+        "Let compounding do the work"
+      ],
+      greetings: [
+        "Patience brings you here, young one. 🧘 Ready to learn?",
+        "Welcome! Let's unlock the power of time itself.",
+        "Ah, another future compounder! Wisdom awaits.",
+        "Hello, grasshopper. Today we learn to let money grow."
+      ],
+      encouragements: [
+        "The compound interest is strong with this one! 💰",
+        "Time will reward this patience. Beautifully done.",
+        "You think like Buffett. The Oracle would be proud.",
+        "Passive income stream: initiated. Well played!"
+      ],
+      warnings: [
+        "Hmm, chasing quick gains, are we? The tortoise beat the hare...",
+        "Consider: does this pay you while you sleep?",
+        "Flashy, but no yield. Where's the passive income?",
+        "Buffett waits decades. Can you wait at least a few years?"
+      ]
+    },
+    decisionInfluence: {
+      pushesFor: ["dividend stocks", "REITs", "bonds", "income funds", "long-term holds"],
+      warnsAgainst: ["day trading", "quick flips", "speculative assets", "no-yield investments"],
+      signatureMove: "The Dividend Snowball - reinvested income that compounds forever"
+    },
+    emotionalResponses: {
+      onProfit: [
+        "The compound interest worked its magic. This is the way. 🧘",
+        "Patience rewarded. Your future self sends thanks from the yacht.",
+        "Time + patience = profit. The formula never fails."
+      ],
+      onLoss: [
+        "Paper losses mean nothing. The dividends keep flowing. Stay calm.",
+        "Markets rise, markets fall. Dividends remain. Patience.",
+        "Buffett lost 50% in 2008. He held. Now he's worth $100B+. Perspective."
+      ],
+      onHighRisk: [
+        "Much volatility, I sense. Does it pay dividends, at least?",
+        "Interesting... but where is the passive income stream?",
+        "The Force is chaotic in this one. Tread carefully."
+      ],
+      onSafeChoice: [
+        "Wise, you are. The compound interest approves. 🧘",
+        "Steady income, steady growth. This is the ancient way.",
+        "Your future self is already thanking you. Excellent choice."
+      ]
+    },
+    teachingStyle: {
+      approach: "story-based",
+      focusAreas: ["Compound interest", "Passive income", "Dividend investing", "Time value of money"],
+      uniqueInsight: "Your biggest advantage at 15 isn't talent or money - it's TIME. Use it wisely."
+    },
+    visualIdentity: {
+      primaryColor: "#F59E0B",
+      secondaryColor: "#D97706",
+      bgGradient: "from-amber-500 to-yellow-600",
+      borderColor: "border-amber-400",
+      glowColor: "shadow-amber-500/30",
+      icon: "Coins"
+    }
   },
 ];
 
@@ -179,3 +492,129 @@ export const coachScenarioWisdom = {
     "yield-yoda": "Here's the secret: Start NOW with whatever you have. $50/month at 15 beats $500/month at 35. The math is magical and absolutely, 100% on your side. Don't wait for the 'perfect' time!"
   }
 };
+
+// ============================================================================
+// COACH PERSONALITY HELPERS
+// ============================================================================
+
+/**
+ * Get a random greeting from a coach
+ */
+export function getCoachGreeting(coach: AICoach): string {
+  const greetings = coach.speechStyle.greetings;
+  return greetings[Math.floor(Math.random() * greetings.length)];
+}
+
+/**
+ * Get a random catchphrase from a coach
+ */
+export function getCoachCatchphrase(coach: AICoach): string {
+  const phrases = coach.speechStyle.catchphrases;
+  return phrases[Math.floor(Math.random() * phrases.length)];
+}
+
+/**
+ * Get coach response based on outcome
+ */
+export function getCoachResponse(
+  coach: AICoach, 
+  outcome: "profit" | "loss" | "highRisk" | "safeChoice"
+): string {
+  const responses = coach.emotionalResponses[
+    outcome === "profit" ? "onProfit" : 
+    outcome === "loss" ? "onLoss" :
+    outcome === "highRisk" ? "onHighRisk" : "onSafeChoice"
+  ];
+  return responses[Math.floor(Math.random() * responses.length)];
+}
+
+/**
+ * Get coach encouragement
+ */
+export function getCoachEncouragement(coach: AICoach): string {
+  const encouragements = coach.speechStyle.encouragements;
+  return encouragements[Math.floor(Math.random() * encouragements.length)];
+}
+
+/**
+ * Get coach warning
+ */
+export function getCoachWarning(coach: AICoach): string {
+  const warnings = coach.speechStyle.warnings;
+  return warnings[Math.floor(Math.random() * warnings.length)];
+}
+
+/**
+ * Check if a decision aligns with coach's preferences
+ */
+export function isCoachAlignedDecision(coach: AICoach, assetType: string): boolean {
+  const normalizedAsset = assetType.toLowerCase();
+  return coach.decisionInfluence.pushesFor.some(pref => 
+    normalizedAsset.includes(pref.toLowerCase()) || pref.toLowerCase().includes(normalizedAsset)
+  );
+}
+
+/**
+ * Get coach's opinion on a specific investment decision
+ */
+export function getCoachOpinion(coach: AICoach, assetType: string, riskLevel: string): {
+  sentiment: "positive" | "neutral" | "cautious";
+  message: string;
+} {
+  const isAligned = isCoachAlignedDecision(coach, assetType);
+  const isHighRisk = ["high", "extreme", "very_aggressive", "crypto"].some(r => 
+    riskLevel.toLowerCase().includes(r) || assetType.toLowerCase().includes(r)
+  );
+  
+  if (coach.riskTolerance === "conservative" && isHighRisk) {
+    return { sentiment: "cautious", message: getCoachWarning(coach) };
+  }
+  
+  if (coach.riskTolerance === "very_aggressive" && !isHighRisk) {
+    return { 
+      sentiment: "neutral", 
+      message: coach.emotionalResponses.onSafeChoice[0] 
+    };
+  }
+  
+  if (isAligned) {
+    return { sentiment: "positive", message: getCoachEncouragement(coach) };
+  }
+  
+  return { 
+    sentiment: "neutral", 
+    message: `${coach.speechStyle.emoji} Interesting choice! Let's see how this plays out.`
+  };
+}
+
+/**
+ * Generate personalized advice wrapper for any message
+ */
+export function wrapWithCoachPersonality(coach: AICoach, message: string): string {
+  const catchphrase = getCoachCatchphrase(coach);
+  return `${coach.speechStyle.emoji} ${message}\n\n💬 *"${catchphrase}"*`;
+}
+
+/**
+ * Get coach by ID
+ */
+export function getCoachById(coachId: string): AICoach | undefined {
+  return aiCoaches.find(coach => coach.id === coachId);
+}
+
+/**
+ * Get coach visual styling
+ */
+export function getCoachVisualStyle(coach: AICoach): {
+  gradient: string;
+  borderClass: string;
+  glowClass: string;
+  bgClass: string;
+} {
+  return {
+    gradient: `bg-gradient-to-r ${coach.visualIdentity.bgGradient}`,
+    borderClass: coach.visualIdentity.borderColor,
+    glowClass: coach.visualIdentity.glowColor,
+    bgClass: `${coach.visualIdentity.borderColor.replace('border-', 'bg-')}/10`,
+  };
+}
