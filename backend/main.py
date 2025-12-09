@@ -77,40 +77,32 @@ async def add_request_id(request: Request, call_next):
     return response
 
 # CORS middleware for frontend integration
-<<<<<<< HEAD
 # Note: In production, restrict to specific domains only
 ALLOWED_ORIGINS = [
-    "https://minifi-app.vercel.app",  # Primary production
+    # Primary production domains
+    "https://minifi-app.vercel.app",
     "https://minifi.vercel.app",
     "https://minifi-tick-ai.vercel.app",
-    "https://minifi.games",  # Custom domain
-    "https://www.minifi.games",  # Custom domain with www
-    "https://*.vercel.app",  # Allow all Vercel preview deployments
+    # Custom domain
+    "https://minifi.games",
+    "https://www.minifi.games",
+    # Legacy Vercel production domains
+    "https://next-gen-ai-hackathon-2025.vercel.app",
+    "https://nextgen-ai-nuvc.vercel.app",
+    # Allow all Vercel preview deployments (handled by regex)
 ]
 
 # Add localhost only in development
 if os.getenv("DEBUG") == "true" or os.getenv("NODE_ENV") != "production":
     ALLOWED_ORIGINS.extend([
         "http://localhost:3000",
-        "http://localhost:8501",
+        "http://localhost:8501",  # React + Streamlit
     ])
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
     allow_origin_regex=r"https://.*\.(vercel\.app|minifi\.games)",  # Allow all Vercel preview deployments and minifi.games subdomains
-=======
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://localhost:8501",  # React + Streamlit
-        # Vercel production (old)
-        "https://next-gen-ai-hackathon-2025.vercel.app",
-        "https://nextgen-ai-nuvc.vercel.app",  # Vercel production (new)
-        "https://*.vercel.app",  # All Vercel subdomains
-    ],
->>>>>>> 5aef7d17f05bbd153335b11d7293d95085a3fa51
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
