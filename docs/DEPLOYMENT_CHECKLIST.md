@@ -142,10 +142,13 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:3000",
-        "https://minifi.vercel.app",           # Production
+        "https://minifi.vercel.app",           # Production (Vercel)
         "https://minifi-tick-ai.vercel.app",   # Team production
+        "https://minifi.games",                 # Custom domain
+        "https://www.minifi.games",             # Custom domain with www
         "https://*.vercel.app",                # Preview deployments
     ],
+    allow_origin_regex=r"https://.*\.(vercel\.app|minifi\.games)",  # Allow subdomains
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

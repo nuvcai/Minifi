@@ -128,3 +128,5 @@ If Supabase is not configured, the app runs in demo mode:
 - No data is persisted
 - Perfect for local development and testing
 
+
+

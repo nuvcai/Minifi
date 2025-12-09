@@ -131,6 +131,8 @@ ALLOWED_ORIGINS = [
     "https://minifi-app.vercel.app",  # Primary production
     "https://minifi.vercel.app",
     "https://minifi-tick-ai.vercel.app",
+    "https://minifi.games",  # Custom domain
+    "https://www.minifi.games",  # Custom domain with www
     "https://*.vercel.app",  # Allow all Vercel preview deployments
 ]
 
@@ -144,7 +146,7 @@ if os.getenv("DEBUG") == "true" or os.getenv("NODE_ENV") != "production":
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
-    allow_origin_regex=r"https://.*\.vercel\.app",  # Allow all Vercel preview deployments
+    allow_origin_regex=r"https://.*\.(vercel\.app|minifi\.games)",  # Allow all Vercel preview deployments and minifi.games subdomains
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],

@@ -159,41 +159,41 @@ export function InvestmentThesis({
     <div className="space-y-5">
       {/* Header */}
       <div className="text-center">
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-violet-500/20 to-purple-500/20 border border-violet-500/30 mb-3">
-          <Brain className="h-4 w-4 text-violet-400" />
-          <span className="text-sm font-medium text-violet-300">Investment Thesis</span>
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-violet-100 to-purple-100 border border-violet-300 mb-3">
+          <Brain className="h-4 w-4 text-violet-600" />
+          <span className="text-sm font-medium text-violet-700">Investment Thesis</span>
         </div>
-        <h3 className="text-lg font-bold text-white mb-1">
+        <h3 className="text-lg font-bold text-gray-900 mb-1">
           Why are you choosing {selectedOption.name}? 📝
         </h3>
-        <p className="text-sm text-slate-400">
+        <p className="text-sm text-gray-500">
           Family Office Principle: "If you can't explain it, you don't understand it."
         </p>
       </div>
 
       {/* Selected Investment Summary */}
-      <Card className="bg-slate-800/50 border-slate-700">
+      <Card className="bg-white border-gray-200 shadow-sm">
         <CardContent className="p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-indigo-500/20 flex items-center justify-center">
-                <Target className="h-5 w-5 text-indigo-400" />
+              <div className="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center">
+                <Target className="h-5 w-5 text-indigo-600" />
               </div>
               <div>
-                <p className="font-medium text-white">{selectedOption.name}</p>
+                <p className="font-medium text-gray-900">{selectedOption.name}</p>
                 <div className="flex items-center gap-2">
                   <Badge variant="outline" className="text-xs">
                     {selectedOption.risk} Risk
                   </Badge>
-                  <span className="text-xs text-slate-400">
+                  <span className="text-xs text-gray-500">
                     Expected: {selectedOption.expectedReturn}
                   </span>
                 </div>
               </div>
             </div>
             <div className="text-right">
-              <p className="text-xs text-slate-400">Mission</p>
-              <p className="text-sm font-medium text-indigo-300">{eventYear}</p>
+              <p className="text-xs text-gray-500">Mission</p>
+              <p className="text-sm font-medium text-indigo-600">{eventYear}</p>
             </div>
           </div>
         </CardContent>
@@ -208,24 +208,24 @@ export function InvestmentThesis({
               placeholder="Write your investment thesis here... Why did you choose this option? What do you expect to happen?"
               value={thesis}
               onChange={(e) => setThesis(e.target.value)}
-              className="min-h-[120px] bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 resize-none"
+              className="min-h-[120px] bg-white border-gray-300 text-gray-900 placeholder:text-gray-400 resize-none"
               maxLength={500}
             />
-            <div className="absolute bottom-2 right-2 text-xs text-slate-500">
+            <div className="absolute bottom-2 right-2 text-xs text-gray-400">
               {thesis.length}/500
             </div>
           </div>
 
           {/* Prompts to help */}
-          <div className="p-3 bg-amber-500/10 rounded-lg border border-amber-500/30">
-            <p className="text-xs font-medium text-amber-300 mb-2 flex items-center gap-1">
+          <div className="p-3 bg-amber-50 rounded-lg border border-amber-200">
+            <p className="text-xs font-medium text-amber-700 mb-2 flex items-center gap-1">
               <Lightbulb className="h-3 w-3" />
               Consider these questions:
             </p>
             <ul className="space-y-1">
               {prompts.map((prompt, i) => (
-                <li key={i} className="text-xs text-slate-300 flex items-start gap-2">
-                  <span className="text-amber-400">•</span>
+                <li key={i} className="text-xs text-gray-600 flex items-start gap-2">
+                  <span className="text-amber-500">•</span>
                   {prompt}
                 </li>
               ))}
@@ -235,8 +235,8 @@ export function InvestmentThesis({
           {/* Quality Indicators */}
           <div className="space-y-2">
             <div className="flex items-center justify-between text-xs">
-              <span className="text-slate-400">Thesis Quality</span>
-              <span className="text-indigo-400 font-medium">+{xpBonus} XP potential</span>
+              <span className="text-gray-500">Thesis Quality</span>
+              <span className="text-indigo-600 font-medium">+{xpBonus} XP potential</span>
             </div>
             <Progress value={(qualityScore / 5) * 100} className="h-2" />
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
@@ -251,8 +251,8 @@ export function InvestmentThesis({
                   key={key}
                   className={`p-2 rounded-lg text-center text-xs transition-all ${
                     quality[key as keyof ThesisQuality]
-                      ? "bg-emerald-500/20 border border-emerald-500/40 text-emerald-300"
-                      : "bg-slate-800 border border-slate-700 text-slate-500"
+                      ? "bg-emerald-100 border border-emerald-300 text-emerald-700"
+                      : "bg-gray-50 border border-gray-200 text-gray-400"
                   }`}
                 >
                   <span className="block text-lg mb-0.5">{icon}</span>
@@ -289,25 +289,25 @@ export function InvestmentThesis({
         /* Coach Reaction */
         <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
           {/* XP Earned Banner */}
-          <div className="p-4 bg-gradient-to-r from-amber-500/20 to-orange-500/20 rounded-xl border border-amber-500/40 text-center">
+          <div className="p-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl border border-amber-300 text-center">
             <div className="flex items-center justify-center gap-2 mb-2">
-              <Sparkles className="h-5 w-5 text-amber-400 animate-pulse" />
-              <span className="text-xl font-bold text-amber-300">+{xpBonus} XP Earned!</span>
-              <Sparkles className="h-5 w-5 text-amber-400 animate-pulse" />
+              <Sparkles className="h-5 w-5 text-amber-500 animate-pulse" />
+              <span className="text-xl font-bold text-amber-600">+{xpBonus} XP Earned!</span>
+              <Sparkles className="h-5 w-5 text-amber-500 animate-pulse" />
             </div>
-            <p className="text-xs text-amber-200/70">For taking time to reason through your decision</p>
+            <p className="text-xs text-amber-600/70">For taking time to reason through your decision</p>
           </div>
 
           {/* Your Thesis */}
-          <Card className="bg-slate-800/50 border-slate-700">
+          <Card className="bg-white border-gray-200 shadow-sm">
             <CardContent className="p-4">
               <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-lg bg-indigo-500/20 flex items-center justify-center flex-shrink-0">
-                  <MessageSquare className="h-4 w-4 text-indigo-400" />
+                <div className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center flex-shrink-0">
+                  <MessageSquare className="h-4 w-4 text-indigo-600" />
                 </div>
                 <div>
-                  <p className="text-xs text-slate-400 mb-1">Your Investment Thesis</p>
-                  <p className="text-sm text-white leading-relaxed italic">"{thesis}"</p>
+                  <p className="text-xs text-gray-500 mb-1">Your Investment Thesis</p>
+                  <p className="text-sm text-gray-800 leading-relaxed italic">"{thesis}"</p>
                 </div>
               </div>
             </CardContent>
@@ -315,15 +315,15 @@ export function InvestmentThesis({
 
           {/* Coach Reaction */}
           {showCoachReaction && (
-            <Card className="bg-gradient-to-r from-indigo-500/15 to-violet-500/15 border-indigo-500/40 animate-in fade-in slide-in-from-bottom-2 duration-300 delay-500">
+            <Card className="bg-gradient-to-r from-indigo-50 to-violet-50 border-indigo-200 animate-in fade-in slide-in-from-bottom-2 duration-300 delay-500">
               <CardContent className="p-4">
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center flex-shrink-0">
                     <span className="text-lg">🧠</span>
                   </div>
                   <div>
-                    <p className="text-xs text-indigo-300 mb-1 font-medium">{coach.name} responds:</p>
-                    <p className="text-sm text-white leading-relaxed">
+                    <p className="text-xs text-indigo-600 mb-1 font-medium">{coach.name} responds:</p>
+                    <p className="text-sm text-gray-800 leading-relaxed">
                       {coachReaction}
                     </p>
                   </div>
@@ -335,18 +335,18 @@ export function InvestmentThesis({
           {/* Quality Badges Earned */}
           <div className="flex flex-wrap justify-center gap-2">
             {quality.isThoughtful && (
-              <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/40">
+              <Badge className="bg-emerald-100 text-emerald-700 border-emerald-300">
                 <Award className="h-3 w-3 mr-1" /> Thoughtful Investor
               </Badge>
             )}
             {quality.mentionsRisk && (
-              <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/40">
+              <Badge className="bg-blue-100 text-blue-700 border-blue-300">
                 <CheckCircle2 className="h-3 w-3 mr-1" /> Risk-Aware
               </Badge>
             )}
           </div>
 
-          <p className="text-xs text-slate-500 text-center animate-pulse">
+          <p className="text-xs text-gray-500 text-center animate-pulse">
             Processing your decision...
           </p>
         </div>

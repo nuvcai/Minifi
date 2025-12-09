@@ -257,29 +257,29 @@ export function KnowledgeQuiz({
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 mb-4 animate-bounce">
             <Trophy className="h-10 w-10 text-white" />
           </div>
-          <h3 className="text-2xl font-bold text-white mb-2">
+          <h3 className="text-2xl font-bold text-gray-900 mb-2">
             Knowledge Check Complete! 🎓
           </h3>
-          <p className="text-slate-400">
+          <p className="text-gray-500">
             You've validated your learning from {eventTitle}
           </p>
         </div>
         
         {/* Score Card */}
-        <Card className="bg-gradient-to-r from-indigo-500/20 to-violet-500/20 border-indigo-500/40">
+        <Card className="bg-gradient-to-r from-indigo-50 to-violet-50 border-indigo-200">
           <CardContent className="p-6">
             <div className="grid grid-cols-3 gap-4 text-center">
               <div>
-                <p className="text-4xl font-bold text-white">{score}/{questions.length}</p>
-                <p className="text-xs text-slate-400">Correct Answers</p>
+                <p className="text-4xl font-bold text-gray-900">{score}/{questions.length}</p>
+                <p className="text-xs text-gray-500">Correct Answers</p>
               </div>
               <div>
-                <p className="text-4xl font-bold text-amber-400">+{totalXpEarned}</p>
-                <p className="text-xs text-slate-400">XP Earned</p>
+                <p className="text-4xl font-bold text-amber-600">+{totalXpEarned}</p>
+                <p className="text-xs text-gray-500">XP Earned</p>
               </div>
               <div>
-                <p className="text-4xl font-bold text-indigo-300">{grade}</p>
-                <p className="text-xs text-slate-400">Grade</p>
+                <p className="text-4xl font-bold text-indigo-600">{grade}</p>
+                <p className="text-xs text-gray-500">Grade</p>
               </div>
             </div>
           </CardContent>
@@ -287,8 +287,8 @@ export function KnowledgeQuiz({
         
         {/* Concepts Mastered */}
         <div className="space-y-2">
-          <h4 className="text-sm font-semibold text-slate-300 flex items-center gap-2">
-            <Brain className="h-4 w-4 text-indigo-400" />
+          <h4 className="text-sm font-semibold text-gray-600 flex items-center gap-2">
+            <Brain className="h-4 w-4 text-indigo-600" />
             Concepts Covered
           </h4>
           <div className="flex flex-wrap gap-2">
@@ -298,8 +298,8 @@ export function KnowledgeQuiz({
                 <Badge 
                   key={q.id}
                   className={correct 
-                    ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40" 
-                    : "bg-slate-700 text-slate-400 border-slate-600"
+                    ? "bg-emerald-100 text-emerald-700 border-emerald-300" 
+                    : "bg-gray-100 text-gray-500 border-gray-200"
                   }
                 >
                   {correct && <CheckCircle2 className="h-3 w-3 mr-1" />}
@@ -311,11 +311,11 @@ export function KnowledgeQuiz({
         </div>
         
         {/* Encouragement based on score */}
-        <Card className="bg-amber-500/10 border-amber-500/30">
+        <Card className="bg-amber-50 border-amber-200">
           <CardContent className="p-4">
             <div className="flex items-start gap-3">
-              <Lightbulb className="h-5 w-5 text-amber-400 flex-shrink-0" />
-              <p className="text-sm text-slate-300">
+              <Lightbulb className="h-5 w-5 text-amber-600 flex-shrink-0" />
+              <p className="text-sm text-gray-600">
                 {percentage >= 80 
                   ? "Outstanding! You've deeply understood this market event. This knowledge will serve you well in future investing decisions."
                   : percentage >= 60
@@ -346,11 +346,11 @@ export function KnowledgeQuiz({
             <Brain className="h-5 w-5 text-white" />
           </div>
           <div>
-            <h3 className="font-semibold text-white">Knowledge Check</h3>
-            <p className="text-xs text-slate-400">Test your understanding</p>
+            <h3 className="font-semibold text-gray-900">Knowledge Check</h3>
+            <p className="text-xs text-gray-500">Test your understanding</p>
           </div>
         </div>
-        <Badge variant="outline" className="text-indigo-400 border-indigo-500/50">
+        <Badge variant="outline" className="text-indigo-600 border-indigo-300">
           Question {currentQuestionIndex + 1}/{questions.length}
         </Badge>
       </div>
@@ -359,17 +359,17 @@ export function KnowledgeQuiz({
       <Progress value={((currentQuestionIndex + 1) / questions.length) * 100} className="h-1.5" />
       
       {/* Question */}
-      <Card className="bg-slate-800/50 border-slate-700">
+      <Card className="bg-white border-gray-200 shadow-sm">
         <CardContent className="p-5">
           <div className="flex items-start gap-3 mb-4">
-            <div className="w-8 h-8 rounded-lg bg-indigo-500/20 flex items-center justify-center text-sm font-bold text-indigo-400 flex-shrink-0">
+            <div className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center text-sm font-bold text-indigo-600 flex-shrink-0">
               {currentQuestionIndex + 1}
             </div>
             <div>
-              <p className="font-medium text-white text-lg leading-relaxed">
+              <p className="font-medium text-gray-900 text-lg leading-relaxed">
                 {currentQuestion.question}
               </p>
-              <Badge className="mt-2 bg-slate-700 text-slate-300 border-slate-600">
+              <Badge className="mt-2 bg-gray-100 text-gray-600 border-gray-200">
                 <Star className="h-3 w-3 mr-1" />
                 +{currentQuestion.xpReward} XP
               </Badge>
@@ -390,21 +390,21 @@ export function KnowledgeQuiz({
                   disabled={isAnswered}
                   className={`w-full p-4 rounded-xl border-2 text-left transition-all duration-300 ${
                     showCorrect
-                      ? "bg-emerald-500/20 border-emerald-500 text-white"
+                      ? "bg-emerald-50 border-emerald-500 text-gray-900"
                       : showWrong
-                      ? "bg-red-500/20 border-red-500 text-white"
+                      ? "bg-red-50 border-red-500 text-gray-900"
                       : isSelected
-                      ? "bg-indigo-500/20 border-indigo-500 text-white"
-                      : "bg-slate-800 border-slate-700 text-slate-300 hover:border-slate-600 hover:bg-slate-750"
+                      ? "bg-indigo-50 border-indigo-500 text-gray-900"
+                      : "bg-white border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50"
                   } ${isAnswered && !isSelected && !option.isCorrect ? "opacity-50" : ""}`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <span className={`w-6 h-6 rounded-full border-2 flex items-center justify-center text-xs font-bold ${
-                        showCorrect ? "bg-emerald-500 border-emerald-400" :
-                        showWrong ? "bg-red-500 border-red-400" :
-                        isSelected ? "bg-indigo-500 border-indigo-400" :
-                        "border-slate-600"
+                        showCorrect ? "bg-emerald-500 border-emerald-400 text-white" :
+                        showWrong ? "bg-red-500 border-red-400 text-white" :
+                        isSelected ? "bg-indigo-500 border-indigo-400 text-white" :
+                        "border-gray-300 text-gray-600"
                       }`}>
                         {showCorrect ? <CheckCircle2 className="h-4 w-4 text-white" /> :
                          showWrong ? <XCircle className="h-4 w-4 text-white" /> :
@@ -413,7 +413,7 @@ export function KnowledgeQuiz({
                       <span className="font-medium">{option.text}</span>
                     </div>
                     {showCorrect && (
-                      <Sparkles className="h-5 w-5 text-emerald-400 animate-pulse" />
+                      <Sparkles className="h-5 w-5 text-emerald-500 animate-pulse" />
                     )}
                   </div>
                 </button>
